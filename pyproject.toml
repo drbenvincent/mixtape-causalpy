@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mixtape-causalpy"
+version = "0.1.0"
+description = "CausalPy implementations of Causal Inference: The Mixtape examples"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0.0",
+]
+
+[project.urls]
+"Mixtape Book" = "https://mixtape.scunning.com"
+"CausalPy" = "https://causalpy.readthedocs.io"
+"Repository" = "https://github.com/pymc-labs/CausalPy"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

@@ -11,11 +11,34 @@ The goal is to provide a practical on-ramp for users who:
 
 This is a **translation repo**, not a copy of the book. We recreate analyses and figures, but link to the book for narrative context.
 
-## Quick Start
+## Setup
+
+Conda is required due to the PyMC dependency.
 
 ```bash
-pip install -r requirements.txt
+# Create the environment
+conda env create -f environment.yml
+
+# Activate it
+conda activate mixtape-causalpy
+
+# Install the local data utilities package
+pip install -e .
+
+# Add the environment as a Jupyter kernel
+python -m ipykernel install --user --name mixtape-causalpy --display-name "Mixtape CausalPy"
+
+# Launch Jupyter
 jupyter lab notebooks/
+```
+
+In Jupyter, select the **"Mixtape CausalPy"** kernel when running notebooks.
+
+### Verify Installation
+
+```python
+import causalpy as cp
+print(cp.__version__)  # Should be >= 0.4.0
 ```
 
 ## Chapter → Notebook Mapping
@@ -23,7 +46,7 @@ jupyter lab notebooks/
 | Mixtape Chapter | Notebook | Status |
 |-----------------|----------|--------|
 | Ch 5: Matching & Subclassification | `05_matching.ipynb` | ⚠️ Partial (IPSW only) |
-| Ch 6: Regression Discontinuity | `06_regression_discontinuity.ipynb` | 🚧 Planned |
+| Ch 6: Regression Discontinuity | `06_regression_discontinuity.ipynb` | ✅ Done |
 | Ch 7: Instrumental Variables | `07_instrumental_variables.ipynb` | 🚧 Planned |
 | Ch 8: Panel Data | `08_panel_data.ipynb` | ⏭️ TODO placeholder |
 | Ch 9: Difference-in-Differences | `09_difference_in_differences.ipynb` | 🚧 Planned |
