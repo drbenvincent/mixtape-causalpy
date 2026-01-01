@@ -105,6 +105,30 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 
 ---
 
+### Conceptual / Foundational Examples (Chapters 2-3)
+
+| Mixtape file | Description | Notebook | CausalPy | Status |
+|--------------|-------------|----------|----------|--------|
+| `ols.py` | OLS basics | `00_data` | 📖 Conceptual | ⏭️ |
+| `ols2.py` | OLS variations | `00_data` | 📖 Conceptual | ⏭️ |
+| `ols3.py` | OLS diagnostics | `00_data` | 📖 Conceptual | ⏭️ |
+| `ols4.py` | OLS extensions | `00_data` | 📖 Conceptual | ⏭️ |
+| `yule.py` | Yule's regression fallacy | `00_data` | 📖 Conceptual | ⏭️ |
+| `independence.py` | Statistical independence | `00_data` | 📖 Conceptual | ⏭️ |
+| `ks.py` | KS test for distributions | `00_data` | 📖 Conceptual | ⏭️ |
+| `collider_discrimination.py` | Collider bias example | `00_data` | 📖 Conceptual | ⏭️ |
+| `moviestar.py` | Movie star collider | `00_data` | 📖 Conceptual | ⏭️ |
+| `reganat.py` | Regression anatomy | `00_data` | 📖 Conceptual | ⏭️ |
+| `lm_3.py` | Linear model example | `00_data` | 📖 Conceptual | ⏭️ |
+
+**Notebook plan**: `00_data_utilities.ipynb`
+- Data loading utilities
+- Quick dataset inspection
+- Links to conceptual material in the book
+- Not a methods notebook
+
+---
+
 ### Chapter 4: Potential Outcomes Causal Model
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
@@ -237,30 +261,6 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 - Show donor weights, pre-treatment fit
 - Placebo-in-space tests with permutation p-value (from R's `synth_3_7.R`)
 - Treatment effect gap plots with uncertainty
-
----
-
-### Conceptual / Foundational Examples (Chapters 2-3)
-
-| Mixtape file | Description | Notebook | CausalPy | Status |
-|--------------|-------------|----------|----------|--------|
-| `ols.py` | OLS basics | `00_data` | 📖 Conceptual | ⏭️ |
-| `ols2.py` | OLS variations | `00_data` | 📖 Conceptual | ⏭️ |
-| `ols3.py` | OLS diagnostics | `00_data` | 📖 Conceptual | ⏭️ |
-| `ols4.py` | OLS extensions | `00_data` | 📖 Conceptual | ⏭️ |
-| `yule.py` | Yule's regression fallacy | `00_data` | 📖 Conceptual | ⏭️ |
-| `independence.py` | Statistical independence | `00_data` | 📖 Conceptual | ⏭️ |
-| `ks.py` | KS test for distributions | `00_data` | 📖 Conceptual | ⏭️ |
-| `collider_discrimination.py` | Collider bias example | `00_data` | 📖 Conceptual | ⏭️ |
-| `moviestar.py` | Movie star collider | `00_data` | 📖 Conceptual | ⏭️ |
-| `reganat.py` | Regression anatomy | `00_data` | 📖 Conceptual | ⏭️ |
-| `lm_3.py` | Linear model example | `00_data` | 📖 Conceptual | ⏭️ |
-
-**Notebook plan**: `00_data_utilities.ipynb`
-- Data loading utilities
-- Quick dataset inspection
-- Links to conceptual material in the book
-- Not a methods notebook
 
 ---
 
