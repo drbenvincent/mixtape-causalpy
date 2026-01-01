@@ -47,7 +47,7 @@ print(cp.__version__)  # Development version from GitHub main branch
 
 | Mixtape Chapter | Notebook | Status |
 |-----------------|----------|--------|
-| Ch 5: Matching & Subclassification | `05_matching.ipynb` | ⚠️ Partial (IPSW only) |
+| Ch 5: Matching & Subclassification | `05_matching.ipynb` | ✅ Done (IPW) |
 | Ch 6: Regression Discontinuity | `06_regression_discontinuity.ipynb` | ✅ Done |
 | Ch 7: Instrumental Variables | `07_instrumental_variables.ipynb` | ✅ Done |
 | Ch 8: Panel Data | `08_panel_data.ipynb` | ⏭️ TODO placeholder |
