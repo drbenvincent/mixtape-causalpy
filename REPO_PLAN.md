@@ -109,23 +109,19 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `ols.py` | OLS basics | `00_data` | 📖 Conceptual | ⏭️ |
-| `ols2.py` | OLS variations | `00_data` | 📖 Conceptual | ⏭️ |
-| `ols3.py` | OLS diagnostics | `00_data` | 📖 Conceptual | ⏭️ |
-| `ols4.py` | OLS extensions | `00_data` | 📖 Conceptual | ⏭️ |
-| `yule.py` | Yule's regression fallacy | `00_data` | 📖 Conceptual | ⏭️ |
-| `independence.py` | Statistical independence | `00_data` | 📖 Conceptual | ⏭️ |
-| `ks.py` | KS test for distributions | `00_data` | 📖 Conceptual | ⏭️ |
-| `collider_discrimination.py` | Collider bias example | `00_data` | 📖 Conceptual | ⏭️ |
-| `moviestar.py` | Movie star collider | `00_data` | 📖 Conceptual | ⏭️ |
-| `reganat.py` | Regression anatomy | `00_data` | 📖 Conceptual | ⏭️ |
-| `lm_3.py` | Linear model example | `00_data` | 📖 Conceptual | ⏭️ |
+| `ols.py` | OLS basics | | 📖 Conceptual | ⏭️ |
+| `ols2.py` | OLS variations | | 📖 Conceptual | ⏭️ |
+| `ols3.py` | OLS diagnostics | | 📖 Conceptual | ⏭️ |
+| `ols4.py` | OLS extensions | | 📖 Conceptual | ⏭️ |
+| `yule.py` | Yule's regression fallacy | | 📖 Conceptual | ⏭️ |
+| `independence.py` | Statistical independence | | 📖 Conceptual | ⏭️ |
+| `ks.py` | KS test for distributions | | 📖 Conceptual | ⏭️ |
+| `collider_discrimination.py` | Collider bias example | | 📖 Conceptual | ⏭️ |
+| `moviestar.py` | Movie star collider | | 📖 Conceptual | ⏭️ |
+| `reganat.py` | Regression anatomy | | 📖 Conceptual | ⏭️ |
+| `lm_3.py` | Linear model example | | 📖 Conceptual | ⏭️ |
 
-**Notebook plan**: `00_data_utilities.ipynb`
-- Data loading utilities
-- Quick dataset inspection
-- Links to conceptual material in the book
-- Not a methods notebook
+**Notebook plan**: None — conceptual examples not targeted for CausalPy implementation.
 
 ---
 
@@ -133,11 +129,11 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `ri.py` | Randomization inference (Fisher's exact test) | `00_data` | 📖 Conceptual | ⏭️ |
-| `thornton_ri.py` | Thornton HIV incentives + RI | `00_data` | 📖 Conceptual | ⏭️ |
-| `tea.py` | Lady tasting tea example | `00_data` | 📖 Conceptual | ⏭️ |
+| `ri.py` | Randomization inference (Fisher's exact test) | | 📖 Conceptual | ⏭️ |
+| `thornton_ri.py` | Thornton HIV incentives + RI | | 📖 Conceptual | ⏭️ |
+| `tea.py` | Lady tasting tea example | | 📖 Conceptual | ⏭️ |
 
-**Notebook plan**: Not a CausalPy estimation target. Conceptual examples linked from data utilities notebook.
+**Notebook plan**: None — conceptual examples not targeted for CausalPy implementation.
 
 ---
 
@@ -264,40 +260,29 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 
 ---
 
-## Implementation Priority Matrix
+## Awaiting CausalPy Features
 
-### Phase 1: Implement — Full CausalPy Coverage
+Some Mixtape examples require CausalPy features that don't exist yet. This section tracks open PRs and feature proposals.
 
-| Notebook | Key Examples | CausalPy Method | Estimated Effort |
-|----------|--------------|-----------------|------------------|
-| `06_regression_discontinuity.ipynb` | LMB close elections | `RegressionDiscontinuity` | Medium |
-| `07_instrumental_variables.ipynb` | Card (1995) | `InstrumentalVariable` | Low |
-| `09_difference_in_differences.ipynb` | Castle, Abortion | `DifferenceInDifferences` | Medium |
-| `10_synthetic_control.ipynb` | Texas prisons | `SyntheticControl` | Medium |
+### Open PRs (In Progress)
 
-### Phase 2: Implement — Partial CausalPy Coverage
+These features are being actively developed in CausalPy:
 
-| Notebook | Key Examples | Approach | Estimated Effort |
-|----------|--------------|----------|------------------|
-| `05_matching.ipynb` | NSW | CausalPy IPSW only; TODO stubs for matching | Medium |
+| Feature | CausalPy PR | Notebook to Update |
+|---------|-------------|-------------------|
+| Staggered DiD | [PR #621](https://github.com/pymc-labs/CausalPy/pull/621) | `09_difference_in_differences.ipynb` |
+| Event Study | [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) | `09_difference_in_differences.ipynb` |
+| Donut RD | [PR #610](https://github.com/pymc-labs/CausalPy/pull/610) | `06_regression_discontinuity.ipynb` |
 
-### Skip with TODO Placeholders
+### Feature Proposals (Not Yet Started)
 
-| Notebook | Reason | Future CausalPy Work |
-|----------|--------|----------------------|
-| `08_panel_data.ipynb` | No panel FE experiment | Awaiting `cp.PanelRegression` |
-| Matching (NN, CEM, subclass) | Not first-class in CausalPy | Awaiting `cp.Matching` |
-| Triple differences | Not supported | Would need new experiment |
+These features have been proposed but don't have open PRs yet. See `proposals/` for detailed writeups:
 
-### Phase 3: Fill in When CausalPy PRs Land
-
-| Feature | CausalPy PR/Issue | Notebook to Update |
-|---------|-------------------|-------------------|
-| Staggered DiD | PR #621 | `09_difference_in_differences.ipynb` |
-| Event study plots | PR #584 | `09_difference_in_differences.ipynb` |
-| Donut RD | PR #610 | `06_regression_discontinuity.ipynb` |
-| Matching | TBD | `05_matching.ipynb` |
-| Panel FE | TBD | `08_panel_data.ipynb` |
+| Feature | Proposal | Notebook to Update |
+|---------|----------|-------------------|
+| Matching (NN, CEM) | [`proposal_matching.md`](proposals/proposal_matching.md) | `05_matching.ipynb` |
+| Panel Fixed Effects | [`proposal_panel_fe.md`](proposals/proposal_panel_fe.md) | `08_panel_data.ipynb` |
+| Triple Differences | [`proposal_triple_diff.md`](proposals/proposal_triple_diff.md) | `09_difference_in_differences.ipynb` |
 
 ---
 
@@ -315,58 +300,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 
 3. **Local caching**: Download once, cache in `~/.cache/mixtape-causalpy/`
 
-### Data loading utility
-
-```python
-# src/mixtape_causalpy/data.py
-
-import pandas as pd
-from pathlib import Path
-
-MIXTAPE_BASE_URL = "https://github.com/scunning1975/mixtape/raw/master/"
-CACHE_DIR = Path.home() / ".cache" / "mixtape-causalpy"
-
-def load_mixtape_data(filename: str, use_cache: bool = True) -> pd.DataFrame:
-    """Load a dataset from the Mixtape repo, with optional caching."""
-    cache_path = CACHE_DIR / filename
-    
-    if use_cache and cache_path.exists():
-        return pd.read_stata(cache_path)
-    
-    url = MIXTAPE_BASE_URL + filename
-    df = pd.read_stata(url)
-    
-    if use_cache:
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        df.to_stata(cache_path)
-    
-    return df
-
-# Convenience functions for common datasets
-def load_lmb() -> pd.DataFrame:
-    """Lee-Moretti-Butler close elections data for RD."""
-    return load_mixtape_data("lmb-data.dta")
-
-def load_castle() -> pd.DataFrame:
-    """Castle doctrine data for DiD."""
-    return load_mixtape_data("castle.dta")
-
-def load_card() -> pd.DataFrame:
-    """Card (1995) returns to schooling data for IV."""
-    return load_mixtape_data("card.dta")
-
-def load_texas() -> pd.DataFrame:
-    """Texas incarceration data for synthetic control."""
-    return load_mixtape_data("texas.dta")
-
-def load_nsw() -> pd.DataFrame:
-    """National Supported Work data for matching."""
-    return load_mixtape_data("nsw_mixtape.dta")
-
-def load_abortion() -> pd.DataFrame:
-    """Abortion legalization data for DiD."""
-    return load_mixtape_data("abortion.dta")
-```
+See `src/mixtape_causalpy/data.py` for the implemented data loading utilities.
 
 ---
 
@@ -434,16 +368,16 @@ For sections/examples we skip due to missing CausalPy support:
 
 Per `mixtape_causalpy_translation_repo.md`, "done" means:
 
-- [ ] **Implemented chapters** (RD, IV, DiD, SC) each have a notebook that:
-  - [ ] Loads the chapter dataset
-  - [ ] Runs a comparable identification strategy in CausalPy
-  - [ ] Reproduces key result figure(s) in spirit
-  - [ ] Clearly states differences vs book's implementation
+- [x] **Implemented chapters** (RD, IV, DiD, SC) each have a notebook that:
+  - [x] Loads the chapter dataset
+  - [x] Runs a comparable identification strategy in CausalPy
+  - [x] Reproduces key result figure(s) in spirit
+  - [x] Clearly states differences vs book's implementation
 
-- [ ] **Partial chapters** (Matching) have a notebook that:
-  - [ ] Demonstrates what CausalPy supports (IPSW)
-  - [ ] Includes TODO placeholders for unsupported methods
-  - [ ] Links to CausalPy issue tracker for future work
+- [x] **Partial chapters** (Matching) have a notebook that:
+  - [x] Demonstrates what CausalPy supports (IPSW)
+  - [x] Includes TODO placeholders for unsupported methods
+  - [x] Links to CausalPy issue tracker for future work
 
 - [ ] **Skipped chapters** (Panel) have a placeholder notebook that:
   - [ ] Explains why the chapter is not yet implemented
@@ -451,15 +385,15 @@ Per `mixtape_causalpy_translation_repo.md`, "done" means:
   - [ ] Links to relevant CausalPy issues/PRs
   - [ ] Can be filled in when CausalPy adds support
 
-- [ ] README provides:
-  - [ ] Quick start instructions
-  - [ ] Chapter → notebook mapping table (with status indicators)
-  - [ ] Link to CausalPy docs
-  - [ ] Link to Mixtape book
+- [x] README provides:
+  - [x] Quick start instructions
+  - [x] Chapter → notebook mapping table (with status indicators)
+  - [x] Link to CausalPy docs
+  - [x] Link to Mixtape book
 
-- [ ] Data layer:
-  - [ ] `data/README.md` documents all datasets and provenance
-  - [ ] Loading works without manual download steps
+- [x] Data layer:
+  - [x] `data/README.md` documents all datasets and provenance
+  - [x] Loading works without manual download steps
 
 ---
 
@@ -479,12 +413,12 @@ We use Conda for environment management due to PyMC dependencies. See `environme
 
 ## Next Steps
 
-1. **Initialize repo structure**: Create folders, requirements.txt, data utilities
-2. **Implement Phase 1 notebooks**: RD, IV, DiD, SC (full CausalPy coverage)
-3. **Implement Phase 2 notebooks**: Matching (IPSW only, with TODO stubs)
-4. **Create placeholder notebooks**: Panel data chapter with TODO template
-5. **CI setup**: Run notebooks on push to ensure reproducibility
-6. **Monitor CausalPy PRs**: When new features land, revisit TODO placeholders
+- [x] **Initialize repo structure**: Create folders, requirements.txt, data utilities
+- [x] **Implement Phase 1 notebooks**: RD, IV, DiD, SC (full CausalPy coverage)
+- [x] **Implement Phase 2 notebooks**: Matching (IPSW only, with TODO stubs)
+- [ ] **Create placeholder notebooks**: Panel data chapter with TODO template
+- [ ] **CI setup**: Run notebooks on push to ensure reproducibility
+- [ ] **Monitor CausalPy PRs**: When new features land, revisit TODO placeholders
 
 ---
 
