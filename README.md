@@ -13,7 +13,7 @@ This is a **translation repo**, not a copy of the book. We recreate analyses and
 
 ## Setup
 
-Conda is required due to the PyMC dependency.
+Conda is required due to the PyMC dependency. The environment uses **Python 3.13**.
 
 ```bash
 # Create the environment
@@ -38,8 +38,10 @@ In Jupyter, select the **"Mixtape CausalPy"** kernel when running notebooks.
 
 ```python
 import causalpy as cp
-print(cp.__version__)  # Should be >= 0.4.0
+print(cp.__version__)  # Development version from GitHub main branch
 ```
+
+> **Note**: This repo uses the development version of CausalPy installed directly from GitHub to access the latest bug fixes and features.
 
 ## Chapter → Notebook Mapping
 
