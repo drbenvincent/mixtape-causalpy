@@ -47,10 +47,10 @@ print(cp.__version__)  # Should be >= 0.4.0
 |-----------------|----------|--------|
 | Ch 5: Matching & Subclassification | `05_matching.ipynb` | ⚠️ Partial (IPSW only) |
 | Ch 6: Regression Discontinuity | `06_regression_discontinuity.ipynb` | ✅ Done |
-| Ch 7: Instrumental Variables | `07_instrumental_variables.ipynb` | 🚧 Planned |
+| Ch 7: Instrumental Variables | `07_instrumental_variables.ipynb` | ✅ Done |
 | Ch 8: Panel Data | `08_panel_data.ipynb` | ⏭️ TODO placeholder |
 | Ch 9: Difference-in-Differences | `09_difference_in_differences.ipynb` | 🚧 Planned |
-| Ch 10: Synthetic Control | `10_synthetic_control.ipynb` | 🚧 Planned |
+| Ch 10: Synthetic Control | `10_synthetic_control.ipynb` | ✅ Done |
 
 ## CausalPy-First Approach
 
