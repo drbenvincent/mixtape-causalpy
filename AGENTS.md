@@ -62,3 +62,26 @@ Work practices for AI assistants (and humans) contributing to this repo.
 3. Implement the TODO placeholder
 4. Update status to ✅ Done
 
+## Reporting Bugs in CausalPy
+
+If you encounter a bug in CausalPy while working on this repo:
+
+1. **Isolate the bug**: Find the specific file and line in the CausalPy source (local clone at `/Users/benjamv/git/CausalPy`)
+2. **Write up the issue**: Create a markdown file with:
+   - Summary of the bug
+   - Location (file and line number)
+   - Current vs expected behavior
+   - Minimal reproduction code
+   - Suggested fix (if obvious)
+3. **Create the issue via GitHub CLI**:
+
+```bash
+cd /Users/benjamv/git/CausalPy
+gh issue create \
+  --title "Bug: <short description>" \
+  --body-file /path/to/issue.md \
+  --label "bug"
+```
+
+4. **Work around the bug** in this repo until it's fixed upstream
+
