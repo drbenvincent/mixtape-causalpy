@@ -426,6 +426,102 @@ This would enable:
 
 This is out of scope for the initial implementation but worth noting for the future.
 
+## Documentation
+
+This feature should include a new documentation page with a pedagogical Jupyter notebook. The notebook should be added to the CausalPy docs under a new "Panel Data" subsection (alongside existing pages like "Difference in Differences", "Synthetic Control", etc.).
+
+### Proposed Notebook Structure
+
+**Title**: `panel_fixed_effects.ipynb`
+
+**Location**: `docs/source/notebooks/panel_fixed_effects.ipynb`
+
+### Content Outline
+
+#### 1. Introduction to Panel Data (Conceptual)
+- What is panel data? (units observed over time)
+- The problem of unobserved heterogeneity
+- Why OLS on pooled data is biased when unit effects correlate with treatment
+- Visual: Scatter plot showing apparent relationship vs true relationship after accounting for unit effects
+
+#### 2. The Within Transformation (Mathematical Foundation)
+- Derivation of the within estimator (demeaning)
+- Why time-invariant confounders drop out
+- Connection to "differencing out" fixed effects
+- Visual: Before/after demeaning showing how unit intercepts disappear
+
+#### 3. Example 1: Simulated Data (Ground Truth Known)
+- Generate panel data with known treatment effect and unit heterogeneity
+- Show naive OLS is biased
+- Show `PanelRegression` recovers true effect
+- Demonstrate both `fe_method="dummies"` and `fe_method="within"` give same answer
+- Visual: Posterior distribution centered on true effect
+
+#### 4. Example 2: Small Panel — State Policy Analysis
+- Classic "50 states × 20 years" setup
+- Use `fe_method="dummies"` to get individual state effects
+- Demonstrate `plot_coefficients()` for treatment effect
+- Demonstrate `plot_unit_effects()` showing state heterogeneity
+- Visual: Map or bar chart of state fixed effects
+
+#### 5. Example 3: Large Panel — Individual Survey Data
+- "10,000 individuals × 5 waves" setup (e.g., labor market outcomes)
+- Use `fe_method="within"` for computational efficiency
+- Demonstrate `plot_trajectories(n_sample=12, select="extreme")`
+- Discuss why within-transformation is necessary at scale
+- Visual: Small multiples of individual trajectories
+
+#### 6. Example 4: Two-Way Fixed Effects
+- Unit AND time fixed effects
+- When to use two-way FE (common shocks affecting all units)
+- Connection to difference-in-differences
+- Visual: Parallel trends plot
+
+#### 7. Diagnostics and Model Checking
+- `plot_residuals()` for homoskedasticity check
+- Checking for serial correlation within units
+- When FE assumptions fail
+
+#### 8. Comparison to Other Approaches
+- Brief comparison to random effects (when to use each)
+- Teaser for mixed models with formulaic (future feature)
+- Connection to CausalPy's `DifferenceInDifferences`
+
+### Pedagogical Approach
+
+The notebook should:
+- **Build intuition first**: Start with visuals and simulations before real data
+- **Show the problem before the solution**: Demonstrate bias in naive approaches
+- **Use progressive complexity**: Simple simulated → small real → large real
+- **Include exercises**: Suggested modifications readers can try (e.g., "What happens if you omit the time FE?")
+- **Cross-reference Mixtape**: Link to Chapter 8 for deeper econometric treatment
+
+### Datasets to Use
+
+| Example | Dataset | Source | N units | T periods |
+|---------|---------|--------|---------|-----------|
+| Simulated | Generated | — | 50 | 10 |
+| State policy | Crime/policy data | Mixtape or similar | 50 | 20 |
+| Individual panel | SASP or similar | [Mixtape](https://github.com/scunning1975/mixtape/blob/master/python/sasp.py) | 254 | 8 |
+| Large panel | Synthetic or subset | Generated | 5,000 | 5 |
+
+### Docs Structure Update
+
+Add to `docs/source/index.rst`:
+
+```rst
+.. toctree::
+   :maxdepth: 2
+   :caption: Notebooks
+
+   notebooks/difference_in_differences
+   notebooks/synthetic_control
+   notebooks/regression_discontinuity
+   notebooks/instrumental_variables
+   notebooks/panel_fixed_effects    <-- NEW
+   ...
+```
+
 ## Connection to Existing CausalPy Methods
 
 Panel FE is closely related to:
