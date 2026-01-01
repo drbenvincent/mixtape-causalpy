@@ -25,11 +25,11 @@ This keeps the repo focused and avoids maintaining parallel "baseline" implement
 | Notebook | Total | ✅ Done | ⏭️ Skip | ⬜ Todo |
 |----------|-------|---------|---------|---------|
 | `05_matching` | 10 | 5 | 5 | 0 |
-| `06_rd` | 14 | 7 | 7 | 0 |
+| `06_rd` | 14 | 8 | 6 | 0 |
 | `07_iv` | 1 | 1 | 0 | 0 |
 | `08_panel` | 6 | 0 | 6 | 0 |
 | `09_did` | 9 | 3 | 6 | 0 |
-| `10_sc` | 3 | 2 | 1 | 0 |
+| `10_sc` | 3 | 3 | 0 | 0 |
 | `00_data` | 11 | 0 | 11 | 0 |
 
 **Status legend:**
@@ -150,7 +150,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 | `lmb_5.py` | LMB quadratic interactions | `06_rd` | ✅ Native | ✅ |
 | `lmb_6.py` | LMB kernel-weighted | `06_rd` | ✅ Native | ✅ |
 | `lmb_7.py` | LMB visualization | `06_rd` | ✅ Native | ✅ |
-| `lmb_8.py` | LMB placebo tests | `06_rd` | ❌ Missing | ⏭️ |
+| `lmb_8.R` | LMB kernel-smoothed visualization | `06_rd` | ✅ Native | ✅ |
 | `lmb_9.py` | LMB donut RD | `06_rd` | ❌ Missing | ⏭️ |
 | `lmb_10.py` | LMB robustness | `06_rd` | ❌ Missing | ⏭️ |
 | `rdd_simulate1.py` | RD simulation - potential outcomes | `06_rd` | 📖 Conceptual | ⏭️ |
@@ -162,6 +162,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 - Main example: Lee-Moretti-Butler close elections using `RegressionDiscontinuity`
 - Show sharp RD estimation with bandwidth sensitivity
 - Demonstrate diagnostic plots (binned scatter, bandwidth sensitivity)
+- Kernel-smoothed RD visualization (from R's `lmb_8.R`)
 - Reference: donut RD via PR #610 when merged
 
 ---
@@ -228,14 +229,14 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 |--------------|-------------|----------|----------|--------|
 | `synth_1.py` | Texas incarceration SC | `10_sc` | ✅ Native | ✅ |
 | `synth_2.py` | Texas SC - weights | `10_sc` | ✅ Native | ✅ |
-| `synth_3_7.py` | Texas SC - placebos (files 3-7) | `10_sc` | ❌ Missing | ⏭️ |
+| `synth_3_7.R` | Texas SC - placebo-in-space tests | `10_sc` | ✅ Native | ✅ |
 
 **Notebook plan**: `10_synthetic_control.ipynb`
 - Texas prison reform as main example
 - Use CausalPy's `SyntheticControl` experiment
 - Show donor weights, pre-treatment fit
-- Implement placebo-in-space tests
-- Demonstrate extrapolation warnings
+- Placebo-in-space tests with permutation p-value (from R's `synth_3_7.R`)
+- Treatment effect gap plots with uncertainty
 
 ---
 

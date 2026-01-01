@@ -45,14 +45,14 @@ print(cp.__version__)  # Development version from GitHub main branch
 
 ## Chapter → Notebook Mapping
 
-| Mixtape Chapter | Notebook | Status |
-|-----------------|----------|--------|
-| Ch 5: Matching & Subclassification | `05_matching.ipynb` | ✅ Done (IPW) |
-| Ch 6: Regression Discontinuity | `06_regression_discontinuity.ipynb` | ✅ Done |
-| Ch 7: Instrumental Variables | `07_instrumental_variables.ipynb` | ✅ Done |
-| Ch 8: Panel Data | `08_panel_data.ipynb` | ⏭️ TODO placeholder |
-| Ch 9: Difference-in-Differences | `09_difference_in_differences.ipynb` | ✅ Done |
-| Ch 10: Synthetic Control | `10_synthetic_control.ipynb` | ✅ Done |
+| Mixtape Chapter | Notebook | Status | Highlights |
+|-----------------|----------|--------|------------|
+| Ch 5: Matching & Subclassification | `05_matching.ipynb` | ✅ Done | IPW with balance diagnostics |
+| Ch 6: Regression Discontinuity | `06_regression_discontinuity.ipynb` | ✅ Done | LMB elections, bandwidth sensitivity, kernel smoothing |
+| Ch 7: Instrumental Variables | `07_instrumental_variables.ipynb` | ✅ Done | Card (1995) returns to schooling |
+| Ch 8: Panel Data | `08_panel_data.ipynb` | ⏭️ TODO | Placeholder (no CausalPy support) |
+| Ch 9: Difference-in-Differences | `09_difference_in_differences.ipynb` | ✅ Done | Castle doctrine, abortion legalization |
+| Ch 10: Synthetic Control | `10_synthetic_control.ipynb` | ✅ Done | Texas prison reform, placebo-in-space tests |
 
 ## CausalPy-First Approach
 
