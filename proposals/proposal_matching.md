@@ -9,15 +9,17 @@ Add support for matching-based causal inference methods to CausalPy, including:
 
 ## Motivation
 
-CausalPy currently supports Inverse Propensity Weighting (`InversePropensityWeighting`), but the Mixtape's Chapter 5 covers several other matching methods that are commonly used in applied work. These methods are complementary to IPW and are often preferred in different settings.
+CausalPy currently supports Inverse Propensity Weighting (`InversePropensityWeighting`), but [Chapter 5 of *Causal Inference: The Mixtape*](https://mixtape.scunning.com/05-matching_and_subclassification) covers several other matching methods that are commonly used in applied work. These methods are complementary to IPW and are often preferred in different settings.
+
+The [Mixtape code repository](https://github.com/scunning1975/mixtape) contains implementations of these methods.
 
 ### Mixtape Coverage
 
 | Mixtape File | Method | Current CausalPy Support |
 |--------------|--------|-------------------------|
-| `teffects_nn.R` | Nearest Neighbor Matching | ❌ Not supported |
-| `cem.R` | Coarsened Exact Matching | ❌ Not supported |
-| `titanic_subclassification.py` | Subclassification | ❌ Not supported |
+| [`teffects_nn.R`](https://github.com/scunning1975/mixtape/blob/master/R/teffects_nn.R) | Nearest Neighbor Matching | ❌ Not supported |
+| [`cem.R`](https://github.com/scunning1975/mixtape/blob/master/R/cem.R) | Coarsened Exact Matching | ❌ Not supported |
+| [`titanic.py`](https://github.com/scunning1975/mixtape/blob/master/python/titanic.py) | Subclassification | ❌ Not supported |
 
 ### Why These Methods Matter
 
@@ -133,6 +135,9 @@ result.plot_balance()  # Covariate balance pre/post matching
 ## References
 
 - **Mixtape Chapter 5**: [Matching and Subclassification](https://mixtape.scunning.com/05-matching_and_subclassification)
+- **Mixtape Code Repository**: [github.com/scunning1975/mixtape](https://github.com/scunning1975/mixtape)
+  - R: [`teffects_nn.R`](https://github.com/scunning1975/mixtape/blob/master/R/teffects_nn.R), [`cem.R`](https://github.com/scunning1975/mixtape/blob/master/R/cem.R)
+  - Python: [`titanic.py`](https://github.com/scunning1975/mixtape/blob/master/python/titanic.py), [`ipw.py`](https://github.com/scunning1975/mixtape/blob/master/python/ipw.py)
 - **MatchIt R Package**: [Documentation](https://kosukeimai.github.io/MatchIt/)
 - **CEM Paper**: Iacus, King, & Porro (2012). "Causal Inference without Balance Checking"
 - **Ho et al. (2007)**: "Matching as Nonparametric Preprocessing for Reducing Model Dependence"

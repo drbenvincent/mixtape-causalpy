@@ -8,12 +8,14 @@ Add support for Triple Differences (Difference-in-Difference-in-Differences, DDD
 
 Triple differences is an extension of DiD that adds a third comparison group to further isolate causal effects. It's useful when standard DiD assumptions may be violated but there's a within-treatment-group comparison available.
 
+[Chapter 9 of *Causal Inference: The Mixtape*](https://mixtape.scunning.com/09-difference_in_differences) covers DDD as an extension of the standard DiD estimator. The [Mixtape code repository](https://github.com/scunning1975/mixtape) contains Python implementations.
+
 ### Mixtape Coverage
 
 | Mixtape File | Method | Current CausalPy Support |
 |--------------|--------|-------------------------|
-| `abortion_ddd.py` | Triple differences with year FE | ❌ Not supported |
-| `abortion_ddd2.py` | Triple differences variations | ❌ Not supported |
+| [`abortion_ddd.py`](https://github.com/scunning1975/mixtape/blob/master/python/abortion_ddd.py) | Triple differences with year FE | ❌ Not supported |
+| [`abortion_ddd2.py`](https://github.com/scunning1975/mixtape/blob/master/python/abortion_ddd2.py) | Triple differences variations | ❌ Not supported |
 
 ### Why DDD Matters
 
@@ -186,6 +188,8 @@ Could be implemented as:
 ## References
 
 - **Mixtape Chapter 9**: [Difference-in-Differences](https://mixtape.scunning.com/09-difference_in_differences) (DDD section)
+- **Mixtape Code Repository**: [github.com/scunning1975/mixtape](https://github.com/scunning1975/mixtape)
+  - Python: [`abortion_ddd.py`](https://github.com/scunning1975/mixtape/blob/master/python/abortion_ddd.py), [`abortion_ddd2.py`](https://github.com/scunning1975/mixtape/blob/master/python/abortion_ddd2.py)
 - **Gruber (1994)**: "The Incidence of Mandated Maternity Benefits" (classic DDD application)
 - **Olden & Møen (2022)**: "The Triple Difference Estimator"
 
