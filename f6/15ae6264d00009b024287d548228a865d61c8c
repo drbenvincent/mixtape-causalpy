@@ -1,0 +1,58 @@
+AGENTS.md
+  h_63db634213747e 5-6,33,58-59
+CITATION.cff
+  h_63db634213747e 1-50
+LICENSE
+  h_63db634213747e 22-23
+NOTICE
+  h_63db634213747e 1-37
+README.md
+  h_63db634213747e 3,5-7,93-95,101,105,110-113
+REPO_PLAN.md
+  h_63db634213747e 3,5-8,300,302,438-440
+_freeze/notebooks/05_matching/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/06_regression_discontinuity/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/07_instrumental_variables/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/09_difference_in_differences/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/10_synthetic_control/execute-results/html.json
+  h_63db634213747e 2,5
+_quarto.yml
+  h_63db634213747e 5,10,20-23,26-30,49-50
+attribution.qmd
+  h_63db634213747e 1-27
+data/README.md
+  h_63db634213747e 36,38,40-41,43,45-57,64,68
+index.qmd
+  h_63db634213747e 5-7
+notebooks/05_matching.qmd
+  h_63db634213747e 8,475
+notebooks/06_regression_discontinuity.qmd
+  h_63db634213747e 8,78-79,485,494
+notebooks/07_instrumental_variables.qmd
+  h_63db634213747e 8,336
+notebooks/09_difference_in_differences.qmd
+  h_63db634213747e 8,463
+notebooks/10_synthetic_control.qmd
+  h_63db634213747e 8,531
+pyproject.toml
+  h_63db634213747e 8,12-14,20,22
+src/mixtape_causalpy/__init__.py
+  h_63db634213747e 2,7
+src/mixtape_causalpy/data.py
+  h_63db634213747e 4-6,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f615ae6264d00009b024287d548228a865d61c8c",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
