@@ -1,0 +1,44 @@
+REPO_PLAN.md
+  h_63db634213747e 69,317,352-363
+_freeze/notebooks/05_matching/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/06_regression_discontinuity/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/07_instrumental_variables/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/08_panel_data/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/09_difference_in_differences/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/10_synthetic_control/execute-results/html.json
+  h_63db634213747e 2,5
+_quarto.yml
+  h_63db634213747e 39-40,47
+index.qmd
+  h_63db634213747e 6
+notebooks/05_matching.qmd
+  h_63db634213747e 110,394,477-485,487,489-490
+notebooks/06_regression_discontinuity.qmd
+  h_63db634213747e 18-19,21,154,156,491-492,494-497,501-502
+notebooks/07_instrumental_variables.qmd
+  h_63db634213747e 22,35,65,342-347,349,351-352
+notebooks/08_panel_data.qmd
+  h_63db634213747e 21,134,396-403,406-407
+notebooks/09_difference_in_differences.qmd
+  h_63db634213747e 36,79,249,465-471,473,475-476
+notebooks/10_synthetic_control.qmd
+  h_63db634213747e 16,18,540-545,547,549-550
+references.bib
+  h_63db634213747e 1-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "60c8b060388e14fcedaab4d0c027d4414bda2095",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
