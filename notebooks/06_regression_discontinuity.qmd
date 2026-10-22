@@ -209,7 +209,7 @@ result_linear = cp.RegressionDiscontinuity(
         sample_kwargs={"progressbar": True, "random_seed": 42}
     ),
     treatment_threshold=0.0,
-)
+).fit()
 result_linear.summary()
 ```
 
@@ -223,7 +223,7 @@ result_interact = cp.RegressionDiscontinuity(
         sample_kwargs={"progressbar": True, "random_seed": 42}
     ),
     treatment_threshold=0.0,
-)
+).fit()
 result_interact.summary()
 ```
 
@@ -240,7 +240,7 @@ result_quad = cp.RegressionDiscontinuity(
     ),
     treatment_threshold=0.0,
     bandwidth=0.05,  # ±5 percentage points (lmb_6)
-)
+).fit()
 result_quad.summary()
 ```
 
@@ -250,7 +250,7 @@ result_quad.summary()
 # CausalPy built-in RD plot
 # Note: CausalPy plots ALL data points even when bandwidth is specified.
 # The model is fitted only on the bandwidth data, but the plot shows full context.
-fig, ax = result_quad.plot()
+fig, ax = result_quad.plot(show=False)
 ax.set_xlabel("Democratic Vote Share (centered)")
 ax.set_ylabel("ADA Score")
 ax.set_title(
@@ -270,12 +270,12 @@ for name, result in [
     ("Interaction", result_interact),
     ("Quadratic+BW", result_quad),
 ]:
-    mean_eff = float(result.discontinuity_at_threshold.mean())
-    ci_lo = float(result.discontinuity_at_threshold.quantile(0.03))
-    ci_hi = float(result.discontinuity_at_threshold.quantile(0.97))
+    disc = result.result.discontinuity_at_threshold
+    mean_eff = float(disc.mean())
+    ci_lo = float(disc.quantile(0.03))
+    ci_hi = float(disc.quantile(0.97))
     print(f"{name:15s}: {mean_eff:5.1f} [94% CI: {ci_lo:.1f}, {ci_hi:.1f}]")
 print()
-print("All specifications show ~47 ADA point effect. Results are robust.")
 ```
 
 ```{python}
@@ -416,9 +416,10 @@ for bw in bandwidths:
             ),
             treatment_threshold=0.0,
             bandwidth=bw,
-        )
-        eff = float(res.discontinuity_at_threshold.mean())
-        sd = float(res.discontinuity_at_threshold.std())
+        ).fit()
+        disc = res.result.discontinuity_at_threshold
+        eff = float(disc.mean())
+        sd = float(disc.std())
         n = len(df_clean[df_clean["demvoteshare_c"].abs() <= bw])
         bw_results.append({"bw": bw, "n": n, "effect": eff, "sd": sd})
         print(f"BW={bw:.2f}: n={n:5d}, effect={eff:.1f} ± {sd:.1f}")
@@ -453,22 +454,30 @@ if len(bw_df) > 0:
         )
     plt.tight_layout()
     plt.show()
-    print("Treatment effect is stable across bandwidths (~47 ADA points).")
+    lo, hi = float(bw_df["effect"].min()), float(bw_df["effect"].max())
+    print(
+        f"Local linear effects across bandwidths "
+        f"{bw_df['bw'].min():.2f}–{bw_df['bw'].max():.2f}: "
+        f"{lo:.1f} to {hi:.1f} ADA points."
+    )
 ```
 
 ---
 
 ## Summary and Comparison to Mixtape
 
-### Key Findings with CausalPy
+### This run
 
-| Specification | Treatment Effect | 94% CI |
-|--------------|------------------|--------|
-| Linear (same slopes) | ~47 | [44, 50] |
-| Interaction (diff slopes) | ~47 | [44, 50] |
-| Quadratic + bandwidth | ~47 | [44, 50] |
+The discontinuity is `result.discontinuity_at_threshold`, not the `treated` coefficient.
 
-**Conclusion**: Winning a close election causes ~47 ADA point shift in voting behavior. Results are robust to specification and bandwidth choices.
+| Specification | Treatment effect | 94% interval |
+|---------------|------------------|--------------|
+| Linear, full sample | 58.4 | [57.2, 59.6] |
+| Interaction, full sample | 55.4 | [54.1, 56.7] |
+| Quadratic, ±5pp bandwidth | 47.0 | [44.3, 49.7] |
+| Local linear, bandwidth 0.02–0.25 | 46.3 to 47.9 | see the bandwidth cell |
+
+The close-election result is the local one, about 47 ADA points, and it is stable across those bandwidths. Full-sample linear and interaction fits use observations far from the cutoff, so they are a different estimand and come out larger. Do not read the table as four replications of 47.
 
 ### Comparison: Mixtape vs CausalPy
 

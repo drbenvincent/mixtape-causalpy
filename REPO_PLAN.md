@@ -69,8 +69,9 @@ mixtape-causalpy/
 ├── REPO_PLAN.md                       # This file
 ├── _quarto.yml                        # Website project (freeze: auto)
 ├── index.qmd                          # Site home
-├── requirements.txt
-├── pyproject.toml
+├── pyproject.toml                     # Dependency source
+├── uv.lock                            # Locked resolve; `uv sync` is the install
+├── .python-version                    # 3.13 for local uv runs
 │
 ├── notebooks/
 │   ├── 00_data_utilities.qmd          # Not started. New chapters are .qmd
@@ -409,22 +410,30 @@ Per `mixtape_causalpy_translation_repo.md`, "done" means:
 
 ## Dependencies
 
-We use Conda for environment management due to PyMC dependencies. See `environment.yml` for the full specification. Quarto itself is installed system-wide; set `QUARTO_PYTHON` to the `mixtape-causalpy` env so it does not pick up another interpreter.
+`uv sync` is the install. `pyproject.toml` is the dependency source and `uv.lock` pins the resolve. Do not add a second pin file. Python is `>=3.12`; `.python-version` pins 3.13 so a fresh `uv sync` matches the lock. Quarto is installed separately. Point `QUARTO_PYTHON` at `.venv/bin/python` so it does not pick up another interpreter.
 
 **Key dependencies:**
-- **Python**: 3.13
-- **CausalPy**: Development version from GitHub (`git+https://github.com/pymc-labs/CausalPy.git@main`)
-- **PyMC**: >=5.10
-- **ArviZ**: >=0.17
+- **Python**: >=3.12 (3.13 pinned for `uv sync`)
+- **CausalPy**: 1.0 line (`>=1.0.0rc1,<2`). Not 0.9.0, and not a GitHub `main` checkout
+- **PyMC**: >=6.0.1,<7
+- **PyTensor**: >=3,<4 (pulled by PyMC 6)
+- **ArviZ**: >=1.1,<2
+- **Quarto executor**: `ipykernel`, `nbclient`, `nbformat`, `pyyaml`. `quarto render` imports these from `QUARTO_PYTHON`. They are not used by the analyses.
 - **Jupyter kernel**: `mixtape-causalpy` (local re-execution only; the site does not use WASM). CI registers that name so publish can resolve it. Committed `_freeze/` is what renders.
 
-> **Note**: We use the development version of CausalPy to access bug fixes (e.g., RD bandwidth parameter fix in issue #625) and upcoming features.
+Confirm the stack after `uv sync`:
+
+```bash
+uv run python -c "import causalpy, pymc; print('causalpy', causalpy.__version__); print('pymc', pymc.__version__)"
+```
+
+`causalpy` must print a 1.0 version and `pymc` a 6.x version.
 
 ---
 
 ## Next Steps
 
-- [x] **Initialize repo structure**: Create folders, requirements.txt, data utilities
+- [x] **Initialize repo structure**: Create folders, `pyproject.toml`, data utilities
 - [x] **Implement Phase 1 pages**: RD, IV, DiD, SC (full CausalPy coverage)
 - [x] **Implement Phase 2 pages**: Matching (IPSW only, with TODO stubs)
 - [x] **Quarto website**: `.qmd` sources, frozen outputs, GitHub Pages workflow

@@ -206,6 +206,7 @@ sample_kwargs = {
     "cores": 1,  # Single core for macOS Jupyter compatibility
     "target_accept": 0.95,
     "progressbar": True,
+    "random_seed": 42,
 }
 
 castle_result = cp.DifferenceInDifferences(
@@ -214,7 +215,7 @@ castle_result = cp.DifferenceInDifferences(
     time_variable_name="t",
     group_variable_name="group",
     model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),
-)
+).fit()
 ```
 
 ```{python}
@@ -224,7 +225,7 @@ castle_result.summary()
 
 ```{python}
 # Plot the DiD result
-fig, ax = castle_result.plot()
+fig, ax = castle_result.plot(show=False)
 ax.set_xlabel("Time Period (0=Pre, 1=Post)")
 ax.set_ylabel("Log Homicide Rate")
 ax.set_title("Castle Doctrine: Difference-in-Differences Estimate")
@@ -363,7 +364,7 @@ abortion_result = cp.DifferenceInDifferences(
     time_variable_name="t",
     group_variable_name="group",
     model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),
-)
+).fit()
 ```
 
 ```{python}
@@ -373,7 +374,7 @@ abortion_result.summary()
 
 ```{python}
 # Plot the DiD result
-fig, ax = abortion_result.plot()
+fig, ax = abortion_result.plot(show=False)
 ax.set_xlabel("Time Period (0=Pre, 1=Post)")
 ax.set_ylabel("Log Gonorrhea Rate")
 ax.set_title("Abortion Legalization: Difference-in-Differences Estimate")
@@ -400,6 +401,9 @@ plt.show()
 2. **No covariates**: Mixtape includes many control variables (demographics, spending, etc.)
 3. **No weighting**: Mixtape uses population weights
 4. **Bayesian estimation**: Different uncertainty quantification approach
+
+### This run
+Castle Doctrine 2×2, `random_seed=42`: causal impact 0.09, 94% interval [-0.42, 0.58]. Abortion-legalization proxy: -0.06, 94% interval [-0.93, 0.82]. Both intervals include zero. These are not the Mixtape's weighted, covariate-adjusted estimates.
 
 ### Event Study (TODO)
 

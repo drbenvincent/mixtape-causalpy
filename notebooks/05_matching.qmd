@@ -319,6 +319,7 @@ sample_kwargs = {
     "cores": 4,
     "target_accept": 0.99,  # Higher target_accept for this challenging problem
     "progressbar": True,
+    "random_seed": 42,
 }
 
 # Propensity score formula using STANDARDIZED continuous variables
@@ -329,7 +330,7 @@ ipw_result = cp.InversePropensityWeighting(
     outcome_variable="re78",
     weighting_scheme="robust",
     model=cp.pymc_models.PropensityScore(sample_kwargs=sample_kwargs),
-)
+).fit()
 ```
 
 ```{python}
@@ -342,7 +343,7 @@ plt.show()
 ```{python}
 # Extract ATE estimates
 ate_samples = [
-    ipw_result.get_ate(i, ipw_result.model.idata, method="robust")[0]
+    ipw_result.get_ate(i, ipw_result.idata, method="robust")[0]
     for i in range(200)
 ]
 ate_mean = np.mean(ate_samples)
@@ -400,6 +401,9 @@ IPW attempts to correct for these differences by reweighting, but:
 - Limited overlap can cause extreme weights
 - Model misspecification affects results
 - No adjustment for unobservables
+
+### This run
+Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE -$12,153.10, posterior sd $362.22, interval [-$12,863.06, -$11,443.15]. The experimental benchmark on this page is $1,794. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -$12,265, so the migration did not move this estimate off the LaLonde failure.
 
 ---
 

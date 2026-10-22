@@ -170,6 +170,8 @@ Now we use CausalPy's `SyntheticControl` to estimate the treatment effect. Causa
 2. Construct the synthetic Texas using these weights
 3. Compare actual Texas to synthetic Texas post-1993
 
+CausalPy 1.0 scales the observation-noise prior from the treated unit's pre-treatment spread (`auto_scale_sigma=True`, the default). That replaces the old fixed `HalfNormal(1)` prior, so posterior magnitudes will not match a pre-1.0 run. This page keeps the default.
+
 ```{python}
 # Run Synthetic Control with CausalPy
 result = cp.SyntheticControl(
@@ -185,9 +187,10 @@ result = cp.SyntheticControl(
             "cores": 4,
             "target_accept": 0.95,
             "progressbar": True,
+            "random_seed": 42,
         }
     ),
-)
+).fit()
 ```
 
 ```{python}
@@ -201,7 +204,7 @@ CausalPy provides a built-in plot showing the actual treated unit vs the synthet
 
 ```{python}
 # Plot the synthetic control results
-fig, ax = result.plot(plot_predictors=True)
+fig, ax = result.plot(plot_predictors=True, show=False)
 ax[0].set_xlabel("Year")
 ax[0].set_ylabel("Black Male Prison Admission Rate (per 100k)")
 ax[0].set_title("Texas Prison Reform: Actual vs Synthetic Control")
@@ -214,7 +217,7 @@ Which states contribute most to the synthetic Texas? The weights tell us which s
 
 ```{python}
 # Extract posterior mean weights
-beta = result.idata.posterior["beta"]
+beta = result.idata["posterior"]["beta"]
 weights_mean = beta.mean(dim=["chain", "draw"]).values.flatten()
 
 # Create a dataframe of weights
@@ -249,7 +252,7 @@ The treatment effect is the difference between actual Texas and synthetic Texas.
 
 ```{python}
 # Get the post-treatment impact
-post_impact = result.post_impact
+post_impact = result.result.impact_post
 
 # Plot the gap (treatment effect over time)
 fig, ax = plt.subplots(figsize=(12, 6))
@@ -343,7 +346,7 @@ placebo_states = [
 
 # Store results
 placebo_gaps = {}
-texas_gap = result.post_impact.mean(dim=["chain", "draw"]).values.flatten()
+texas_gap = result.result.impact_post.mean(dim=["chain", "draw"]).values.flatten()
 
 print("Running placebo tests (this may take a few minutes)...")
 print("-" * 50)
@@ -369,12 +372,13 @@ for state in placebo_states:
                     "cores": 4,
                     "target_accept": 0.9,
                     "progressbar": False,
+                    "random_seed": 42,
                 }
             ),
-        )
+        ).fit()
 
         # Store the mean gap
-        gap = placebo_result.post_impact.mean(dim=["chain", "draw"]).values.flatten()
+        gap = placebo_result.result.impact_post.mean(dim=["chain", "draw"]).values.flatten()
         placebo_gaps[state] = gap
         print(f"Mean gap: {np.mean(gap):.1f}")
 
@@ -487,29 +491,36 @@ plt.tight_layout()
 plt.show()
 
 print(
-    f"\nTexas's effect ({texas_mean_effect:,.0f}) is clearly in the extreme tail of the distribution."
+    f"\nTexas's effect ({texas_mean_effect:,.0f}) is larger in absolute value than "
+    f"all {len(placebo_mean_effects)} placebo effects."
 )
-print("This provides strong evidence that the effect is not due to chance.")
+print(
+    f"With {len(placebo_mean_effects)} placebos the smallest two-sided p-value "
+    f"this design can return is {1 / (len(placebo_mean_effects) + 1):.3f}. "
+    "That is not a 5% rejection."
+)
 ```
 
 ## Comparison to Mixtape Results
 
-### Key Findings
+### This run (CausalPy 1.0.0rc1, `auto_scale_sigma=True`)
 
-The Mixtape's synthetic control analysis of Texas shows:
+Pre-treatment correlation between Texas and synthetic Texas is 0.9717. Posterior mean donor weights are diffuse: the largest is California at 0.0317. A pre-1.0 run of this page, under the old `HalfNormal(1)` observation prior, concentrated weight on Florida, New York, and Illinois (about 0.38, 0.36, and 0.24).
 
-1. **Pre-treatment fit**: Synthetic Texas closely matches actual Texas before 1993
-2. **Post-treatment divergence**: After prison expansion, Texas incarceration rates diverged
-3. **Positive treatment effect**: Prison expansion led to higher incarceration rates
+Mean post-treatment gap: 42,478, 95% interval [38,858, 45,799]. Posterior probability of an increase: 1.0. The same page under the old prior reported about 21,069. Those magnitudes are not comparable.
 
-### Differences from Book's Implementation
+Placebo-in-space: Texas is larger than all 10 placebos. The two-sided permutation p-value is 0.091, the smallest value 10 placebos can produce. This design cannot reject at 5%. The direction matches the Mixtape. The donor pool and the effect size do not match a pre-1.0 CausalPy run, and they are not a sparse `Synth` solution.
 
-| Aspect | Mixtape | CausalPy |
-|--------|---------|----------|
+### Differences from the book's implementation
+
+| Aspect | Mixtape | CausalPy 1.0 |
+|--------|---------|--------------|
 | Package | R's `Synth` via rpy2 | Pure Python (PyMC) |
 | Estimation | Optimization-based | Bayesian (MCMC) |
 | Inference | Point estimates | Full posterior distributions |
 | Covariates | Multiple predictors | Outcome matching only |
+| Observation noise | Not a Bayesian prior | Data-scaled `sigma` (`auto_scale_sigma=True`), not the pre-1.0 `HalfNormal(1)` prior |
+| Donor weights, this run | Sparse in the book | Diffuse. Largest posterior mean weight about 0.03 |
 
 ## Summary
 
@@ -520,9 +531,9 @@ This notebook demonstrated:
 3. **Visualizing results**: actual vs synthetic, treatment effects
 4. **Donor weights**: which states contribute to synthetic Texas
 5. **Effect summaries**: average and cumulative causal impacts
-6. **Placebo-in-space tests**: permutation inference for statistical significance
+6. **Placebo-in-space tests**: permutation inference against 10 donor states
 
-The key finding replicates the Mixtape: Texas's prison capacity expansion in 1993 caused a significant increase in black male incarceration rates compared to what would have occurred without the policy. The placebo tests confirm that Texas's effect is unusually large compared to placebo states.
+Texas's post-1993 incarceration rate is higher than the synthetic control, and the posterior probability of an increase under this model is 1.0. Texas's mean gap is larger than all 10 placebo gaps. That permutation result is the strongest this 10-placebo design can give (p = 0.091), not a 5% test. Posterior mean weights are diffuse under CausalPy 1.0's default `auto_scale_sigma=True`, so the gap size is not the pre-1.0 number and not a sparse `Synth` weight vector.
 
 ---
 

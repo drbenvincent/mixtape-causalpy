@@ -17,41 +17,30 @@ This is a **translation repo**, not a copy of the book. We recreate analyses and
 
 ## Setup
 
-Conda is required due to the PyMC dependency. The environment uses **Python 3.13**. CausalPy is installed from GitHub `main`. Rendering uses that conda env's Jupyter kernel, not WebAssembly.
+Install with [uv](https://docs.astral.sh/uv/). `uv sync` is the only install path. It creates `.venv` from `pyproject.toml` and `uv.lock`, including the Python in `.python-version` (3.13) if you do not already have it. PyMC 6 installs from PyPI; conda is not required.
 
 ```bash
-# Create the environment
-conda env create -f environment.yml
-
-# Activate it
-conda activate mixtape-causalpy
-
-# Install the local data utilities package
-pip install -e .
-
-# Register the kernel Quarto executes against
-python -m ipykernel install --user --name mixtape-causalpy --display-name "Mixtape CausalPy"
-```
-
-Quarto discovers Python on its own, and `pyproject.toml` can send it to the wrong interpreter. Point it at this env:
-
-```bash
-export QUARTO_PYTHON="$(which python)"
+uv sync
+uv run python -m ipykernel install --user --name mixtape-causalpy --display-name "Mixtape CausalPy"
+export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
 quarto preview
 ```
 
+The lock includes `ipykernel`, `nbclient`, `nbformat`, and `pyyaml` because Quarto imports them from `QUARTO_PYTHON` when it executes a chapter. They are not analysis dependencies.
+
+Quarto discovers Python on its own. Point `QUARTO_PYTHON` at this project's `.venv` so it does not pick up another interpreter. Copy `.vscode/settings.json.example` to `.vscode/settings.json` if you use the editor preview button. That file is gitignored.
+
 `quarto preview` serves the website. A full `quarto render` republishes from `_freeze/` and does not re-sample unless a `.qmd` changed. Preview and single-file render re-execute the chapter you are editing, which re-runs MCMC. After that, commit the updated `_freeze/` so CI can publish without sampling.
 
-Copy `.vscode/settings.json.example` to `.vscode/settings.json` and set `<CONDA_ENV_PATH>` if you use the editor preview button. That file is gitignored because the path is machine-specific.
+### Verify the stack
 
-### Verify Installation
+A bare `pip install causalpy` still resolves to 0.9.0 until 1.0.0 final is the PyPI default. This project pins the 1.0 line (`causalpy>=1.0.0rc1,<2`) and PyMC 6. Confirm the environment `uv sync` created:
 
-```python
-import causalpy as cp
-print(cp.__version__)  # Development version from GitHub main branch
+```bash
+uv run python -c "import causalpy, pymc; print('causalpy', causalpy.__version__); print('pymc', pymc.__version__)"
 ```
 
-> **Note**: This repo uses the development version of CausalPy installed directly from GitHub to access the latest bug fixes and features.
+`causalpy` must be a 1.0 version, not `0.9.0`. `pymc` must be 6.x (6.3.2 or a newer 6.x).
 
 ## Chapter → page mapping
 
