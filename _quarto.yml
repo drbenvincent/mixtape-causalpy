@@ -20,6 +20,9 @@ website:
         href: https://mixtape.scunning.com
       - text: CausalPy
         href: https://causalpy.readthedocs.io
+    right:
+      - text: Benjamin T. Vincent
+        href: https://drbenvincent.github.io/
   sidebar:
     style: docked
     search: true
