@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -110,6 +110,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -244,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#part-5-bandwidth-sensitivity-analysis" id="toc-part-5-bandwidth-sensitivity-analysis" class="nav-link" data-scroll-target="#part-5-bandwidth-sensitivity-analysis">Part 5: Bandwidth Sensitivity Analysis</a></li>
   <li><a href="#summary-and-comparison-to-mixtape" id="toc-summary-and-comparison-to-mixtape" class="nav-link" data-scroll-target="#summary-and-comparison-to-mixtape">Summary and Comparison to Mixtape</a>
   <ul class="collapse">
-  <li><a href="#key-findings-with-causalpy" id="toc-key-findings-with-causalpy" class="nav-link" data-scroll-target="#key-findings-with-causalpy">Key Findings with CausalPy</a></li>
+  <li><a href="#this-run" id="toc-this-run" class="nav-link" data-scroll-target="#this-run">This run</a></li>
   <li><a href="#comparison-mixtape-vs-causalpy" id="toc-comparison-mixtape-vs-causalpy" class="nav-link" data-scroll-target="#comparison-mixtape-vs-causalpy">Comparison: Mixtape vs CausalPy</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -347,7 +350,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="cell-3" class="cell" data-execution_count="1">
+<div id="4a0e9687" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -376,7 +379,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="part-1-rd-concepts-via-simulation" class="level2">
 <h2 class="anchored" data-anchor-id="part-1-rd-concepts-via-simulation">Part 1: RD Concepts via Simulation</h2>
 <p>Before diving into real data, let’s build intuition for regression discontinuity using simulated examples (rdd_simulate1-4).</p>
-<div id="cell-5" class="cell" data-execution_count="2">
+<div id="16aaccad" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rdd_simulate1 &amp; rdd_simulate2: Treatment effect simulations</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sim_dat <span class="op">=</span> pd.DataFrame({<span class="st">"x"</span>: np.random.normal(<span class="dv">50</span>, <span class="dv">25</span>, <span class="dv">1000</span>)})</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sim_dat.loc[sim_dat.x <span class="op">&lt;</span> <span class="dv">0</span>, <span class="st">"x"</span>] <span class="op">=</span> <span class="dv">0</span></span>
@@ -413,12 +416,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="06_regression_discontinuity_files/figure-html/cell-3-output-1.png" width="1389" height="515" class="figure-img"></p>
+<p><img src="06_regression_discontinuity_files/figure-html/cell-3-output-1.png" width="1335" height="494" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="cell-6" class="cell" data-execution_count="3">
+<div id="33678a00" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rdd_simulate3: Nonlinear CEF - Linear fit creates FALSE discontinuity</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sim_nonlin <span class="op">=</span> pd.DataFrame({<span class="st">"x"</span>: np.random.normal(<span class="dv">100</span>, <span class="dv">50</span>, <span class="dv">1000</span>)})</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sim_nonlin.loc[sim_nonlin.x <span class="op">&lt;</span> <span class="dv">0</span>, <span class="st">"x"</span>] <span class="op">=</span> <span class="dv">0</span></span>
@@ -456,7 +459,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="06_regression_discontinuity_files/figure-html/cell-4-output-1.png" width="1389" height="515" class="figure-img"></p>
+<p><img src="06_regression_discontinuity_files/figure-html/cell-4-output-1.png" width="1336" height="494" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -466,7 +469,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="part-2-lee-moretti-and-butler-2004-close-elections" class="level2">
 <h2 class="anchored" data-anchor-id="part-2-lee-moretti-and-butler-2004-close-elections">Part 2: Lee, Moretti, and Butler (2004) — Close Elections</h2>
 <p>Now we turn to real data. The key question: Does <em>winning</em> a close election affect voting behavior?</p>
-<div id="cell-8" class="cell" data-execution_count="4">
+<div id="6ce5bc48" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and prepare data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_lmb()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df.dropna(subset<span class="op">=</span>[<span class="st">"demvoteshare"</span>, <span class="st">"score"</span>]).copy()</span>
@@ -485,7 +488,7 @@ Treated (above 50%): 8097
 Control (below 50%): 5480</code></pre>
 </div>
 </div>
-<div id="cell-9" class="cell" data-execution_count="5">
+<div id="770da3c3" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_1 &amp; lmb_2: Naive comparisons (NOT RD - just to motivate the method)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>lmb_subset <span class="op">=</span> df_clean[df_clean[<span class="st">"lagdemvoteshare"</span>].between(<span class="fl">0.48</span>, <span class="fl">0.52</span>)].copy()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -520,7 +523,7 @@ RD solves this by comparing only at the threshold.</code></pre>
 <p>Now we use <strong>CausalPy’s <code>RegressionDiscontinuity</code></strong> for proper RD estimation with Bayesian inference.</p>
 <section id="lmb_3-linear-rd-with-causalpy-same-slopes" class="level3">
 <h3 class="anchored" data-anchor-id="lmb_3-linear-rd-with-causalpy-same-slopes">lmb_3: Linear RD with CausalPy (same slopes)</h3>
-<div id="cell-12" class="cell" data-execution_count="6">
+<div id="1dbd562b" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_3: CausalPy RD - Linear specification (same slope on both sides)</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>result_linear <span class="op">=</span> cp.RegressionDiscontinuity(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
@@ -530,7 +533,7 @@ RD solves this by comparing only at the threshold.</code></pre>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">True</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>).fit()</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>result_linear.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Initializing NUTS using jitter+adapt_diag...
@@ -538,39 +541,38 @@ Multiprocess sampling (4 chains in 4 jobs)
 NUTS: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"e311b92164b746019c0e0bd4a96d3a59","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
-</div>
-<div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 3 seconds.
+<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 4 seconds.
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Difference in Differences experiment
+<pre><code>Regression Discontinuity experiment
 Formula: score ~ 1 + demvoteshare_c + treated
 Running variable: demvoteshare_c
 Threshold on running variable: 0.0
+Bandwidth: inf
+Donut hole: 0.0
+Observations used for fit: 13577
 
 Results:
-Discontinuity at threshold = 58.40$CI_{94\%}$[57, 60]
+Discontinuity at threshold = 58.39$CI_{94\%}$[57, 60]
 
 
 Model coefficients:
-    Intercept        11, 94% HDI [10, 12]
-    treated[T.True]  58, 94% HDI [57, 60]
-    demvoteshare_c   -49, 94% HDI [-52, -46]
-    y_hat_sigma      24, 94% HDI [24, 25]</code></pre>
+  Intercept        11, 94% HDI [10, 12]
+  treated[T.True]  58, 94% HDI [57, 60]
+  demvoteshare_c   -49, 94% HDI [-52, -46]</code></pre>
 </div>
 </div>
-<div id="cell-13" class="cell" data-execution_count="7">
+<div id="e8fda9bf" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_4: CausalPy RD - Different slopes (interaction term)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>result_interact <span class="op">=</span> cp.RegressionDiscontinuity(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
@@ -580,7 +582,7 @@ Model coefficients:
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">True</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>).fit()</span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>result_interact.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Initializing NUTS using jitter+adapt_diag...
@@ -588,40 +590,39 @@ Multiprocess sampling (4 chains in 4 jobs)
 NUTS: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"2d2e57b966ff4f439608f13c24838f68","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
-</div>
-<div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 5 seconds.
+<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 6 seconds.
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Difference in Differences experiment
+<pre><code>Regression Discontinuity experiment
 Formula: score ~ 1 + demvoteshare_c + treated + demvoteshare_c:treated
 Running variable: demvoteshare_c
 Threshold on running variable: 0.0
+Bandwidth: inf
+Donut hole: 0.0
+Observations used for fit: 13577
 
 Results:
-Discontinuity at threshold = 55.37$CI_{94\%}$[54, 57]
+Discontinuity at threshold = 55.38$CI_{94\%}$[54, 57]
 
 
 Model coefficients:
-    Intercept                       17, 94% HDI [16, 18]
-    treated[T.True]                 55, 94% HDI [54, 57]
-    demvoteshare_c                  -5.9, 94% HDI [-12, -0.17]
-    demvoteshare_c:treated[T.True]  -55, 94% HDI [-62, -48]
-    y_hat_sigma                     24, 94% HDI [24, 24]</code></pre>
+  Intercept                       17, 94% HDI [16, 18]
+  treated[T.True]                 55, 94% HDI [54, 57]
+  demvoteshare_c                  -5.9, 94% HDI [-12, -0.13]
+  demvoteshare_c:treated[T.True]  -55, 94% HDI [-62, -49]</code></pre>
 </div>
 </div>
-<div id="cell-14" class="cell" data-execution_count="8">
+<div id="e1725f18" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_5 &amp; lmb_6: CausalPy RD - Quadratic specification with bandwidth</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: Use I(demvoteshare_c**2) instead of pre-computed column so patsy can</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># compute it for prediction data too</span></span>
@@ -634,7 +635,7 @@ Model coefficients:
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    bandwidth<span class="op">=</span><span class="fl">0.05</span>,  <span class="co"># ±5 percentage points (lmb_6)</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>).fit()</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>result_quad.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Initializing NUTS using jitter+adapt_diag...
@@ -642,49 +643,48 @@ Multiprocess sampling (4 chains in 4 jobs)
 NUTS: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"06c832a6c9d14385ba37a7d124d089b4","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
-</div>
-<div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 2 seconds.
+<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 3 seconds.
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Difference in Differences experiment
+<pre><code>Regression Discontinuity experiment
 Formula: score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated
 Running variable: demvoteshare_c
 Threshold on running variable: 0.0
+Bandwidth: 0.05
+Donut hole: 0.0
+Observations used for fit: 2387
 
 Results:
-Discontinuity at threshold = 47.04$CI_{94\%}$[44, 50]
+Discontinuity at threshold = 47.02$CI_{94\%}$[44, 50]
 
 
 Model coefficients:
-    Intercept                               17, 94% HDI [16, 19]
-    treated[T.True]                         47, 94% HDI [44, 50]
-    demvoteshare_c                          22, 94% HDI [-31, 73]
-    demvoteshare_c:treated[T.True]          -34, 94% HDI [-104, 33]
-    I(demvoteshare_c ** 2)                  -2.5, 94% HDI [-97, 91]
-    I(demvoteshare_c ** 2):treated[T.True]  -0.85, 94% HDI [-99, 97]
-    y_hat_sigma                             19, 94% HDI [19, 20]</code></pre>
+  Intercept                               17, 94% HDI [16, 19]
+  treated[T.True]                         47, 94% HDI [44, 50]
+  demvoteshare_c                          22, 94% HDI [-29, 74]
+  demvoteshare_c:treated[T.True]          -35, 94% HDI [-106, 29]
+  I(demvoteshare_c ** 2)                  -1.4, 94% HDI [-90, 97]
+  I(demvoteshare_c ** 2):treated[T.True]  -1.7, 94% HDI [-92, 93]</code></pre>
 </div>
 </div>
 </section>
 <section id="causalpy-rd-plot" class="level3">
 <h3 class="anchored" data-anchor-id="causalpy-rd-plot">CausalPy RD Plot</h3>
-<div id="cell-16" class="cell" data-execution_count="9">
+<div id="144023ff" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy built-in RD plot</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: CausalPy plots ALL data points even when bandwidth is specified.</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The model is fitted only on the bandwidth data, but the plot shows full context.</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> result_quad.plot()</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> result_quad.plot(show<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share (centered)"</span>)</span>
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(</span>
@@ -694,46 +694,41 @@ Model coefficients:
 <span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="06_regression_discontinuity_files/figure-html/cell-10-output-1.png" width="710" height="472" class="figure-img"></p>
-</figure>
+<pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-</div>
-<div id="cell-17" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary of CausalPy RD estimates across specifications</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"CausalPy RD Estimates: Treatment Effect at Threshold"</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, result <span class="kw">in</span> [</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Linear"</span>, result_linear),</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Interaction"</span>, result_interact),</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Quadratic+BW"</span>, result_quad),</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>]:</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    mean_eff <span class="op">=</span> <span class="bu">float</span>(result.discontinuity_at_threshold.mean())</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    ci_lo <span class="op">=</span> <span class="bu">float</span>(result.discontinuity_at_threshold.quantile(<span class="fl">0.03</span>))</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    ci_hi <span class="op">=</span> <span class="bu">float</span>(result.discontinuity_at_threshold.quantile(<span class="fl">0.97</span>))</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:15s}</span><span class="ss">: </span><span class="sc">{</span>mean_eff<span class="sc">:5.1f}</span><span class="ss"> [94% CI: </span><span class="sc">{</span>ci_lo<span class="sc">:.1f}</span><span class="ss">, </span><span class="sc">{</span>ci_hi<span class="sc">:.1f}</span><span class="ss">]"</span>)</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All specifications show ~47 ADA point effect. Results are robust."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="d65ec196" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary of CausalPy RD estimates across specifications</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"CausalPy RD Estimates: Treatment Effect at Threshold"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, result <span class="kw">in</span> [</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Linear"</span>, result_linear),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Interaction"</span>, result_interact),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Quadratic+BW"</span>, result_quad),</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>]:</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    disc <span class="op">=</span> result.result.discontinuity_at_threshold</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    mean_eff <span class="op">=</span> <span class="bu">float</span>(disc.mean())</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    ci_lo <span class="op">=</span> <span class="bu">float</span>(disc.quantile(<span class="fl">0.03</span>))</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    ci_hi <span class="op">=</span> <span class="bu">float</span>(disc.quantile(<span class="fl">0.97</span>))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:15s}</span><span class="ss">: </span><span class="sc">{</span>mean_eff<span class="sc">:5.1f}</span><span class="ss"> [94% CI: </span><span class="sc">{</span>ci_lo<span class="sc">:.1f}</span><span class="ss">, </span><span class="sc">{</span>ci_hi<span class="sc">:.1f}</span><span class="ss">]"</span>)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CausalPy RD Estimates: Treatment Effect at Threshold
 ============================================================
-Linear         :  58.4 [94% CI: 57.1, 59.7]
-Interaction    :  55.4 [94% CI: 54.0, 56.7]
-Quadratic+BW   :  47.0 [94% CI: 44.4, 49.7]
-
-All specifications show ~47 ADA point effect. Results are robust.</code></pre>
+Linear         :  58.4 [94% CI: 57.2, 59.6]
+Interaction    :  55.4 [94% CI: 54.1, 56.7]
+Quadratic+BW   :  47.0 [94% CI: 44.3, 49.7]
+</code></pre>
 </div>
 </div>
-<div id="cell-18" class="cell" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_9 - Optimal Bandwidth Selection (rdrobust) - Awaiting CausalPy support</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># R code: rdrobust(y = lmb_data$score, x = lmb_data$demvoteshare, c = 0.5)</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy has manual bandwidth but no data-driven IK/CCT selection</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy"</span>)</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Using manual bandwidth sensitivity analysis instead (see below)."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4fa4594d" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_9 - Optimal Bandwidth Selection (rdrobust) - Awaiting CausalPy support</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># R code: rdrobust(y = lmb_data$score, x = lmb_data$demvoteshare, c = 0.5)</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy has manual bandwidth but no data-driven IK/CCT selection</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy"</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Using manual bandwidth sensitivity analysis instead (see below)."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>PLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy
 Using manual bandwidth sensitivity analysis instead (see below).</code></pre>
@@ -742,25 +737,25 @@ Using manual bandwidth sensitivity analysis instead (see below).</code></pre>
 </section>
 <section id="validity-check-mccrary-density-test-lmb_10-placeholder" class="level3">
 <h3 class="anchored" data-anchor-id="validity-check-mccrary-density-test-lmb_10-placeholder">Validity Check: McCrary Density Test (lmb_10) — PLACEHOLDER</h3>
-<div id="cell-20" class="cell" data-execution_count="12">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_10 - McCrary Density Test - Awaiting CausalPy support</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># R code: DCdensity(lmb_data$demvoteshare, cutpoint = 0.5)</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tests for manipulation at threshold (bunching)</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PLACEHOLDER: McCrary density test not in CausalPy"</span>)</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Visual inspection of running variable density below:"</span>)</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Visual check (not a formal test)</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>ax.hist(df_clean[<span class="st">"demvoteshare"</span>], bins<span class="op">=</span><span class="dv">50</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, edgecolor<span class="op">=</span><span class="st">"black"</span>)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Threshold"</span>)</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share"</span>)</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Density"</span>)</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Running Variable Distribution (Visual Manipulation Check)"</span>)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"No obvious bunching at threshold. Formal test would confirm."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="137d2819" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_10 - McCrary Density Test - Awaiting CausalPy support</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># R code: DCdensity(lmb_data$demvoteshare, cutpoint = 0.5)</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tests for manipulation at threshold (bunching)</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PLACEHOLDER: McCrary density test not in CausalPy"</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Visual inspection of running variable density below:"</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Visual check (not a formal test)</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>ax.hist(df_clean[<span class="st">"demvoteshare"</span>], bins<span class="op">=</span><span class="dv">50</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, edgecolor<span class="op">=</span><span class="st">"black"</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Threshold"</span>)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share"</span>)</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Density"</span>)</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Running Variable Distribution (Visual Manipulation Check)"</span>)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"No obvious bunching at threshold. Formal test would confirm."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>PLACEHOLDER: McCrary density test not in CausalPy
 Visual inspection of running variable density below:</code></pre>
@@ -768,7 +763,7 @@ Visual inspection of running variable density below:</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="06_regression_discontinuity_files/figure-html/cell-13-output-2.png" width="833" height="469" class="figure-img"></p>
+<p><img src="06_regression_discontinuity_files/figure-html/cell-13-output-2.png" width="800" height="451" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -781,95 +776,95 @@ Visual inspection of running variable density below:</code></pre>
 </section>
 <section id="part-4-rd-visualizations-lmb_7-lmb_8" class="level2">
 <h2 class="anchored" data-anchor-id="part-4-rd-visualizations-lmb_7-lmb_8">Part 4: RD Visualizations (lmb_7, lmb_8)</h2>
-<div id="cell-22" class="cell" data-execution_count="13">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_7: Three RD visualizations (quadratic, kernel smooth, linear)</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>lmb_close <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.45</span>, <span class="fl">0.55</span>)].copy()</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>lmb_close[<span class="st">"bin"</span>] <span class="op">=</span> pd.cut(lmb_close[<span class="st">"lagdemvoteshare"</span>], bins<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>binned <span class="op">=</span> lmb_close.groupby(<span class="st">"bin"</span>)[<span class="st">"score"</span>].mean().reset_index()</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>binned[<span class="st">"midpoint"</span>] <span class="op">=</span> binned[<span class="st">"bin"</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.mid <span class="cf">if</span> pd.notna(x) <span class="cf">else</span> np.nan)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>binned <span class="op">=</span> binned.dropna()</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>below <span class="op">=</span> lmb_close[lmb_close[<span class="st">"lagdemvoteshare"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>above <span class="op">=</span> lmb_close[lmb_close[<span class="st">"lagdemvoteshare"</span>] <span class="op">&gt;=</span> <span class="fl">0.5</span>]</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kernel_smooth(x, y, x_grid, bw<span class="op">=</span><span class="fl">0.02</span>):</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>        [</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>            np.<span class="bu">sum</span>(np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((x <span class="op">-</span> x0) <span class="op">/</span> bw) <span class="op">**</span> <span class="dv">2</span>) <span class="op">*</span> y)</span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>            <span class="op">/</span> np.<span class="bu">sum</span>(np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((x <span class="op">-</span> x0) <span class="op">/</span> bw) <span class="op">**</span> <span class="dv">2</span>))</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> x0 <span class="kw">in</span> x_grid</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>        ]</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, (deg, title) <span class="kw">in</span> <span class="bu">zip</span>(</span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>    axes, [(<span class="dv">2</span>, <span class="st">"Quadratic"</span>), (<span class="va">None</span>, <span class="st">"Kernel Smooth"</span>), (<span class="dv">1</span>, <span class="st">"Linear"</span>)]</span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>):</span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>    ax.scatter(binned[<span class="st">"midpoint"</span>], binned[<span class="st">"score"</span>], s<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">"black"</span>)</span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> subset, color <span class="kw">in</span> [(below, <span class="st">"C0"</span>), (above, <span class="st">"C3"</span>)]:</span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>        x_v, y_v <span class="op">=</span> subset[<span class="st">"lagdemvoteshare"</span>].values, subset[<span class="st">"score"</span>].values</span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>        x_line <span class="op">=</span> np.linspace(x_v.<span class="bu">min</span>(), x_v.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
-<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> deg <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>            ax.plot(x_line, kernel_smooth(x_v, y_v, x_line), color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>            ax.plot(</span>
-<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>                x_line,</span>
-<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>                np.polyval(np.polyfit(x_v, y_v, deg), x_line),</span>
-<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span>color,</span>
-<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>                linewidth<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>    ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>)</span>
-<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="fl">0.45</span>, <span class="fl">0.55</span>)</span>
-<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
-<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Lagged Dem Vote Share"</span>)</span>
-<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
-<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
-<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"RD Visualizations (lmb_7)"</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
-<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a9841d94" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_7: Three RD visualizations (quadratic, kernel smooth, linear)</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>lmb_close <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.45</span>, <span class="fl">0.55</span>)].copy()</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>lmb_close[<span class="st">"bin"</span>] <span class="op">=</span> pd.cut(lmb_close[<span class="st">"lagdemvoteshare"</span>], bins<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>binned <span class="op">=</span> lmb_close.groupby(<span class="st">"bin"</span>)[<span class="st">"score"</span>].mean().reset_index()</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>binned[<span class="st">"midpoint"</span>] <span class="op">=</span> binned[<span class="st">"bin"</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.mid <span class="cf">if</span> pd.notna(x) <span class="cf">else</span> np.nan)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>binned <span class="op">=</span> binned.dropna()</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>below <span class="op">=</span> lmb_close[lmb_close[<span class="st">"lagdemvoteshare"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>above <span class="op">=</span> lmb_close[lmb_close[<span class="st">"lagdemvoteshare"</span>] <span class="op">&gt;=</span> <span class="fl">0.5</span>]</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kernel_smooth(x, y, x_grid, bw<span class="op">=</span><span class="fl">0.02</span>):</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>            np.<span class="bu">sum</span>(np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((x <span class="op">-</span> x0) <span class="op">/</span> bw) <span class="op">**</span> <span class="dv">2</span>) <span class="op">*</span> y)</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>            <span class="op">/</span> np.<span class="bu">sum</span>(np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((x <span class="op">-</span> x0) <span class="op">/</span> bw) <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> x0 <span class="kw">in</span> x_grid</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, (deg, title) <span class="kw">in</span> <span class="bu">zip</span>(</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>    axes, [(<span class="dv">2</span>, <span class="st">"Quadratic"</span>), (<span class="va">None</span>, <span class="st">"Kernel Smooth"</span>), (<span class="dv">1</span>, <span class="st">"Linear"</span>)]</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>    ax.scatter(binned[<span class="st">"midpoint"</span>], binned[<span class="st">"score"</span>], s<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">"black"</span>)</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> subset, color <span class="kw">in</span> [(below, <span class="st">"C0"</span>), (above, <span class="st">"C3"</span>)]:</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>        x_v, y_v <span class="op">=</span> subset[<span class="st">"lagdemvoteshare"</span>].values, subset[<span class="st">"score"</span>].values</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>        x_line <span class="op">=</span> np.linspace(x_v.<span class="bu">min</span>(), x_v.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> deg <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>            ax.plot(x_line, kernel_smooth(x_v, y_v, x_line), color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>            ax.plot(</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>                x_line,</span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>                np.polyval(np.polyfit(x_v, y_v, deg), x_line),</span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span>color,</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>                linewidth<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>    ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>)</span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="fl">0.45</span>, <span class="fl">0.55</span>)</span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Lagged Dem Vote Share"</span>)</span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"RD Visualizations (lmb_7)"</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="06_regression_discontinuity_files/figure-html/cell-14-output-1.png" width="1489" height="515" class="figure-img"></p>
+<p><img src="06_regression_discontinuity_files/figure-html/cell-14-output-1.png" width="1432" height="494" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="cell-23" class="cell" data-execution_count="14">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_8: Kernel-smoothed RD plot (full range)</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>df_kernel <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.25</span>, <span class="fl">0.75</span>)].copy()</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>below_k <span class="op">=</span> df_kernel[df_kernel[<span class="st">"demvoteshare"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>above_k <span class="op">=</span> df_kernel[df_kernel[<span class="st">"demvoteshare"</span>] <span class="op">&gt;=</span> <span class="fl">0.5</span>]</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>ax.scatter(df_kernel[<span class="st">"demvoteshare"</span>], df_kernel[<span class="st">"score"</span>], alpha<span class="op">=</span><span class="fl">0.1</span>, s<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">"gray"</span>)</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> subset, color, label <span class="kw">in</span> [(below_k, <span class="st">"C0"</span>, <span class="st">"Below"</span>), (above_k, <span class="st">"C3"</span>, <span class="st">"Above"</span>)]:</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    x_v, y_v <span class="op">=</span> subset[<span class="st">"demvoteshare"</span>].values, subset[<span class="st">"score"</span>].values</span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    x_grid <span class="op">=</span> np.linspace(x_v.<span class="bu">min</span>(), x_v.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    ax.plot(</span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>        x_grid,</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>        kernel_smooth(x_v, y_v, x_grid, bw<span class="op">=</span><span class="fl">0.05</span>),</span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>color,</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        linewidth<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span>label,</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share"</span>)</span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Kernel-Smoothed RD Plot (lmb_8)"</span>)</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="fl">0.25</span>, <span class="fl">0.75</span>)</span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Kernel discontinuity estimate: ~</span><span class="sc">{</span>kernel_smooth(above_k[<span class="st">'demvoteshare'</span>].values, above_k[<span class="st">'score'</span>].values, [<span class="fl">0.501</span>])[<span class="dv">0</span>] <span class="op">-</span> kernel_smooth(below_k[<span class="st">'demvoteshare'</span>].values, below_k[<span class="st">'score'</span>].values, [<span class="fl">0.499</span>])[<span class="dv">0</span>]<span class="sc">:.0f}</span><span class="ss"> ADA points"</span></span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a533d9ef" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_8: Kernel-smoothed RD plot (full range)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>df_kernel <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.25</span>, <span class="fl">0.75</span>)].copy()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>below_k <span class="op">=</span> df_kernel[df_kernel[<span class="st">"demvoteshare"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>above_k <span class="op">=</span> df_kernel[df_kernel[<span class="st">"demvoteshare"</span>] <span class="op">&gt;=</span> <span class="fl">0.5</span>]</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>ax.scatter(df_kernel[<span class="st">"demvoteshare"</span>], df_kernel[<span class="st">"score"</span>], alpha<span class="op">=</span><span class="fl">0.1</span>, s<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> subset, color, label <span class="kw">in</span> [(below_k, <span class="st">"C0"</span>, <span class="st">"Below"</span>), (above_k, <span class="st">"C3"</span>, <span class="st">"Above"</span>)]:</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    x_v, y_v <span class="op">=</span> subset[<span class="st">"demvoteshare"</span>].values, subset[<span class="st">"score"</span>].values</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    x_grid <span class="op">=</span> np.linspace(x_v.<span class="bu">min</span>(), x_v.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    ax.plot(</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>        x_grid,</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        kernel_smooth(x_v, y_v, x_grid, bw<span class="op">=</span><span class="fl">0.05</span>),</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>color,</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>        linewidth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span>label,</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share"</span>)</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Kernel-Smoothed RD Plot (lmb_8)"</span>)</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="fl">0.25</span>, <span class="fl">0.75</span>)</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Kernel discontinuity estimate: ~</span><span class="sc">{</span>kernel_smooth(above_k[<span class="st">'demvoteshare'</span>].values, above_k[<span class="st">'score'</span>].values, [<span class="fl">0.501</span>])[<span class="dv">0</span>] <span class="op">-</span> kernel_smooth(below_k[<span class="st">'demvoteshare'</span>].values, below_k[<span class="st">'score'</span>].values, [<span class="fl">0.499</span>])[<span class="dv">0</span>]<span class="sc">:.0f}</span><span class="ss"> ADA points"</span></span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="06_regression_discontinuity_files/figure-html/cell-15-output-1.png" width="989" height="590" class="figure-img"></p>
+<p><img src="06_regression_discontinuity_files/figure-html/cell-15-output-1.png" width="952" height="566" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -881,194 +876,224 @@ Visual inspection of running variable density below:</code></pre>
 </section>
 <section id="part-5-bandwidth-sensitivity-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="part-5-bandwidth-sensitivity-analysis">Part 5: Bandwidth Sensitivity Analysis</h2>
-<div id="cell-25" class="cell" data-execution_count="15">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy bandwidth sensitivity analysis</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>bandwidths <span class="op">=</span> [<span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span>]</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>bw_results <span class="op">=</span> []</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bw <span class="kw">in</span> bandwidths:</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> cp.RegressionDiscontinuity(</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>            data<span class="op">=</span>df_clean,</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>            formula<span class="op">=</span><span class="st">"score ~ 1 + demvoteshare_c + treated"</span>,</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>            running_variable_name<span class="op">=</span><span class="st">"demvoteshare_c"</span>,</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>                sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">False</span>, <span class="st">"cores"</span>: <span class="dv">1</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>            ),</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>            treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>            bandwidth<span class="op">=</span>bw,</span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>        eff <span class="op">=</span> <span class="bu">float</span>(res.discontinuity_at_threshold.mean())</span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>        sd <span class="op">=</span> <span class="bu">float</span>(res.discontinuity_at_threshold.std())</span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="bu">len</span>(df_clean[df_clean[<span class="st">"demvoteshare_c"</span>].<span class="bu">abs</span>() <span class="op">&lt;=</span> bw])</span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>        bw_results.append({<span class="st">"bw"</span>: bw, <span class="st">"n"</span>: n, <span class="st">"effect"</span>: eff, <span class="st">"sd"</span>: sd})</span>
-<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"BW=</span><span class="sc">{</span>bw<span class="sc">:.2f}</span><span class="ss">: n=</span><span class="sc">{</span>n<span class="sc">:5d}</span><span class="ss">, effect=</span><span class="sc">{</span>eff<span class="sc">:.1f}</span><span class="ss"> ± </span><span class="sc">{</span>sd<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
-<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"BW=</span><span class="sc">{</span>bw<span class="sc">:.2f}</span><span class="ss">: Error - </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>bw_df <span class="op">=</span> pd.DataFrame(bw_results)</span>
-<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot bandwidth sensitivity</span></span>
-<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(bw_df) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>    ax.errorbar(</span>
-<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>        bw_df[<span class="st">"bw"</span>],</span>
-<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>        bw_df[<span class="st">"effect"</span>],</span>
-<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>        yerr<span class="op">=</span><span class="fl">1.96</span> <span class="op">*</span> bw_df[<span class="st">"sd"</span>],</span>
-<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">=</span><span class="st">"o-"</span>,</span>
-<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>        capsize<span class="op">=</span><span class="dv">5</span>,</span>
-<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>        markersize<span class="op">=</span><span class="dv">8</span>,</span>
-<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>    ax.axhline(y<span class="op">=</span><span class="dv">0</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
-<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Bandwidth"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Treatment Effect (ADA Score)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"CausalPy RD: Bandwidth Sensitivity"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, row <span class="kw">in</span> bw_df.iterrows():</span>
-<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a>        ax.annotate(</span>
-<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"n=</span><span class="sc">{</span><span class="bu">int</span>(row[<span class="st">'n'</span>])<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a>            (row[<span class="st">"bw"</span>], row[<span class="st">"effect"</span>]),</span>
-<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a>            textcoords<span class="op">=</span><span class="st">"offset points"</span>,</span>
-<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a>            xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
-<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>            ha<span class="op">=</span><span class="st">"center"</span>,</span>
-<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>,</span>
-<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
-<span id="cb31-53"><a href="#cb31-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Treatment effect is stable across bandwidths (~47 ADA points)."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6020fdf7" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy bandwidth sensitivity analysis</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>bandwidths <span class="op">=</span> [<span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span>]</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>bw_results <span class="op">=</span> []</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bw <span class="kw">in</span> bandwidths:</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> cp.RegressionDiscontinuity(</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>            data<span class="op">=</span>df_clean,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>            formula<span class="op">=</span><span class="st">"score ~ 1 + demvoteshare_c + treated"</span>,</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>            running_variable_name<span class="op">=</span><span class="st">"demvoteshare_c"</span>,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>                sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">False</span>, <span class="st">"cores"</span>: <span class="dv">1</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>            treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>            bandwidth<span class="op">=</span>bw,</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>        ).fit()</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>        disc <span class="op">=</span> res.result.discontinuity_at_threshold</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>        eff <span class="op">=</span> <span class="bu">float</span>(disc.mean())</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>        sd <span class="op">=</span> <span class="bu">float</span>(disc.std())</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="bu">len</span>(df_clean[df_clean[<span class="st">"demvoteshare_c"</span>].<span class="bu">abs</span>() <span class="op">&lt;=</span> bw])</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>        bw_results.append({<span class="st">"bw"</span>: bw, <span class="st">"n"</span>: n, <span class="st">"effect"</span>: eff, <span class="st">"sd"</span>: sd})</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"BW=</span><span class="sc">{</span>bw<span class="sc">:.2f}</span><span class="ss">: n=</span><span class="sc">{</span>n<span class="sc">:5d}</span><span class="ss">, effect=</span><span class="sc">{</span>eff<span class="sc">:.1f}</span><span class="ss"> ± </span><span class="sc">{</span>sd<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"BW=</span><span class="sc">{</span>bw<span class="sc">:.2f}</span><span class="ss">: Error - </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>bw_df <span class="op">=</span> pd.DataFrame(bw_results)</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot bandwidth sensitivity</span></span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(bw_df) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    ax.errorbar(</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>        bw_df[<span class="st">"bw"</span>],</span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>        bw_df[<span class="st">"effect"</span>],</span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a>        yerr<span class="op">=</span><span class="fl">1.96</span> <span class="op">*</span> bw_df[<span class="st">"sd"</span>],</span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">=</span><span class="st">"o-"</span>,</span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>        capsize<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a>        markersize<span class="op">=</span><span class="dv">8</span>,</span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>    ax.axhline(y<span class="op">=</span><span class="dv">0</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Bandwidth"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Treatment Effect (ADA Score)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"CausalPy RD: Bandwidth Sensitivity"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, row <span class="kw">in</span> bw_df.iterrows():</span>
+<span id="cb32-44"><a href="#cb32-44" aria-hidden="true" tabindex="-1"></a>        ax.annotate(</span>
+<span id="cb32-45"><a href="#cb32-45" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"n=</span><span class="sc">{</span><span class="bu">int</span>(row[<span class="st">'n'</span>])<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb32-46"><a href="#cb32-46" aria-hidden="true" tabindex="-1"></a>            (row[<span class="st">"bw"</span>], row[<span class="st">"effect"</span>]),</span>
+<span id="cb32-47"><a href="#cb32-47" aria-hidden="true" tabindex="-1"></a>            textcoords<span class="op">=</span><span class="st">"offset points"</span>,</span>
+<span id="cb32-48"><a href="#cb32-48" aria-hidden="true" tabindex="-1"></a>            xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb32-49"><a href="#cb32-49" aria-hidden="true" tabindex="-1"></a>            ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb32-50"><a href="#cb32-50" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb32-51"><a href="#cb32-51" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb32-52"><a href="#cb32-52" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb32-53"><a href="#cb32-53" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb32-54"><a href="#cb32-54" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> <span class="bu">float</span>(bw_df[<span class="st">"effect"</span>].<span class="bu">min</span>()), <span class="bu">float</span>(bw_df[<span class="st">"effect"</span>].<span class="bu">max</span>())</span>
+<span id="cb32-55"><a href="#cb32-55" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb32-56"><a href="#cb32-56" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Local linear effects across bandwidths "</span></span>
+<span id="cb32-57"><a href="#cb32-57" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>bw_df[<span class="st">'bw'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">–</span><span class="sc">{</span>bw_df[<span class="st">'bw'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">: "</span></span>
+<span id="cb32-58"><a href="#cb32-58" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>lo<span class="sc">:.1f}</span><span class="ss"> to </span><span class="sc">{</span>hi<span class="sc">:.1f}</span><span class="ss"> ADA points."</span></span>
+<span id="cb32-59"><a href="#cb32-59" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Initializing NUTS using jitter+adapt_diag...
 Sequential sampling (2 chains in 1 job)
 NUTS: [beta, y_hat_sigma]
 Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.
 We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...</code></pre>
+Initializing NUTS using jitter+adapt_diag...
+Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>BW=0.02: n=  945, effect=46.3 ± 1.4</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 2 seconds.
+<pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 2 seconds.
 We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
+Initializing NUTS using jitter+adapt_diag...
+Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.05: n= 2387, effect=46.8 ± 1.4</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 3 seconds.
+We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Initializing NUTS using jitter+adapt_diag...</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>BW=0.05: n= 2387, effect=46.8 ± 1.4</code></pre>
+<pre><code>BW=0.10: n= 4632, effect=47.3 ± 1.2</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Sequential sampling (2 chains in 1 job)
 NUTS: [beta, y_hat_sigma]
 Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 3 seconds.
 We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>BW=0.10: n= 4632, effect=47.2 ± 1.1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
-Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...</code></pre>
+Initializing NUTS using jitter+adapt_diag...
+Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>BW=0.15: n= 6788, effect=47.2 ± 1.0</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
+<pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
 We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Initializing NUTS using jitter+adapt_diag...</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>BW=0.20: n= 8699, effect=47.8 ± 0.9</code></pre>
+<pre><code>BW=0.20: n= 8699, effect=47.9 ± 0.9</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Sequential sampling (2 chains in 1 job)
 NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 5 seconds.
+Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
 We recommend running at least 4 chains for robust computation of convergence diagnostics
+The rhat statistic is larger than 1.01 for some parameters. This indicates problems during sampling. See https://arxiv.org/abs/1903.08008 for details
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>BW=0.25: n=10174, effect=47.7 ± 0.8</code></pre>
+<pre><code>BW=0.25: n=10174, effect=47.8 ± 0.8</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="06_regression_discontinuity_files/figure-html/cell-16-output-13.png" width="991" height="591" class="figure-img"></p>
+<p><img src="06_regression_discontinuity_files/figure-html/cell-16-output-13.png" width="951" height="566" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Treatment effect is stable across bandwidths (~47 ADA points).</code></pre>
+<pre><code>Local linear effects across bandwidths 0.02–0.25: 46.3 to 47.9 ADA points.</code></pre>
 </div>
 </div>
 <hr>
 </section>
 <section id="summary-and-comparison-to-mixtape" class="level2">
 <h2 class="anchored" data-anchor-id="summary-and-comparison-to-mixtape">Summary and Comparison to Mixtape</h2>
-<section id="key-findings-with-causalpy" class="level3">
-<h3 class="anchored" data-anchor-id="key-findings-with-causalpy">Key Findings with CausalPy</h3>
+<section id="this-run" class="level3">
+<h3 class="anchored" data-anchor-id="this-run">This run</h3>
+<p>The discontinuity is <code>result.discontinuity_at_threshold</code>, not the <code>treated</code> coefficient.</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 38%">
+<col style="width: 29%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Specification</th>
-<th>Treatment Effect</th>
-<th>94% CI</th>
+<th>Treatment effect</th>
+<th>94% interval</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Linear (same slopes)</td>
-<td>~47</td>
-<td>[44, 50]</td>
+<td>Linear, full sample</td>
+<td>58.4</td>
+<td>[57.2, 59.6]</td>
 </tr>
 <tr class="even">
-<td>Interaction (diff slopes)</td>
-<td>~47</td>
-<td>[44, 50]</td>
+<td>Interaction, full sample</td>
+<td>55.4</td>
+<td>[54.1, 56.7]</td>
 </tr>
 <tr class="odd">
-<td>Quadratic + bandwidth</td>
-<td>~47</td>
-<td>[44, 50]</td>
+<td>Quadratic, ±5pp bandwidth</td>
+<td>47.0</td>
+<td>[44.3, 49.7]</td>
+</tr>
+<tr class="even">
+<td>Local linear, bandwidth 0.02–0.25</td>
+<td>46.3 to 47.9</td>
+<td>see the bandwidth cell</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Conclusion</strong>: Winning a close election causes ~47 ADA point shift in voting behavior. Results are robust to specification and bandwidth choices.</p>
+<p>The close-election result is the local one, about 47 ADA points, and it is stable across those bandwidths. Full-sample linear and interaction fits use observations far from the cutoff, so they are a different estimand and come out larger. Do not read the table as four replications of 47.</p>
 </section>
 <section id="comparison-mixtape-vs-causalpy" class="level3">
 <h3 class="anchored" data-anchor-id="comparison-mixtape-vs-causalpy">Comparison: Mixtape vs CausalPy</h3>

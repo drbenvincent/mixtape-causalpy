@@ -64,7 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -110,6 +110,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -245,6 +248,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#key-differences" id="toc-key-differences" class="nav-link" data-scroll-target="#key-differences">Key Differences</a></li>
   <li><a href="#why-the-results-may-differ" id="toc-why-the-results-may-differ" class="nav-link" data-scroll-target="#why-the-results-may-differ">Why the Results May Differ</a></li>
+  <li><a href="#this-run" id="toc-this-run" class="nav-link" data-scroll-target="#this-run">This run</a></li>
   <li><a href="#event-study-todo" id="toc-event-study-todo" class="nav-link" data-scroll-target="#event-study-todo">Event Study (TODO)</a></li>
   </ul></li>
   <li><a href="#todo-event-study-design" id="toc-todo-event-study-design" class="nav-link" data-scroll-target="#todo-event-study-design">TODO: Event Study Design</a></li>
@@ -357,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="cell-3" class="cell" data-execution_count="1">
+<div id="5889b1bf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -385,7 +389,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="adapting-to-22-did" class="level3">
 <h3 class="anchored" data-anchor-id="adapting-to-22-did">Adapting to 2×2 DiD</h3>
 <p>Since CausalPy uses a 2×2 framework, we’ll: 1. Select states that adopted in 2006 (the largest cohort) as the <strong>treated group</strong> 2. Use never-treated states as the <strong>control group</strong> 3. Compare pre-2006 to post-2006 periods</p>
-<div id="cell-5" class="cell" data-execution_count="2">
+<div id="6ca191fc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>castle <span class="op">=</span> load_castle()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset shape: </span><span class="sc">{</span>castle<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -399,7 +403,7 @@ Years: [np.int16(2000), np.int16(2001), np.int16(2002), np.int16(2003), np.int16
 States: 50</code></pre>
 </div>
 </div>
-<div id="cell-6" class="cell" data-execution_count="3">
+<div id="4ba4aed9" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Examine treatment timing</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>treatment_dates <span class="op">=</span> castle.groupby(<span class="st">"state"</span>)[<span class="st">"treatment_date"</span>].first()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Treatment adoption by year:"</span>)</span>
@@ -429,7 +433,7 @@ States adopting in 2006: 11
 ['Alabama', 'Georgia', 'Indiana', 'Kansas', 'Kentucky', 'Louisiana', 'Michigan', 'Mississippi', 'Oklahoma', 'South Carolina', 'South Dakota']</code></pre>
 </div>
 </div>
-<div id="cell-7" class="cell" data-execution_count="4">
+<div id="883dd2ba" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create simplified 2x2 DiD dataset</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Treated: states that adopted in 2006</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Control: never-treated states</span></span>
@@ -463,7 +467,7 @@ group
 <section id="visualize-parallel-trends" class="level3">
 <h3 class="anchored" data-anchor-id="visualize-parallel-trends">Visualize Parallel Trends</h3>
 <p>Before running DiD, we should check whether treated and control groups followed similar trends pre-treatment. This is the key identifying assumption.</p>
-<div id="cell-9" class="cell" data-execution_count="5">
+<div id="dcdc8f32" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot average outcomes by group over time</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -492,7 +496,7 @@ group
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="09_difference_in_differences_files/figure-html/cell-6-output-1.png" width="952" height="566" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -501,7 +505,7 @@ group
 <section id="causalpy-difference-in-differences-estimation" class="level3">
 <h3 class="anchored" data-anchor-id="causalpy-difference-in-differences-estimation">CausalPy Difference-in-Differences Estimation</h3>
 <p>Now we’ll estimate the DiD effect using CausalPy’s <code>DifferenceInDifferences</code> class.</p>
-<div id="cell-11" class="cell" data-execution_count="6">
+<div id="6bc6e2c0" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For CausalPy DiD, we need a simpler time structure</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate to pre/post periods</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>castle_did <span class="op">=</span> castle_2x2.copy()</span>
@@ -539,7 +543,7 @@ group
 Shape: (80, 5)</code></pre>
 </div>
 </div>
-<div id="cell-12" class="cell" data-execution_count="7">
+<div id="25eb96b0" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run CausalPy DiD</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tune"</span>: <span class="dv">1000</span>,</span>
@@ -548,24 +552,20 @@ Shape: (80, 5)</code></pre>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cores"</span>: <span class="dv">1</span>,  <span class="co"># Single core for macOS Jupyter compatibility</span></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,</span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>castle_result <span class="op">=</span> cp.DifferenceInDifferences(</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    castle_agg,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"y ~ 1 + group * post_treatment"</span>,</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"t"</span>,</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    group_variable_name<span class="op">=</span><span class="st">"group"</span>,</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>castle_result <span class="op">=</span> cp.DifferenceInDifferences(</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    castle_agg,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"y ~ 1 + group * post_treatment"</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"t"</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    group_variable_name<span class="op">=</span><span class="st">"group"</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Initializing NUTS using jitter+adapt_diag...
 Sequential sampling (2 chains in 1 job)
 NUTS: [beta, y_hat_sigma]</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"71ba88a49eb94a2ab13743b0047e22a2","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
 </div>
 <div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
@@ -573,14 +573,17 @@ NUTS: [beta, y_hat_sigma]</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.
 We recommend running at least 4 chains for robust computation of convergence diagnostics
-Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]</code></pre>
 </div>
 </div>
-<div id="cell-13" class="cell" data-execution_count="8">
+<div id="0630adce" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>castle_result.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -588,18 +591,17 @@ Sampling: [y_hat]</code></pre>
 Formula: y ~ 1 + group * post_treatment
 
 Results:
-Causal impact = 0.10$CI_{94\%}$[-0.42, 0.63]
+Causal impact = 0.09$CI_{94\%}$[-0.42, 0.58]
 Model coefficients:
-    Intercept             1.3, 94% HDI [1.1, 1.4]
-    group                 0.52, 94% HDI [0.13, 0.89]
-    post_treatment        -0.06, 94% HDI [-0.32, 0.21]
-    group:post_treatment  0.1, 94% HDI [-0.42, 0.63]
-    y_hat_sigma           0.54, 94% HDI [0.47, 0.64]</code></pre>
+  Intercept             1.3, 94% HDI [1.1, 1.4]
+  group                 0.52, 94% HDI [0.15, 0.86]
+  post_treatment        -0.058, 94% HDI [-0.34, 0.21]
+  group:post_treatment  0.09, 94% HDI [-0.39, 0.6]</code></pre>
 </div>
 </div>
-<div id="cell-14" class="cell" data-execution_count="9">
+<div id="1319fc0a" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the DiD result</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> castle_result.plot()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> castle_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Time Period (0=Pre, 1=Post)"</span>)</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Log Homicide Rate"</span>)</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Castle Doctrine: Difference-in-Differences Estimate"</span>)</span>
@@ -608,7 +610,7 @@ Model coefficients:
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="09_difference_in_differences_files/figure-html/cell-10-output-1.png" width="708" height="469" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -625,7 +627,7 @@ Model coefficients:
 <h2 class="anchored" data-anchor-id="example-2-abortion-legalization-and-gonorrhea-rates">Example 2: Abortion Legalization and Gonorrhea Rates</h2>
 <p>This example examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected health outcomes, using gonorrhea rates as a proxy.</p>
 <p><strong>Key details:</strong> - <strong>Outcome</strong>: Log gonorrhea rate (<code>lnr</code>) - <strong>Treatment</strong>: Early abortion legalization (<code>repeal</code> = 1 for early-legalizing states) - <strong>Units</strong>: U.S. states × age cohorts - <strong>Time period</strong>: 1985-2000</p>
-<div id="cell-17" class="cell" data-execution_count="10">
+<div id="e7b3e240" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>abortion <span class="op">=</span> load_abortion()</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset shape: </span><span class="sc">{</span>abortion<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -638,7 +640,7 @@ Model coefficients:
 After dropping missing lnr: (17921, 39)</code></pre>
 </div>
 </div>
-<div id="cell-18" class="cell" data-execution_count="11">
+<div id="8b1427a3" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Key columns</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Key columns:"</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion[[<span class="st">"fip"</span>, <span class="st">"year"</span>, <span class="st">"repeal"</span>, <span class="st">"lnr"</span>, <span class="st">"bf15"</span>]].describe())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -655,7 +657,7 @@ min        1.000000   1985.000000      0.000000     -1.791759      0.000000
 max       56.000000   2000.000000      1.000000     10.006608      1.000000</code></pre>
 </div>
 </div>
-<div id="cell-19" class="cell" data-execution_count="12">
+<div id="c541d682" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For DiD, focus on the bf15 cohort (as in abortion_dd.py)</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># bf15 = 1 indicates cohorts born after 1973 (affected by abortion legalization)</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>abortion_bf15 <span class="op">=</span> abortion[abortion[<span class="st">"bf15"</span>] <span class="op">==</span> <span class="dv">1</span>].copy()</span>
@@ -671,7 +673,7 @@ max       56.000000   2000.000000      1.000000     10.006608      1.000000</cod
 Repeal states: 10.9%</code></pre>
 </div>
 </div>
-<div id="cell-20" class="cell" data-execution_count="13">
+<div id="59e24766" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for CausalPy DiD</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># We'll create a simpler 2x2 by using 1985-1992 vs 1993-2000</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -702,7 +704,7 @@ group
 1                40   40</code></pre>
 </div>
 </div>
-<div id="cell-21" class="cell" data-execution_count="14">
+<div id="81208bdf" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate by state and period for cleaner DiD</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>abortion_agg <span class="op">=</span> (</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    abortion_did.groupby([<span class="st">"unit"</span>, <span class="st">"group"</span>, <span class="st">"t"</span>, <span class="st">"post_treatment"</span>])</span>
@@ -732,7 +734,7 @@ group
 Shape: (102, 5)</code></pre>
 </div>
 </div>
-<div id="cell-22" class="cell" data-execution_count="15">
+<div id="808bc419" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize parallel trends</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -769,12 +771,12 @@ Shape: (102, 5)</code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="09_difference_in_differences_files/figure-html/cell-16-output-1.png" width="952" height="566" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="cell-23" class="cell" data-execution_count="16">
+<div id="eb38add8" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run CausalPy DiD</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>abortion_result <span class="op">=</span> cp.DifferenceInDifferences(</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    abortion_agg,</span>
@@ -782,16 +784,11 @@ Shape: (102, 5)</code></pre>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"t"</span>,</span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    group_variable_name<span class="op">=</span><span class="st">"group"</span>,</span>
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Initializing NUTS using jitter+adapt_diag...
 Sequential sampling (2 chains in 1 job)
 NUTS: [beta, y_hat_sigma]</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"eee63617309b425ba5ab8f4bc91664c2","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
 </div>
 <div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
@@ -799,14 +796,17 @@ NUTS: [beta, y_hat_sigma]</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.
 We recommend running at least 4 chains for robust computation of convergence diagnostics
-Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]</code></pre>
 </div>
 </div>
-<div id="cell-24" class="cell" data-execution_count="17">
+<div id="279c75d8" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>abortion_result.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -814,18 +814,17 @@ Sampling: [y_hat]</code></pre>
 Formula: y ~ 1 + group * post_treatment
 
 Results:
-Causal impact = -0.04$CI_{94\%}$[-0.91, 0.84]
+Causal impact = -0.06$CI_{94\%}$[-0.93, 0.82]
 Model coefficients:
-    Intercept             8.3, 94% HDI [8.1, 8.5]
-    group                 -0.55, 94% HDI [-1.2, 0.031]
-    post_treatment        -0.54, 94% HDI [-0.81, -0.27]
-    group:post_treatment  -0.041, 94% HDI [-0.91, 0.84]
-    y_hat_sigma           0.69, 94% HDI [0.61, 0.8]</code></pre>
+  Intercept             8.3, 94% HDI [8.1, 8.5]
+  group                 -0.54, 94% HDI [-1.1, 0.082]
+  post_treatment        -0.53, 94% HDI [-0.79, -0.26]
+  group:post_treatment  -0.056, 94% HDI [-0.98, 0.74]</code></pre>
 </div>
 </div>
-<div id="cell-25" class="cell" data-execution_count="18">
+<div id="b457e6ef" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the DiD result</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> abortion_result.plot()</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> abortion_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Time Period (0=Pre, 1=Post)"</span>)</span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Log Gonorrhea Rate"</span>)</span>
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Abortion Legalization: Difference-in-Differences Estimate"</span>)</span>
@@ -834,7 +833,7 @@ Model coefficients:
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-19-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="09_difference_in_differences_files/figure-html/cell-19-output-1.png" width="708" height="469" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -890,6 +889,10 @@ Model coefficients:
 <li><strong>No weighting</strong>: Mixtape uses population weights</li>
 <li><strong>Bayesian estimation</strong>: Different uncertainty quantification approach</li>
 </ol>
+</section>
+<section id="this-run" class="level3">
+<h3 class="anchored" data-anchor-id="this-run">This run</h3>
+<p>Castle Doctrine 2×2, <code>random_seed=42</code>: causal impact 0.09, 94% interval [-0.42, 0.58]. Abortion-legalization proxy: -0.06, 94% interval [-0.93, 0.82]. Both intervals include zero. These are not the Mixtape’s weighted, covariate-adjusted estimates.</p>
 </section>
 <section id="event-study-todo" class="level3">
 <h3 class="anchored" data-anchor-id="event-study-todo">Event Study (TODO)</h3>
