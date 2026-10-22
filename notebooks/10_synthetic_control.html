@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -313,8 +332,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 <section id="overview" class="level3">
 <h3 class="anchored" data-anchor-id="overview">Overview</h3>
-<p>Synthetic control is a method for estimating causal effects in comparative case studies where a single treated unit is compared to a weighted combination of control units. The key idea is to construct a “synthetic” control that closely matches the treated unit’s pre-intervention trajectory.</p>
-<p>This notebook covers the <strong>Texas prison reform</strong> example from Cunningham (2021), which examines the effect of prison capacity expansion on incarceration rates.</p>
+<p>Synthetic control is a method for estimating causal effects in comparative case studies where a single treated unit is compared to a weighted combination of control units <span class="citation" data-cites="abadie2010">(<a href="#ref-abadie2010" role="doc-biblioref">Abadie et al. 2010</a>)</span>. The key idea is to construct a “synthetic” control that closely matches the treated unit’s pre-intervention trajectory.</p>
+<p>This notebook covers the <strong>Texas prison reform</strong> example from <span class="citation" data-cites="cunningham2021">Cunningham (<a href="#ref-cunningham2021" role="doc-biblioref">2021</a>)</span>, which examines the effect of prison capacity expansion on incarceration rates.</p>
 </section>
 <section id="what-well-cover" class="level3">
 <h3 class="anchored" data-anchor-id="what-well-cover">What we’ll cover</h3>
@@ -1640,14 +1659,33 @@ With 10 placebos the smallest two-sided p-value this design can return is 0.091.
 </ol>
 <p>Texas’s post-1993 incarceration rate is higher than the synthetic control, and the posterior probability of an increase under this model is 1.0. Texas’s mean gap is larger than all 10 placebo gaps. That permutation result is the strongest this 10-placebo design can give (p = 0.091), not a 5% test. Posterior mean weights are diffuse under CausalPy 1.0’s default <code>auto_scale_sigma=True</code>, so the gap size is not the pre-1.0 number and not a sparse <code>Synth</code> weight vector.</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Further reading
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>First edition: <a href="https://mixtape-1ed.netlify.app/10-synthetic_control.html">Chapter 10: Synthetic Control</a></li>
+<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/synthetic-control-pymc.html">Synthetic control</a></li>
+</ul>
+</div>
+</div>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
-<ul>
-<li><strong>Mixtape chapter</strong>: <a href="https://mixtape-1ed.netlify.app/10-synthetic_control.html">Chapter 10: Synthetic Control</a></li>
-<li><strong>CausalPy documentation</strong>: <a href="https://causalpy.readthedocs.io/">https://causalpy.readthedocs.io/</a></li>
-<li><strong>Original paper</strong>: Abadie, A., Diamond, A., &amp; Hainmueller, J. (2010). Synthetic Control Methods for Comparative Case Studies. <em>Journal of the American Statistical Association</em>, 105(490), 493-505.</li>
-</ul>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-abadie2010" class="csl-entry" role="listitem">
+Abadie, Alberto, Alexis Diamond, and Jens Hainmueller. 2010. <span>“Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of <span class="nocase">California’s</span> Tobacco Control Program.”</span> <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746">https://doi.org/10.1198/jasa.2009.ap08746</a>.
+</div>
+<div id="ref-cunningham2021" class="csl-entry" role="listitem">
+Cunningham, Scott. 2021. <em>Causal Inference: The Mixtape</em>. 1st ed. Yale University Press. <a href="https://doi.org/10.2307/j.ctv1c29t27">https://doi.org/10.2307/j.ctv1c29t27</a>.
+</div>
+</div>
 
 
 </section>

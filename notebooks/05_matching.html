@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -526,7 +545,7 @@ This is NOT necessarily the causal effect - it may be confounded!</code></pre>
 <section id="example-2-nsw-experimental-benchmark" class="level2">
 <h2 class="anchored" data-anchor-id="example-2-nsw-experimental-benchmark">Example 2: NSW Experimental Benchmark</h2>
 <p>The <strong>National Supported Work (NSW)</strong> demonstration was a randomized job training program in the 1970s. Because treatment was randomly assigned, the simple difference in outcomes is an unbiased estimate of the Average Treatment Effect (ATE).</p>
-<p>This experimental estimate serves as a <strong>benchmark</strong> for evaluating observational methods. LaLonde (1986) famously showed that many observational estimators failed to recover this experimental benchmark when using non-experimental control groups.</p>
+<p>This experimental estimate serves as a <strong>benchmark</strong> for evaluating observational methods. <span class="citation" data-cites="lalonde1986">LaLonde (<a href="#ref-lalonde1986" role="doc-biblioref">1986</a>)</span> famously showed that many observational estimators failed to recover this experimental benchmark when using non-experimental control groups.</p>
 <p><strong>Outcome</strong>: Real earnings in 1978 (<code>re78</code>)</p>
 <div id="1d944b5c" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load NSW experimental data</span></span>
@@ -966,7 +985,7 @@ Experimental benchmark: $1,794.34</code></pre>
 </section>
 <section id="the-lalonde-problem" class="level3">
 <h3 class="anchored" data-anchor-id="the-lalonde-problem">The LaLonde Problem</h3>
-<p>The famous LaLonde (1986) paper showed that observational estimators often fail to recover the experimental benchmark. The NSW treated group was very different from CPS controls:</p>
+<p>The famous <span class="citation" data-cites="lalonde1986">LaLonde (<a href="#ref-lalonde1986" role="doc-biblioref">1986</a>)</span> paper showed that observational estimators often fail to recover the experimental benchmark. The NSW treated group was very different from CPS controls:</p>
 <ul>
 <li><strong>Lower prior earnings</strong>: NSW participants were disadvantaged workers</li>
 <li><strong>Different demographics</strong>: More minority, less educated</li>
@@ -1029,23 +1048,33 @@ Experimental benchmark: $1,794.34</code></pre>
 <p><strong>What CausalPy supports:</strong> - ✅ Inverse Propensity Weighting (multiple schemes) - ✅ Propensity score diagnostics - ✅ Balance plots</p>
 <p><strong>What’s not yet available:</strong> - ❌ Nearest neighbor matching - ❌ Subclassification - ❌ Coarsened exact matching</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Further reading
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>First edition: <a href="https://mixtape-1ed.netlify.app/05-matching_and_subclassification">Chapter 5: Matching and Subclassification</a></li>
+<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/inverse-propensity-pymc.html">Inverse propensity weighting</a></li>
+<li>Dehejia, Rajeev H., and Sadek Wahba (1999). “Causal Effects in Nonexperimental Studies: Reevaluating the Evaluation of Training Programs.” <em>Journal of the American Statistical Association</em> 94 (448): 1053–1062.</li>
+<li>Rosenbaum, Paul R., and Donald B. Rubin (1983). “The Central Role of the Propensity Score in Observational Studies for Causal Effects.” <em>Biometrika</em> 70 (1): 41–55.</li>
+<li>Aronow, Peter M., and Benjamin T. Miller (2019). <em>Foundations of Agnostic Statistics</em>. Cambridge University Press.</li>
+</ul>
+</div>
+</div>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
-<ul>
-<li><strong>Mixtape chapter</strong>: https://mixtape-1ed.netlify.app/05-matching_and_subclassification</li>
-<li><strong>CausalPy docs</strong>: https://causalpy.readthedocs.io</li>
-<li><strong>Original papers</strong>:
-<ul>
-<li>LaLonde, R. (1986). “Evaluating the Econometric Evaluations of Training Programs with Experimental Data”</li>
-<li>Dehejia, R. &amp; Wahba, S. (1999). “Causal Effects in Nonexperimental Studies: Reevaluating the Evaluation of Training Programs”</li>
-<li>Rosenbaum, P. &amp; Rubin, D. (1983). “The Central Role of the Propensity Score in Observational Studies for Causal Effects”</li>
-</ul></li>
-<li><strong>Weighting schemes</strong>:
-<ul>
-<li>Aronow, P. &amp; Miller, B. (2019). “Foundations of Agnostic Statistics”</li>
-</ul></li>
-</ul>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-lalonde1986" class="csl-entry" role="listitem">
+LaLonde, Robert J. 1986. <span>“Evaluating the Econometric Evaluations of Training Programs with Experimental Data.”</span> <em>American Economic Review</em> 76 (4): 604–20.
+</div>
+</div>
 
 
 </section>

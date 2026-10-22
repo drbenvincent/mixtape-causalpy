@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -334,7 +353,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="important-note-on-staggered-did" class="level3">
 <h3 class="anchored" data-anchor-id="important-note-on-staggered-did">Important Note on Staggered DiD</h3>
 <p>The Mixtape examples use <strong>staggered adoption</strong> designs where different units receive treatment at different times. CausalPy’s current <code>DifferenceInDifferences</code> implementation is designed for the <strong>simple 2×2 case</strong> (one treated group, one control group, pre and post periods).</p>
-<p>For staggered DiD, see: - CausalPy PR #621 (staggered DiD support) - Recent literature on issues with TWFE in staggered settings (Goodman-Bacon, Callaway &amp; Sant’Anna, Sun &amp; Abraham)</p>
+<p>For staggered DiD, see: - CausalPy PR #621 (staggered DiD support) - Recent literature on issues with TWFE in staggered settings <span class="citation" data-cites="goodmanbacon2021 callaway2021 sun2021">(<a href="#ref-goodmanbacon2021" role="doc-biblioref">Goodman-Bacon 2021</a>; <a href="#ref-callaway2021" role="doc-biblioref">Callaway and Sant’Anna 2021</a>; <a href="#ref-sun2021" role="doc-biblioref">Sun and Abraham 2021</a>)</span></p>
 <p>In this notebook, we adapt the examples to work with CausalPy’s 2×2 framework.</p>
 </section>
 <section id="mixtape-files-implemented" class="level3">
@@ -412,7 +431,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="example-1-castle-doctrine-and-homicide-rates" class="level2">
 <h2 class="anchored" data-anchor-id="example-1-castle-doctrine-and-homicide-rates">Example 1: Castle Doctrine and Homicide Rates</h2>
-<p>The Castle Doctrine (also known as “Stand Your Ground” laws) expands the legal right to use deadly force in self-defense. The Mixtape examines whether these laws increased homicide rates.</p>
+<p>The Castle Doctrine (also known as “Stand Your Ground” laws) expands the legal right to use deadly force in self-defense. The Mixtape examines whether these laws increased homicide rates, following <span class="citation" data-cites="cheng2013">Cheng and Hoekstra (<a href="#ref-cheng2013" role="doc-biblioref">2013</a>)</span>.</p>
 <p><strong>Key details:</strong> - <strong>Outcome</strong>: Log homicide rate (<code>l_homicide</code>) - <strong>Treatment</strong>: Adoption of Castle Doctrine (<code>post</code> = 1 after adoption) - <strong>Units</strong>: U.S. states - <strong>Time period</strong>: 2000-2010</p>
 <section id="adapting-to-22-did" class="level3">
 <h3 class="anchored" data-anchor-id="adapting-to-22-did">Adapting to 2×2 DiD</h3>
@@ -653,7 +672,7 @@ Model coefficients:
 </section>
 <section id="example-2-abortion-legalization-and-gonorrhea-rates" class="level2">
 <h2 class="anchored" data-anchor-id="example-2-abortion-legalization-and-gonorrhea-rates">Example 2: Abortion Legalization and Gonorrhea Rates</h2>
-<p>This example examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected health outcomes, using gonorrhea rates as a proxy.</p>
+<p>This example follows <span class="citation" data-cites="donohue2001">Donohue and Levitt (<a href="#ref-donohue2001" role="doc-biblioref">2001</a>)</span>, but uses gonorrhea rates as a proxy rather than crime. It examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected that outcome.</p>
 <p><strong>Key details:</strong> - <strong>Outcome</strong>: Log gonorrhea rate (<code>lnr</code>) - <strong>Treatment</strong>: Early abortion legalization (<code>repeal</code> = 1 for early-legalizing states) - <strong>Units</strong>: U.S. states × age cohorts - <strong>Time period</strong>: 1985-2000</p>
 <div id="e7b3e240" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
@@ -965,23 +984,43 @@ Model coefficients:
 </ul>
 <p><strong>Next steps:</strong> - When CausalPy adds staggered DiD support, return to implement the full event study analyses - Consider adding covariates to the formula for richer specifications</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Further reading
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>First edition: <a href="https://mixtape-1ed.netlify.app/09-difference_in_differences.html">Chapter 9: Difference-in-Differences</a></li>
+<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html">Difference-in-differences</a></li>
+<li><a href="https://github.com/pymc-labs/CausalPy/pull/621">CausalPy PR #621</a> tracks staggered DiD support. This page does not estimate a staggered design.</li>
+</ul>
+</div>
+</div>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
-<ul>
-<li><strong>Mixtape chapter</strong>: https://mixtape-1ed.netlify.app/09-difference_in_differences.html</li>
-<li><strong>CausalPy docs</strong>: https://causalpy.readthedocs.io</li>
-<li><strong>Original papers</strong>:
-<ul>
-<li>Cheng, C., &amp; Hoekstra, M. (2013). “Does Strengthening Self-Defense Law Deter Crime or Escalate Violence?”</li>
-<li>Donohue, J., &amp; Levitt, S. (2001). “The Impact of Legalized Abortion on Crime”</li>
-</ul></li>
-<li><strong>Modern DiD literature</strong>:
-<ul>
-<li>Goodman-Bacon, A. (2021). “Difference-in-Differences with Variation in Treatment Timing”</li>
-<li>Callaway, B., &amp; Sant’Anna, P. (2021). “Difference-in-Differences with Multiple Time Periods”</li>
-</ul></li>
-</ul>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-callaway2021" class="csl-entry" role="listitem">
+Callaway, Brantly, and Pedro H. C. Sant’Anna. 2021. <span>“Difference-in-Differences with Multiple Time Periods.”</span> <em>Journal of Econometrics</em> 225 (2): 200–230. <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">https://doi.org/10.1016/j.jeconom.2020.12.001</a>.
+</div>
+<div id="ref-cheng2013" class="csl-entry" role="listitem">
+Cheng, Cheng, and Mark Hoekstra. 2013. <span>“Does Strengthening Self-Defense Law Deter Crime or Escalate Violence? Evidence from Expansions to Castle Doctrine.”</span> <em>Journal of Human Resources</em> 48 (3): 821–54. <a href="https://doi.org/10.3368/jhr.48.3.821">https://doi.org/10.3368/jhr.48.3.821</a>.
+</div>
+<div id="ref-donohue2001" class="csl-entry" role="listitem">
+Donohue, John J., III, and Steven D. Levitt. 2001. <span>“The Impact of Legalized Abortion on Crime.”</span> <em>Quarterly Journal of Economics</em> 116 (2): 379–420. <a href="https://doi.org/10.1162/00335530151144050">https://doi.org/10.1162/00335530151144050</a>.
+</div>
+<div id="ref-goodmanbacon2021" class="csl-entry" role="listitem">
+Goodman-Bacon, Andrew. 2021. <span>“Difference-in-Differences with Variation in Treatment Timing.”</span> <em>Journal of Econometrics</em> 225 (2): 254–77. <a href="https://doi.org/10.1016/j.jeconom.2021.03.014">https://doi.org/10.1016/j.jeconom.2021.03.014</a>.
+</div>
+<div id="ref-sun2021" class="csl-entry" role="listitem">
+Sun, Liyang, and Sarah Abraham. 2021. <span>“Estimating Dynamic Treatment Effects in Event Studies with Heterogeneous Treatment Effects.”</span> <em>Journal of Econometrics</em> 225 (2): 175–99. <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">https://doi.org/10.1016/j.jeconom.2020.09.006</a>.
+</div>
+</div>
 
 
 </section>

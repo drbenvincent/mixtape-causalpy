@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -318,7 +337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Exclusion</strong>: Affects the outcome only through the treatment</li>
 <li><strong>Independence</strong>: Is not correlated with the unmeasured confounders</li>
 </ol>
-<p>This notebook covers the <strong>Card (1995)</strong> example, which estimates the returns to schooling using proximity to a four-year college (<code>nearc4</code>) as an instrument for years of education.</p>
+<p>This notebook covers the <span class="citation" data-cites="card1995">Card (<a href="#ref-card1995" role="doc-biblioref">1995</a>)</span> example, which estimates the returns to schooling using proximity to a four-year college (<code>nearc4</code>) as an instrument for years of education.</p>
 </section>
 <section id="what-well-cover" class="level3">
 <h3 class="anchored" data-anchor-id="what-well-cover">What we’ll cover</h3>
@@ -342,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td><code>card.py</code></td>
-<td>Card (1995) returns to schooling IV</td>
+<td><span class="citation" data-cites="card1995">Card (<a href="#ref-card1995" role="doc-biblioref">1995</a>)</span> returns to schooling IV</td>
 <td>✅</td>
 </tr>
 </tbody>
@@ -376,7 +395,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="load-and-explore-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-and-explore-data">Load and Explore Data</h2>
-<p>The Card (1995) dataset contains information about wages, education, and geographic variables. The key variables are:</p>
+<p>The <span class="citation" data-cites="card1995">Card (<a href="#ref-card1995" role="doc-biblioref">1995</a>)</span> dataset contains information about wages, education, and geographic variables. The key variables are:</p>
 <ul>
 <li><strong><code>lwage</code></strong>: Log of hourly wage (outcome)</li>
 <li><strong><code>educ</code></strong>: Years of education (endogenous treatment)</li>
@@ -983,14 +1002,30 @@ Interpretation: Each additional year of education causes a 18.3% increase in wag
 </ol>
 <p>The key takeaway: IV allows us to estimate causal effects when there is unmeasured confounding, provided we have a valid instrument. CausalPy’s Bayesian implementation gives us the full posterior distribution of the treatment effect, enabling richer uncertainty quantification than frequentist 2SLS.</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Further reading
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>First edition: <a href="https://mixtape-1ed.netlify.app/07-instrumental_variables.html">Chapter 7: Instrumental Variables</a></li>
+<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/instrumental-variables-pymc.html">Instrumental variables</a></li>
+</ul>
+</div>
+</div>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
-<ul>
-<li><strong>Mixtape chapter</strong>: <a href="https://mixtape-1ed.netlify.app/07-instrumental_variables.html">Chapter 7: Instrumental Variables</a></li>
-<li><strong>CausalPy documentation</strong>: <a href="https://causalpy.readthedocs.io/">https://causalpy.readthedocs.io/</a></li>
-<li><strong>Original paper</strong>: Card, D. (1995). Using Geographic Variation in College Proximity to Estimate the Return to Schooling. In <em>Aspects of Labour Market Behaviour: Essays in Honour of John Vanderkamp</em>.</li>
-</ul>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-card1995" class="csl-entry" role="listitem">
+Card, David. 1995. <span>“Using Geographic Variation in College Proximity to Estimate the Return to Schooling.”</span> In <em>Aspects of Labour Market Behaviour: Essays in Honour of John Vanderkamp</em>, edited by Louis N. Christofides, E. Kenneth Grant, and Robert Swidinsky. University of Toronto Press.
+</div>
+</div>
 
 
 </section>

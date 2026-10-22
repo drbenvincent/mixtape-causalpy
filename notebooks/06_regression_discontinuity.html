@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -264,7 +283,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
   <li><a href="#part-1-rd-concepts-via-simulation" id="toc-part-1-rd-concepts-via-simulation" class="nav-link" data-scroll-target="#part-1-rd-concepts-via-simulation">Part 1: RD Concepts via Simulation</a></li>
-  <li><a href="#part-2-lee-moretti-and-butler-2004-close-elections" id="toc-part-2-lee-moretti-and-butler-2004-close-elections" class="nav-link" data-scroll-target="#part-2-lee-moretti-and-butler-2004-close-elections">Part 2: Lee, Moretti, and Butler (2004) — Close Elections</a></li>
+  <li><a href="#part-2-close-elections" id="toc-part-2-close-elections" class="nav-link" data-scroll-target="#part-2-close-elections">Part 2: Close elections</a></li>
   <li><a href="#part-3-causalpy-rd-estimation-lmb_3-through-lmb_6" id="toc-part-3-causalpy-rd-estimation-lmb_3-through-lmb_6" class="nav-link" data-scroll-target="#part-3-causalpy-rd-estimation-lmb_3-through-lmb_6">Part 3: CausalPy RD Estimation (lmb_3 through lmb_6)</a>
   <ul class="collapse">
   <li><a href="#lmb_3-linear-rd-with-causalpy-same-slopes" id="toc-lmb_3-linear-rd-with-causalpy-same-slopes" class="nav-link" data-scroll-target="#lmb_3-linear-rd-with-causalpy-same-slopes">lmb_3: Linear RD with CausalPy (same slopes)</a></li>
@@ -279,7 +298,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#comparison-mixtape-vs-causalpy" id="toc-comparison-mixtape-vs-causalpy" class="nav-link" data-scroll-target="#comparison-mixtape-vs-causalpy">Comparison: Mixtape vs CausalPy</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
-  <li><a href="#references-1" id="toc-references-1" class="nav-link" data-scroll-target="#references-1">References</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/notebooks/06_regression_discontinuity.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -313,7 +331,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="overview" class="level3">
 <h3 class="anchored" data-anchor-id="overview">Overview</h3>
 <p>Regression discontinuity (RD) designs exploit situations where treatment is assigned based on whether a “running variable” crosses a known threshold. When units cannot precisely manipulate their position relative to the threshold, we can estimate causal effects by comparing outcomes just above and just below the cutoff.</p>
-<p>This notebook follows the structure of the Mixtape chapter: 1. <strong>Pedagogical simulations</strong> to build intuition for RD 2. <strong>Lee, Moretti, and Butler (2004)</strong> close elections empirical example 3. <strong>CausalPy implementation</strong> with Bayesian estimation</p>
+<p>This notebook follows the structure of the Mixtape chapter <span class="citation" data-cites="cunningham2021">(<a href="#ref-cunningham2021" role="doc-biblioref">Cunningham 2021</a>)</span>:</p>
+<ol type="1">
+<li><strong>Pedagogical simulations</strong> to build intuition for RD</li>
+<li>The close-elections example in <span class="citation" data-cites="lee2004voters">Lee et al. (<a href="#ref-lee2004voters" role="doc-biblioref">2004</a>)</span></li>
+<li><strong>CausalPy implementation</strong> with Bayesian estimation</li>
+</ol>
 </section>
 <section id="what-well-cover" class="level3">
 <h3 class="anchored" data-anchor-id="what-well-cover">What we’ll cover</h3>
@@ -495,9 +518,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <hr>
 </section>
-<section id="part-2-lee-moretti-and-butler-2004-close-elections" class="level2">
-<h2 class="anchored" data-anchor-id="part-2-lee-moretti-and-butler-2004-close-elections">Part 2: Lee, Moretti, and Butler (2004) — Close Elections</h2>
-<p>Now we turn to real data. The key question: Does <em>winning</em> a close election affect voting behavior?</p>
+<section id="part-2-close-elections" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-close-elections">Part 2: Close elections</h2>
+<p>Now we turn to real data from <span class="citation" data-cites="lee2004voters">Lee et al. (<a href="#ref-lee2004voters" role="doc-biblioref">2004</a>)</span>. The key question: Does <em>winning</em> a close election affect voting behavior?</p>
 <div id="6ce5bc48" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and prepare data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_lmb()</span>
@@ -1153,25 +1176,35 @@ Sampling: [y_hat]</code></pre>
 </tbody>
 </table>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Further reading
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>First edition: <a href="https://mixtape-1ed.netlify.app/06-regression_discontinuity.html">Chapter 6: Regression Discontinuity</a></li>
+<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/regression-discontinuity-drinking-pymc.html">Regression discontinuity</a></li>
+<li>McCrary, Justin (2008). “Manipulation of the Running Variable in the Regression Discontinuity Design: A Density Test.” <em>Journal of Econometrics</em> 142 (2): 698–714. The density-test cell on this page is a placeholder and does not run the test.</li>
+</ul>
+</div>
+</div>
 </section>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
-<ul>
-<li><strong>Mixtape chapter</strong>: <a href="https://mixtape-1ed.netlify.app/06-regression_discontinuity.html">Chapter 6: Regression Discontinuity</a></li>
-<li><strong>CausalPy documentation</strong>: <a href="https://causalpy.readthedocs.io/">https://causalpy.readthedocs.io/</a></li>
-<li><strong>Original paper</strong>: Lee, D. S., Moretti, E., &amp; Butler, M. J. (2004). Do voters affect or elect policies? <em>QJE</em>.</li>
-<li><strong>McCrary test</strong>: McCrary, J. (2008). Manipulation of the running variable. <em>Journal of Econometrics</em>.</li>
-</ul>
-<hr>
-</section>
-<section id="references-1" class="level2">
-<h2 class="anchored" data-anchor-id="references-1">References</h2>
-<ul>
-<li><strong>Mixtape chapter</strong>: <a href="https://mixtape-1ed.netlify.app/06-regression_discontinuity.html">Chapter 6: Regression Discontinuity</a></li>
-<li><strong>CausalPy documentation</strong>: <a href="https://causalpy.readthedocs.io/">https://causalpy.readthedocs.io/</a></li>
-<li><strong>Original paper</strong>: Lee, D. S., Moretti, E., &amp; Butler, M. J. (2004). Do voters affect or elect policies? Evidence from the US House. <em>Quarterly Journal of Economics</em>, 119(3), 807-859.</li>
-</ul>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-cunningham2021" class="csl-entry" role="listitem">
+Cunningham, Scott. 2021. <em>Causal Inference: The Mixtape</em>. 1st ed. Yale University Press. <a href="https://doi.org/10.2307/j.ctv1c29t27">https://doi.org/10.2307/j.ctv1c29t27</a>.
+</div>
+<div id="ref-lee2004voters" class="csl-entry" role="listitem">
+Lee, David S., Enrico Moretti, and Matthew J. Butler. 2004. <span>“Do Voters Affect or Elect Policies? Evidence from the <span>U.S.</span> House.”</span> <em>Quarterly Journal of Economics</em> 119 (3): 807–59. <a href="https://doi.org/10.1162/0033553041502153">https://doi.org/10.1162/0033553041502153</a>.
+</div>
+</div>
 
 
 </section>

@@ -61,7 +61,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -315,7 +334,7 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Fixed effects are not a fix for reverse causality, and they are not a fix for a confounder that changes across sessions. The chapter shows those failures with published tables from Cornwell and Trumbull (1994) and Cornwell and Rupert (1997). Those datasets are not in the Mixtape repo. This page cites the tables and does not recreate them.</p>
+<p>Fixed effects are not a fix for reverse causality, and they are not a fix for a confounder that changes across sessions. The chapter shows those failures with published tables from <span class="citation" data-cites="cornwell1994">Cornwell and Trumbull (<a href="#ref-cornwell1994" role="doc-biblioref">1994</a>)</span> and <span class="citation" data-cites="cornwell1997">Cornwell and Rupert (<a href="#ref-cornwell1997" role="doc-biblioref">1997</a>)</span>. Those datasets are not in the Mixtape repo. This page cites the tables and does not recreate them.</p>
 </div>
 </div>
 <p>The coded exercise is Cunningham and Kendall’s Survey of Adult Service Providers. Each row is one of a provider’s recent client sessions, not a calendar year. The outcome is log hourly price (<code>lnw</code>). <a href="https://mixtape-1ed.netlify.app/08-panel_data">Table 8.3</a> reports three columns on the same balanced sample: pooled OLS, provider fixed effects, and OLS on provider-demeaned variables. Columns 2 and 3 are the same point estimates. That equivalence is the result to show. The book does not put session fixed effects in this regression.</p>
@@ -450,7 +469,7 @@ NaN         70
 Name: count, dtype: int64</code></pre>
 </div>
 </div>
-<p>Cleaning follows the chapter, not a looser <code>dropna</code> on the whole frame:</p>
+<p>Cleaning follows the chapter <span class="citation" data-cites="cunningham2021">(<a href="#ref-cunningham2021" role="doc-biblioref">Cunningham 2021</a>)</span>, not a looser <code>dropna</code> on the whole frame:</p>
 <ol type="1">
 <li>Drop a row if any Table 8.3 variable is missing.</li>
 <li>Keep providers who still have all four sessions.</li>
@@ -1027,15 +1046,37 @@ Warning
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
 <p>Provider fixed effects and the within transformation answer the same point-estimate question, and only that question. They delete time-invariant confounding. They leave reverse causality and session-varying confounding alone. On this survey, that distinction is visible: the unsafe premium and the steeper session-length elasticity show up once the provider mean is removed, and the time-invariant covariates do not survive the transformation.</p>
 <hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Further reading
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>First edition: <a href="https://mixtape-1ed.netlify.app/08-panel_data">Chapter 8: Panel Data</a></li>
+<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/panel-fixed-effects.html">Panel fixed effects</a></li>
+<li>Cunningham and Kendall, Survey of Adult Service Providers. Data file <code>sasp_panel.dta</code> in the <a href="https://github.com/scunning1975/mixtape">Mixtape repo</a>. The coded exercise uses this file; it is not a published paper.</li>
+</ul>
+</div>
+</div>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
-<ul>
-<li><strong>Mixtape chapter (1st ed.)</strong>: <a href="https://mixtape-1ed.netlify.app/08-panel_data">Chapter 8: Panel Data</a></li>
-<li><strong>Exercise</strong>: Cunningham and Kendall, Survey of Adult Service Providers. Data file <code>sasp_panel.dta</code> in the <a href="https://github.com/scunning1975/mixtape">Mixtape repo</a>.</li>
-<li><strong>FE is not a cure-all</strong>: Cornwell and Trumbull (1994); Cornwell and Rupert (1997). Cited, not replicated.</li>
-<li><strong>CausalPy</strong>: <a href="https://causalpy.readthedocs.io/"><code>PanelRegression</code></a></li>
-</ul>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-cornwell1997" class="csl-entry" role="listitem">
+Cornwell, Christopher, and Peter Rupert. 1997. <span>“Unobservable Individual Effects, Marriage and the Earnings of Young Men.”</span> <em>Economic Inquiry</em> 35 (2): 285–94. <a href="https://doi.org/10.1111/j.1465-7295.1997.tb01910.x">https://doi.org/10.1111/j.1465-7295.1997.tb01910.x</a>.
+</div>
+<div id="ref-cornwell1994" class="csl-entry" role="listitem">
+Cornwell, Christopher, and William N. Trumbull. 1994. <span>“Estimating the Economic Model of Crime with Panel Data.”</span> <em>Review of Economics and Statistics</em> 76 (2): 360–66. <a href="https://doi.org/10.2307/2109893">https://doi.org/10.2307/2109893</a>.
+</div>
+<div id="ref-cunningham2021" class="csl-entry" role="listitem">
+Cunningham, Scott. 2021. <em>Causal Inference: The Mixtape</em>. 1st ed. Yale University Press. <a href="https://doi.org/10.2307/j.ctv1c29t27">https://doi.org/10.2307/j.ctv1c29t27</a>.
+</div>
+</div>
 
 
 </section>
