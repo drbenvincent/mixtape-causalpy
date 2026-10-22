@@ -422,7 +422,7 @@ We use Conda for environment management due to PyMC dependencies. See `environme
 - **CausalPy**: Development version from GitHub (`git+https://github.com/pymc-labs/CausalPy.git@main`)
 - **PyMC**: >=5.10
 - **ArviZ**: >=0.17
-- **Jupyter kernel**: `mixtape-causalpy` (execution only; the site does not use WASM)
+- **Jupyter kernel**: `mixtape-causalpy` (local re-execution only; the site does not use WASM). CI registers that name so publish can resolve it. Committed `_freeze/` is what renders.
 
 > **Note**: We use the development version of CausalPy to access bug fixes (e.g., RD bandwidth parameter fix in issue #625) and upcoming features.
 

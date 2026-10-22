@@ -17,6 +17,42 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      # Quarto resolves `jupyter: mixtape-causalpy` before freeze can skip
+      # execution. The name only has to exist; committed `_freeze/` is what renders.
+      - name: Register freeze kernel name
+        run: |
+          python3 - <<'PY'
+          import json, shutil, subprocess
+          from pathlib import Path
+          out = subprocess.check_output(["jupyter", "--paths", "--json"], text=True)
+          data_paths = [Path(p) for p in json.loads(out)["data"]]
+          src = next(
+              (p / "kernels" / "python3" / "kernel.json" for p in data_paths if (p / "kernels" / "python3" / "kernel.json").is_file()),
+              None,
+          )
+          dest_parent = None
+          for p in data_paths:
+              try:
+                  (p / "kernels").mkdir(parents=True, exist_ok=True)
+              except OSError:
+                  continue
+              dest_parent = p / "kernels"
+              break
+          if dest_parent is None:
+              raise SystemExit("no writable Jupyter data path")
+          dest = dest_parent / "mixtape-causalpy"
+          dest.mkdir(parents=True, exist_ok=True)
+          if src is not None:
+              shutil.copy(src, dest / "kernel.json")
+          else:
+              (dest / "kernel.json").write_text(json.dumps({
+                  "argv": ["python3", "-m", "ipykernel_launcher", "-f", "{connection_file}"],
+                  "display_name": "Mixtape CausalPy",
+                  "language": "python",
+              }))
+          print(f"registered {dest}")
+          PY
+
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
