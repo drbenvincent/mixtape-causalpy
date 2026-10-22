@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Chapter 5: Matching and Subclassification – The Mixtape in CausalPy</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/06_regression_discontinuity.html" rel="next">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-0441d281c0042f78ca5e6da214781463.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">The Mixtape in CausalPy</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://mixtape.scunning.com"> 
+<span class="menu-text">Mixtape</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://causalpy.readthedocs.io"> 
+<span class="menu-text">CausalPy</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/05_matching.html">Chapters</a></li><li class="breadcrumb-item"><a href="../notebooks/05_matching.html">Chapter 5: Matching and Subclassification</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/05_matching.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Chapter 5: Matching and Subclassification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/06_regression_discontinuity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 6: Regression Discontinuity</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/07_instrumental_variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Instrumental Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/09_difference_in_differences.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 9: Difference-in-Differences</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/10_synthetic_control.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 10: Synthetic Control</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#causal-inference-the-mixtape-causalpy" id="toc-causal-inference-the-mixtape-causalpy" class="nav-link active" data-scroll-target="#causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</a>
+  <ul class="collapse">
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#what-well-cover" id="toc-what-well-cover" class="nav-link" data-scroll-target="#what-well-cover">What we’ll cover</a></li>
+  <li><a href="#causalpy-support" id="toc-causalpy-support" class="nav-link" data-scroll-target="#causalpy-support">CausalPy Support</a></li>
+  <li><a href="#mixtape-files-implemented" id="toc-mixtape-files-implemented" class="nav-link" data-scroll-target="#mixtape-files-implemented">Mixtape files implemented</a></li>
+  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#example-1-simple-difference-in-outcomes-titanic" id="toc-example-1-simple-difference-in-outcomes-titanic" class="nav-link" data-scroll-target="#example-1-simple-difference-in-outcomes-titanic">Example 1: Simple Difference in Outcomes (Titanic)</a></li>
+  <li><a href="#example-2-nsw-experimental-benchmark" id="toc-example-2-nsw-experimental-benchmark" class="nav-link" data-scroll-target="#example-2-nsw-experimental-benchmark">Example 2: NSW Experimental Benchmark</a></li>
+  <li><a href="#example-3-inverse-propensity-weighting-with-causalpy" id="toc-example-3-inverse-propensity-weighting-with-causalpy" class="nav-link" data-scroll-target="#example-3-inverse-propensity-weighting-with-causalpy">Example 3: Inverse Propensity Weighting with CausalPy</a>
+  <ul class="collapse">
+  <li><a href="#the-challenge" id="toc-the-challenge" class="nav-link" data-scroll-target="#the-challenge">The Challenge</a></li>
+  <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution">The Solution</a></li>
+  <li><a href="#visualize-covariate-imbalance" id="toc-visualize-covariate-imbalance" class="nav-link" data-scroll-target="#visualize-covariate-imbalance">Visualize Covariate Imbalance</a></li>
+  <li><a href="#causalpy-inverse-propensity-weighting" id="toc-causalpy-inverse-propensity-weighting" class="nav-link" data-scroll-target="#causalpy-inverse-propensity-weighting">CausalPy Inverse Propensity Weighting</a></li>
+  <li><a href="#balance-diagnostics" id="toc-balance-diagnostics" class="nav-link" data-scroll-target="#balance-diagnostics">Balance Diagnostics</a></li>
+  </ul></li>
+  <li><a href="#comparison-to-mixtape-results" id="toc-comparison-to-mixtape-results" class="nav-link" data-scroll-target="#comparison-to-mixtape-results">Comparison to Mixtape Results</a>
+  <ul class="collapse">
+  <li><a href="#key-differences" id="toc-key-differences" class="nav-link" data-scroll-target="#key-differences">Key Differences</a></li>
+  <li><a href="#the-lalonde-problem" id="toc-the-lalonde-problem" class="nav-link" data-scroll-target="#the-lalonde-problem">The LaLonde Problem</a></li>
+  </ul></li>
+  <li><a href="#todo-subclassification" id="toc-todo-subclassification" class="nav-link" data-scroll-target="#todo-subclassification">TODO: Subclassification</a></li>
+  <li><a href="#todo-nearest-neighbor-matching" id="toc-todo-nearest-neighbor-matching" class="nav-link" data-scroll-target="#todo-nearest-neighbor-matching">TODO: Nearest Neighbor Matching</a></li>
+  <li><a href="#todo-coarsened-exact-matching-cem" id="toc-todo-coarsened-exact-matching-cem" class="nav-link" data-scroll-target="#todo-coarsened-exact-matching-cem">TODO: Coarsened Exact Matching (CEM)</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/notebooks/05_matching.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/05_matching.html">Chapters</a></li><li class="breadcrumb-item"><a href="../notebooks/05_matching.html">Chapter 5: Matching and Subclassification</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Chapter 5: Matching and Subclassification</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="causal-inference-the-mixtape-causalpy" class="level2">
+<h2 class="anchored" data-anchor-id="causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</h2>
+<p><strong>Mixtape chapter</strong>: <a href="https://mixtape.scunning.com/05-matching_and_subclassification">Matching and Subclassification</a></p>
+<p><strong>CausalPy method</strong>: <code>InversePropensityWeighting</code></p>
+<hr>
+<section id="overview" class="level3">
+<h3 class="anchored" data-anchor-id="overview">Overview</h3>
+<p>Matching and related methods aim to create comparable treatment and control groups by balancing observed covariates. This chapter covers several approaches:</p>
+<ol type="1">
+<li><strong>Simple difference in outcomes</strong> (Titanic example)</li>
+<li><strong>Experimental benchmark</strong> (NSW randomized experiment)</li>
+<li><strong>Inverse Propensity Weighting</strong> (CausalPy’s approach)</li>
+</ol>
+</section>
+<section id="what-well-cover" class="level3">
+<h3 class="anchored" data-anchor-id="what-well-cover">What we’ll cover</h3>
+<ol type="1">
+<li>Conceptual introduction with the Titanic example</li>
+<li>Experimental ATE as a benchmark using NSW data</li>
+<li>IPW estimation using CausalPy with the LaLonde observational data</li>
+<li>Balance diagnostics and propensity score overlap</li>
+</ol>
+</section>
+<section id="causalpy-support" class="level3">
+<h3 class="anchored" data-anchor-id="causalpy-support">CausalPy Support</h3>
+<p>CausalPy provides <code>InversePropensityWeighting</code> for propensity score-based estimation. Other matching methods (nearest neighbor, subclassification, coarsened exact matching) are not yet supported.</p>
+</section>
+<section id="mixtape-files-implemented" class="level3">
+<h3 class="anchored" data-anchor-id="mixtape-files-implemented">Mixtape files implemented</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 48%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>titanic.py</code></td>
+<td>Simple difference in outcomes</td>
+<td>✅ (conceptual)</td>
+</tr>
+<tr class="even">
+<td><code>nsw_experimental.py</code></td>
+<td>NSW experimental benchmark</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td><code>nsw_pscore.py</code></td>
+<td>Propensity score estimation</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td><code>ipw.py</code></td>
+<td>Inverse propensity weighting</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td><code>teffects_ipw.py</code></td>
+<td>Treatment effects via IPW</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td><code>titanic_subclassification.py</code></td>
+<td>Subclassification</td>
+<td>⏭️ (no CausalPy)</td>
+</tr>
+<tr class="odd">
+<td><code>training_example.py</code></td>
+<td>Training program example</td>
+<td>⏭️ (no CausalPy)</td>
+</tr>
+<tr class="even">
+<td><code>training_bias_reduction.py</code></td>
+<td>Bias reduction via matching</td>
+<td>⏭️ (no CausalPy)</td>
+</tr>
+<tr class="odd">
+<td><code>teffects_nn.py</code></td>
+<td>Nearest neighbor matching</td>
+<td>⏭️ (missing)</td>
+</tr>
+<tr class="even">
+<td><code>cem.py</code></td>
+<td>Coarsened exact matching</td>
+<td>⏭️ (missing)</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div id="cell-3" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> causalpy <span class="im">as</span> cp</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the src directory to path for our data utilities</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="st">"../src"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mixtape_causalpy <span class="im">import</span> load_nsw, load_cps, load_mixtape_data</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="example-1-simple-difference-in-outcomes-titanic" class="level2">
+<h2 class="anchored" data-anchor-id="example-1-simple-difference-in-outcomes-titanic">Example 1: Simple Difference in Outcomes (Titanic)</h2>
+<p>Before diving into propensity scores, let’s illustrate the fundamental problem with a simple example from the Titanic disaster.</p>
+<p><strong>Question</strong>: Did being in first class improve survival?</p>
+<p>A naive comparison of survival rates between first and other classes gives us the <strong>simple difference in outcomes (SDO)</strong>. But this comparison may be confounded by other factors (e.g., cabin location, access to lifeboats).</p>
+<div id="cell-5" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Titanic data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>titanic <span class="op">=</span> load_mixtape_data(<span class="st">"titanic.dta"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset shape: </span><span class="sc">{</span>titanic<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>titanic.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset shape: (2201, 4)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">class</th>
+<th data-quarto-table-cell-role="th">age</th>
+<th data-quarto-table-cell-role="th">sex</th>
+<th data-quarto-table-cell-role="th">survived</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>1st class</td>
+<td>adults</td>
+<td>man</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>1st class</td>
+<td>adults</td>
+<td>man</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>1st class</td>
+<td>adults</td>
+<td>man</td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>1st class</td>
+<td>adults</td>
+<td>man</td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>1st class</td>
+<td>adults</td>
+<td>man</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-6" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create binary variables (as in titanic.py)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>titanic[<span class="st">"first_class"</span>] <span class="op">=</span> (titanic[<span class="st">"class"</span>] <span class="op">==</span> <span class="st">"1st class"</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>titanic[<span class="st">"survived_d"</span>] <span class="op">=</span> (titanic[<span class="st">"survived"</span>] <span class="op">==</span> <span class="st">"yes"</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple difference in outcomes</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ey1 <span class="op">=</span> titanic.loc[titanic[<span class="st">"first_class"</span>] <span class="op">==</span> <span class="dv">1</span>, <span class="st">"survived_d"</span>].mean()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>ey0 <span class="op">=</span> titanic.loc[titanic[<span class="st">"first_class"</span>] <span class="op">==</span> <span class="dv">0</span>, <span class="st">"survived_d"</span>].mean()</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>sdo <span class="op">=</span> ey1 <span class="op">-</span> ey0</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Survival rate (1st class): </span><span class="sc">{</span>ey1<span class="sc">:.1%}</span><span class="ss">"</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Survival rate (other):     </span><span class="sc">{</span>ey0<span class="sc">:.1%}</span><span class="ss">"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Simple Difference in Outcomes: </span><span class="sc">{</span>sdo<span class="sc">:.1%}</span><span class="ss">"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">This is NOT necessarily the causal effect - it may be confounded!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Survival rate (1st class): 62.5%
+Survival rate (other):     27.1%
+
+Simple Difference in Outcomes: 35.4%
+
+This is NOT necessarily the causal effect - it may be confounded!</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="example-2-nsw-experimental-benchmark" class="level2">
+<h2 class="anchored" data-anchor-id="example-2-nsw-experimental-benchmark">Example 2: NSW Experimental Benchmark</h2>
+<p>The <strong>National Supported Work (NSW)</strong> demonstration was a randomized job training program in the 1970s. Because treatment was randomly assigned, the simple difference in outcomes is an unbiased estimate of the Average Treatment Effect (ATE).</p>
+<p>This experimental estimate serves as a <strong>benchmark</strong> for evaluating observational methods. LaLonde (1986) famously showed that many observational estimators failed to recover this experimental benchmark when using non-experimental control groups.</p>
+<p><strong>Outcome</strong>: Real earnings in 1978 (<code>re78</code>)</p>
+<div id="cell-8" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load NSW experimental data</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>nsw <span class="op">=</span> load_nsw()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NSW experimental data shape: </span><span class="sc">{</span>nsw<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Treatment distribution:"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(nsw[<span class="st">"treat"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NSW experimental data shape: (445, 11)
+
+Treatment distribution:
+treat
+0.0    260
+1.0    185
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<div id="cell-9" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Key variables</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Key variables:"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    nsw[</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"treat"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"age"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"educ"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"black"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"hisp"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"marr"</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"nodegree"</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re74"</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re75"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re78"</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    ].describe()</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key variables:
+            treat         age        educ       black       hisp        marr  \
+count  445.000000  445.000000  445.000000  445.000000  445.00000  445.000000   
+mean     0.415730   25.370787   10.195505    0.833708    0.08764    0.168539   
+std      0.493402    7.100282    1.792119    0.372762    0.28309    0.374766   
+min      0.000000   17.000000    3.000000    0.000000    0.00000    0.000000   
+25%      0.000000   20.000000    9.000000    1.000000    0.00000    0.000000   
+50%      0.000000   24.000000   10.000000    1.000000    0.00000    0.000000   
+75%      1.000000   28.000000   11.000000    1.000000    0.00000    0.000000   
+max      1.000000   55.000000   16.000000    1.000000    1.00000    1.000000   
+
+         nodegree          re74          re75          re78  
+count  445.000000    445.000000    445.000000    445.000000  
+mean     0.782022   2102.265381   1377.138306   5300.764160  
+std      0.413337   5363.582520   3150.960693   6631.491699  
+min      0.000000      0.000000      0.000000      0.000000  
+25%      1.000000      0.000000      0.000000      0.000000  
+50%      1.000000      0.000000      0.000000   3701.812012  
+75%      1.000000    824.388916   1220.836060   8124.714844  
+max      1.000000  39570.679688  25142.240234  60307.929688  </code></pre>
+</div>
+</div>
+<div id="cell-10" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate experimental ATE (as in nsw_experimental.py)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>mean_treated <span class="op">=</span> nsw[nsw[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>mean_control <span class="op">=</span> nsw[nsw[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>experimental_ate <span class="op">=</span> mean_treated <span class="op">-</span> mean_control</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (treated):  $</span><span class="sc">{</span>mean_treated<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (control):  $</span><span class="sc">{</span>mean_control<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">*** Experimental ATE: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss"> ***"</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">This is our benchmark - observational methods should try to recover this."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean earnings (treated):  $6,349.14
+Mean earnings (control):  $4,554.80
+
+*** Experimental ATE: $1,794.34 ***
+
+This is our benchmark - observational methods should try to recover this.</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="example-3-inverse-propensity-weighting-with-causalpy" class="level2">
+<h2 class="anchored" data-anchor-id="example-3-inverse-propensity-weighting-with-causalpy">Example 3: Inverse Propensity Weighting with CausalPy</h2>
+<p>Now we’ll use CausalPy’s <code>InversePropensityWeighting</code> to estimate the treatment effect using an <strong>observational control group</strong> (CPS data) instead of the experimental control group.</p>
+<section id="the-challenge" class="level3">
+<h3 class="anchored" data-anchor-id="the-challenge">The Challenge</h3>
+<p>When we replace the experimental control group with CPS controls, the simple difference in outcomes will be heavily biased because the CPS sample differs systematically from NSW participants (in age, education, earnings history, etc.).</p>
+</section>
+<section id="the-solution" class="level3">
+<h3 class="anchored" data-anchor-id="the-solution">The Solution</h3>
+<p>Inverse Propensity Weighting (IPW) reweights observations to create a “pseudo-population” where treatment assignment is independent of observed covariates.</p>
+<div id="cell-12" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load CPS control data</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> load_cps()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CPS data shape: </span><span class="sc">{</span>cps<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CPS data shape: (15992, 11)</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine NSW with CPS controls (as in ipw.py)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The Mixtape uses the FULL NSW data (both treated and control from the experiment)</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># combined with CPS controls, then uses treat indicator to distinguish groups</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> pd.concat([cps, nsw], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create unemployment indicators (as in original code)</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>combined[<span class="st">"u74"</span>] <span class="op">=</span> (combined[<span class="st">"re74"</span>] <span class="op">==</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>combined[<span class="st">"u75"</span>] <span class="op">=</span> (combined[<span class="st">"re75"</span>] <span class="op">==</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Combined dataset shape: </span><span class="sc">{</span>combined<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Treatment distribution:"</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(combined[<span class="st">"treat"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Combined dataset shape: (16437, 13)
+
+Treatment distribution:
+treat
+0.0    16252
+1.0      185
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the bias without adjustment</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>naive_mean_treated <span class="op">=</span> combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>naive_mean_control <span class="op">=</span> combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>naive_diff <span class="op">=</span> naive_mean_treated <span class="op">-</span> naive_mean_control</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Without any adjustment (naive comparison):"</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (NSW treated): $</span><span class="sc">{</span>naive_mean_treated<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (CPS control): $</span><span class="sc">{</span>naive_mean_control<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Naive difference: $</span><span class="sc">{</span>naive_diff<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Experimental benchmark: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Bias: $</span><span class="sc">{</span>naive_diff <span class="op">-</span> experimental_ate<span class="sc">:,.2f}</span><span class="ss"> (way off!)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Without any adjustment (naive comparison):
+Mean earnings (NSW treated): $6,349.14
+Mean earnings (CPS control): $14,682.01
+Naive difference: $-8,332.87
+
+Experimental benchmark: $1,794.34
+Bias: $-10,127.21 (way off!)</code></pre>
+</div>
+</div>
+</section>
+<section id="visualize-covariate-imbalance" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-covariate-imbalance">Visualize Covariate Imbalance</h3>
+<p>Before applying IPW, let’s see how different the treated and control groups are:</p>
+<div id="cell-16" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare means by treatment group</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>covariates <span class="op">=</span> [<span class="st">"age"</span>, <span class="st">"educ"</span>, <span class="st">"black"</span>, <span class="st">"hisp"</span>, <span class="st">"marr"</span>, <span class="st">"nodegree"</span>, <span class="st">"re74"</span>, <span class="st">"re75"</span>]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>balance_table <span class="op">=</span> combined.groupby(<span class="st">"treat"</span>)[covariates].mean().T</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>balance_table.columns <span class="op">=</span> [<span class="st">"Control (CPS)"</span>, <span class="st">"Treated (NSW)"</span>]</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>balance_table[<span class="st">"Difference"</span>] <span class="op">=</span> (</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    balance_table[<span class="st">"Treated (NSW)"</span>] <span class="op">-</span> balance_table[<span class="st">"Control (CPS)"</span>]</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Covariate Balance (before weighting):"</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(balance_table.<span class="bu">round</span>(<span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Covariate Balance (before weighting):
+          Control (CPS)  Treated (NSW)    Difference
+age           33.090000      25.820000     -7.280000
+educ          12.000000      10.350000     -1.650000
+black          0.090000       0.840000      0.760000
+hisp           0.070000       0.060000     -0.010000
+marr           0.700000       0.190000     -0.510000
+nodegree       0.300000       0.710000      0.400000
+re74       13826.269531    2095.570068 -11730.690430
+re75       13452.679688    1532.060059 -11920.629883</code></pre>
+</div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize prior earnings distributions</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, var <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">"re74"</span>, <span class="st">"re75"</span>]):</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[i]</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    ax.hist(</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][var],</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span><span class="dv">30</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Control (CPS)"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        density<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    ax.hist(</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>        combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][var],</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span><span class="dv">30</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Treated (NSW)"</span>,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>        density<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="ss">f"Prior Earnings (</span><span class="sc">{</span>var<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Density"</span>)</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    ax.legend()</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Distribution of </span><span class="sc">{</span>var<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Note: NSW participants had much lower prior earnings than CPS controls!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_matching_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Note: NSW participants had much lower prior earnings than CPS controls!</code></pre>
+</div>
+</div>
+</section>
+<section id="causalpy-inverse-propensity-weighting" class="level3">
+<h3 class="anchored" data-anchor-id="causalpy-inverse-propensity-weighting">CausalPy Inverse Propensity Weighting</h3>
+<p>Now we’ll use CausalPy to estimate propensity scores and compute the IPW-adjusted treatment effect.</p>
+<p>CausalPy’s <code>InversePropensityWeighting</code> supports several weighting schemes: - <strong>raw</strong>: Simple inverse probability weighting - <strong>robust</strong>: Horvitz-Thompson type weighting - <strong>doubly robust</strong>: Combines propensity and outcome models - <strong>overlap</strong>: Targets the overlap population</p>
+<div id="cell-19" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for CausalPy</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>ipw_data <span class="op">=</span> combined.copy()</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure treat is 0/1 integer</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"treat"</span>] <span class="op">=</span> ipw_data[<span class="st">"treat"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize continuous variables to help MCMC sampling</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Earnings are on very different scales (0 to ~40,000) which can cause divergences</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"age_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"age"</span>] <span class="op">-</span> ipw_data[<span class="st">"age"</span>].mean()) <span class="op">/</span> ipw_data[<span class="st">"age"</span>].std()</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"educ_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"educ"</span>] <span class="op">-</span> ipw_data[<span class="st">"educ"</span>].mean()) <span class="op">/</span> ipw_data[</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"educ"</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>].std()</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"re74_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"re74"</span>] <span class="op">-</span> ipw_data[<span class="st">"re74"</span>].mean()) <span class="op">/</span> ipw_data[</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re74"</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>].std()</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"re75_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"re75"</span>] <span class="op">-</span> ipw_data[<span class="st">"re75"</span>].mean()) <span class="op">/</span> ipw_data[</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re75"</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>].std()</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for missing values in key columns</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>key_cols <span class="op">=</span> [</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"treat"</span>,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"age"</span>,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"educ"</span>,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"black"</span>,</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"hisp"</span>,</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"marr"</span>,</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nodegree"</span>,</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re74"</span>,</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re75"</span>,</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"u74"</span>,</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"u75"</span>,</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re78"</span>,</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Missing values:</span><span class="ch">\n</span><span class="sc">{</span>ipw_data[key_cols]<span class="sc">.</span>isnull()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Dataset shape: </span><span class="sc">{</span>ipw_data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Standardized variable ranges:"</span>)</span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  age_std:  [</span><span class="sc">{</span>ipw_data[<span class="st">'age_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'age_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span>)</span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  educ_std: [</span><span class="sc">{</span>ipw_data[<span class="st">'educ_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'educ_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span></span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  re74_std: [</span><span class="sc">{</span>ipw_data[<span class="st">'re74_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'re74_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span></span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  re75_std: [</span><span class="sc">{</span>ipw_data[<span class="st">'re75_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'re75_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span></span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Missing values:
+treat       0
+age         0
+educ        0
+black       0
+hisp        0
+marr        0
+nodegree    0
+re74        0
+re75        0
+u74         0
+u75         0
+re78        0
+dtype: int64
+
+Dataset shape: (16437, 17)
+
+Standardized variable ranges:
+  age_std:  [-1.54, 1.99]
+  educ_std: [-4.18, 2.10]
+  re74_std: [-1.42, 2.67]
+  re75_std: [-1.42, 1.27]</code></pre>
+</div>
+</div>
+<div id="cell-20" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run CausalPy IPW with robust weighting</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tune"</span>: <span class="dv">1000</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"draws"</span>: <span class="dv">500</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"chains"</span>: <span class="dv">4</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cores"</span>: <span class="dv">4</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.99</span>,  <span class="co"># Higher target_accept for this challenging problem</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Propensity score formula using STANDARDIZED continuous variables</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co"># This helps MCMC sampling converge better (avoids divergences from large scale differences)</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>ipw_result <span class="op">=</span> cp.InversePropensityWeighting(</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    ipw_data,</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"treat ~ 1 + age_std + educ_std + black + hisp + marr + nodegree + re74_std + re75_std + u74 + u75"</span>,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    outcome_variable<span class="op">=</span><span class="st">"re78"</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    weighting_scheme<span class="op">=</span><span class="st">"robust"</span>,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.PropensityScore(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [b]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"eebadb908e554779b9faf34f451b63cb","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 1_000 tune and 500 draw iterations (4_000 + 2_000 draws total) took 40 seconds.
+Sampling: [b, t_pred]
+Sampling: [t_pred]</code></pre>
+</div>
+</div>
+<div id="cell-21" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the results - propensity score distribution and ATE</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_ate(prop_draws<span class="op">=</span><span class="dv">50</span>, ate_draws<span class="op">=</span><span class="dv">200</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_matching_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-22" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract ATE estimates</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>ate_samples <span class="op">=</span> [</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    ipw_result.get_ate(i, ipw_result.model.idata, method<span class="op">=</span><span class="st">"robust"</span>)[<span class="dv">0</span>]</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">200</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>ate_mean <span class="op">=</span> np.mean(ate_samples)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>ate_std <span class="op">=</span> np.std(ate_samples)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"IPW Results (Robust Weighting):"</span>)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Estimated ATE: $</span><span class="sc">{</span>ate_mean<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Std Dev: $</span><span class="sc">{</span>ate_std<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  95% CI: [$</span><span class="sc">{</span>ate_mean <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> ate_std<span class="sc">:,.2f}</span><span class="ss">, $</span><span class="sc">{</span>ate_mean <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> ate_std<span class="sc">:,.2f}</span><span class="ss">]"</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Experimental benchmark: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>IPW Results (Robust Weighting):
+  Estimated ATE: $-12,264.54
+  Std Dev: $307.47
+  95% CI: [$-12,867.18, $-11,661.90]
+
+Experimental benchmark: $1,794.34</code></pre>
+</div>
+</div>
+</section>
+<section id="balance-diagnostics" class="level3">
+<h3 class="anchored" data-anchor-id="balance-diagnostics">Balance Diagnostics</h3>
+<p>CausalPy provides tools to check whether the weighting achieves covariate balance:</p>
+<div id="cell-24" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance for age covariate (using standardized variable)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_balance_ecdf(<span class="st">"age_std"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_matching_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-25" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance for education (using standardized variable)</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_balance_ecdf(<span class="st">"educ_std"</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_matching_files/figure-html/cell-18-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="comparison-to-mixtape-results" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-to-mixtape-results">Comparison to Mixtape Results</h2>
+<section id="key-differences" class="level3">
+<h3 class="anchored" data-anchor-id="key-differences">Key Differences</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 28%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspect</th>
+<th>Mixtape</th>
+<th>This Notebook</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Propensity model</td>
+<td>Logistic regression (statsmodels)</td>
+<td>Bayesian logistic (PyMC)</td>
+</tr>
+<tr class="even">
+<td>Weighting</td>
+<td>Manual Horvitz-Thompson</td>
+<td>CausalPy <code>robust</code> scheme</td>
+</tr>
+<tr class="odd">
+<td>Uncertainty</td>
+<td>Bootstrap or asymptotic</td>
+<td>Bayesian posterior</td>
+</tr>
+<tr class="even">
+<td>Specification</td>
+<td>Polynomial terms + interactions</td>
+<td>Linear in covariates</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-lalonde-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-lalonde-problem">The LaLonde Problem</h3>
+<p>The famous LaLonde (1986) paper showed that observational estimators often fail to recover the experimental benchmark. The NSW treated group was very different from CPS controls:</p>
+<ul>
+<li><strong>Lower prior earnings</strong>: NSW participants were disadvantaged workers</li>
+<li><strong>Different demographics</strong>: More minority, less educated</li>
+<li><strong>Selection into treatment</strong>: Voluntary program participation</li>
+</ul>
+<p>IPW attempts to correct for these differences by reweighting, but: - Limited overlap can cause extreme weights - Model misspecification affects results - No adjustment for unobservables</p>
+<hr>
+</section>
+</section>
+<section id="todo-subclassification" class="level2">
+<h2 class="anchored" data-anchor-id="todo-subclassification">TODO: Subclassification</h2>
+<blockquote class="blockquote">
+<p><strong>Not yet implemented</strong>: Subclassification stratifies observations into propensity score bins and estimates effects within each stratum.</p>
+</blockquote>
+<p><strong>Mixtape reference</strong>: <code>titanic_subclassification.py</code></p>
+<p><strong>CausalPy tracking</strong>: No current issue/PR for subclassification</p>
+<p><strong>When to revisit</strong>: Would need a new method in CausalPy.</p>
+<hr>
+</section>
+<section id="todo-nearest-neighbor-matching" class="level2">
+<h2 class="anchored" data-anchor-id="todo-nearest-neighbor-matching">TODO: Nearest Neighbor Matching</h2>
+<blockquote class="blockquote">
+<p><strong>Not yet implemented</strong>: Nearest neighbor matching pairs treated units with similar control units based on propensity scores or covariates.</p>
+</blockquote>
+<p><strong>Mixtape reference</strong>: <code>teffects_nn.py</code> (file is empty in original repo)</p>
+<p><strong>CausalPy tracking</strong>: No current issue/PR for matching</p>
+<p><strong>When to revisit</strong>: Would need a new <code>cp.Matching</code> experiment class.</p>
+<hr>
+</section>
+<section id="todo-coarsened-exact-matching-cem" class="level2">
+<h2 class="anchored" data-anchor-id="todo-coarsened-exact-matching-cem">TODO: Coarsened Exact Matching (CEM)</h2>
+<blockquote class="blockquote">
+<p><strong>Not yet implemented</strong>: CEM temporarily coarsens covariates and performs exact matching within coarsened strata.</p>
+</blockquote>
+<p><strong>Mixtape reference</strong>: <code>cem.py</code> (file is empty in original repo)</p>
+<p><strong>CausalPy tracking</strong>: No current issue/PR for CEM</p>
+<p><strong>When to revisit</strong>: Would need a new experiment class in CausalPy.</p>
+<hr>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>In this notebook, we demonstrated:</p>
+<ol type="1">
+<li><p><strong>Simple Difference in Outcomes</strong>: The Titanic example shows that naive comparisons can be misleading when treatment is not randomly assigned.</p></li>
+<li><p><strong>Experimental Benchmark</strong>: The NSW randomized experiment provides an unbiased ATE estimate (~$1,794) that serves as our ground truth.</p></li>
+<li><p><strong>The LaLonde Problem</strong>: When we substitute CPS controls for the experimental controls, the naive difference is heavily biased (negative!).</p></li>
+<li><p><strong>CausalPy IPW</strong>: Using <code>InversePropensityWeighting</code>, we attempted to recover the experimental benchmark by reweighting observations based on their probability of treatment.</p></li>
+</ol>
+<p><strong>Key takeaways:</strong></p>
+<ul>
+<li>IPW is one approach to addressing selection bias in observational studies</li>
+<li>CausalPy provides Bayesian propensity score estimation with uncertainty quantification</li>
+<li>Balance diagnostics help assess whether weighting achieves covariate balance</li>
+<li>The LaLonde problem remains challenging — observational methods may not fully recover experimental estimates</li>
+</ul>
+<p><strong>What CausalPy supports:</strong> - ✅ Inverse Propensity Weighting (multiple schemes) - ✅ Propensity score diagnostics - ✅ Balance plots</p>
+<p><strong>What’s not yet available:</strong> - ❌ Nearest neighbor matching - ❌ Subclassification - ❌ Coarsened exact matching</p>
+<hr>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li><strong>Mixtape chapter</strong>: https://mixtape.scunning.com/05-matching_and_subclassification</li>
+<li><strong>CausalPy docs</strong>: https://causalpy.readthedocs.io</li>
+<li><strong>Original papers</strong>:
+<ul>
+<li>LaLonde, R. (1986). “Evaluating the Econometric Evaluations of Training Programs with Experimental Data”</li>
+<li>Dehejia, R. &amp; Wahba, S. (1999). “Causal Effects in Nonexperimental Studies: Reevaluating the Evaluation of Training Programs”</li>
+<li>Rosenbaum, P. &amp; Rubin, D. (1983). “The Central Role of the Propensity Score in Observational Studies for Causal Effects”</li>
+</ul></li>
+<li><strong>Weighting schemes</strong>:
+<ul>
+<li>Aronow, P. &amp; Miller, B. (2019). “Foundations of Agnostic Statistics”</li>
+</ul></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/drbenvincent\.github\.io\/mixtape-causalpy\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/06_regression_discontinuity.html" class="pagination-link" aria-label="Chapter 6: Regression Discontinuity">
+        <span class="nav-page-text">Chapter 6: Regression Discontinuity</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/notebooks/05_matching.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

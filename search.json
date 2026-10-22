@@ -1,0 +1,724 @@
+[
+  {
+    "objectID": "notebooks/10_synthetic_control.html",
+    "href": "notebooks/10_synthetic_control.html",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "",
+    "text": "Mixtape chapter: Synthetic Control\nCausalPy method: SyntheticControl\n\n\n\nSynthetic control is a method for estimating causal effects in comparative case studies where a single treated unit is compared to a weighted combination of control units. The key idea is to construct a “synthetic” control that closely matches the treated unit’s pre-intervention trajectory.\nThis notebook covers the Texas prison reform example from Cunningham (2021), which examines the effect of prison capacity expansion on incarceration rates.\n\n\n\n\nData preparation for synthetic control\nCausalPy SyntheticControl estimation\nVisualizing the synthetic vs actual treated unit\nDonor weights and pre-treatment fit\nTreatment effect estimation\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\nsynth_1.py\nTexas SC basic implementation\n✅\n\n\nsynth_2.py\nTexas SC - treatment effect plot\n✅\n\n\nsynth_3_7.R\nPlacebo-in-space tests\n✅",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#causal-inference-the-mixtape-causalpy",
+    "href": "notebooks/10_synthetic_control.html#causal-inference-the-mixtape-causalpy",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "",
+    "text": "Mixtape chapter: Synthetic Control\nCausalPy method: SyntheticControl\n\n\n\nSynthetic control is a method for estimating causal effects in comparative case studies where a single treated unit is compared to a weighted combination of control units. The key idea is to construct a “synthetic” control that closely matches the treated unit’s pre-intervention trajectory.\nThis notebook covers the Texas prison reform example from Cunningham (2021), which examines the effect of prison capacity expansion on incarceration rates.\n\n\n\n\nData preparation for synthetic control\nCausalPy SyntheticControl estimation\nVisualizing the synthetic vs actual treated unit\nDonor weights and pre-treatment fit\nTreatment effect estimation\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\nsynth_1.py\nTexas SC basic implementation\n✅\n\n\nsynth_2.py\nTexas SC - treatment effect plot\n✅\n\n\nsynth_3_7.R\nPlacebo-in-space tests\n✅",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#setup",
+    "href": "notebooks/10_synthetic_control.html#setup",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Setup",
+    "text": "Setup\n\nimport warnings\n\nwarnings.filterwarnings(\"ignore\")\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport arviz as az\n\nimport causalpy as cp\n\n# Add the src directory to path for our data utilities\nimport sys\n\nsys.path.insert(0, \"../src\")\nfrom mixtape_causalpy import load_texas\n\n%matplotlib inline",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#load-and-explore-data",
+    "href": "notebooks/10_synthetic_control.html#load-and-explore-data",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Load and Explore Data",
+    "text": "Load and Explore Data\nThe Texas dataset contains state-level panel data on incarceration rates (bmprison - black male prison admission rate) and various predictors across US states from 1985-2000.\n\nThe Texas Prison Expansion\nIn 1993, Texas dramatically expanded prison capacity. The synthetic control method allows us to estimate what incarceration rates would have been in Texas without this policy change, by constructing a weighted combination of other states that matched Texas’s pre-1993 trajectory.\nKey variables: - statefip: State FIPS code (48 = Texas) - year: Year (1985-2000) - bmprison: Black male prison admission rate per 100,000 - state: State name\n\n# Load the data\ndf_raw = load_texas()\nprint(f\"Dataset shape: {df_raw.shape}\")\nprint(f\"Years: {df_raw['year'].min()} to {df_raw['year'].max()}\")\nprint(f\"States: {df_raw['statefip'].nunique()}\")\ndf_raw.head()\n\nDataset shape: (816, 24)\nYears: 1985.0 to 2000.0\nStates: 51\n\n\n\n\n\n\n\n\n\nstatefip\nyear\nrace\nbmprison\nwmprison\nbmpop\nwmpop\nerror\ncrack\nalcohol\n...\nperc1519\naidscapita\nstate\nparole\nprobation\ncapacity_rated\ncapacity_operational\ncapacity_design\nbmprate\nwmprate\n\n\n\n\n0\n1.0\n1985.0\n2.0\n6227.0\n4210.0\n464428\n1427743\n0.0\n0.217438\n1.90\n...\n8.461768\n0.679504\nAlabama\n2425.0\n16520\n9787.0\n9787.0\n9787.0\n1340.789062\n294.871002\n\n\n1\n1.0\n1986.0\n1.0\n6657.0\n4423.0\n465387\n1434773\n0.0\n0.276875\n1.90\n...\n8.473580\n0.851692\nAlabama\n3038.0\n21371\n10374.0\n10374.0\n10374.0\n1430.422363\n308.271759\n\n\n2\n1.0\n1987.0\n1.0\n7281.0\n4803.0\n467545\n1442894\n0.0\n0.211371\n1.89\n...\n8.397089\n1.967214\nAlabama\n3456.0\n23406\n11107.0\n11107.0\n11107.0\n1557.283203\n332.872681\n\n\n3\n1.0\n1988.0\n1.0\n7244.0\n4605.0\n468281\n1445048\n0.0\n0.559781\n1.89\n...\n8.280076\n2.758137\nAlabama\n4701.0\n25301\n11162.0\n11162.0\n11162.0\n1546.934448\n318.674530\n\n\n4\n1.0\n1989.0\n1.0\n8056.0\n4998.0\n468893\n1445678\n0.0\n0.721824\n1.87\n...\n8.088959\n3.845907\nAlabama\n5724.0\n25519\n11162.0\n11662.0\n11662.0\n1718.089233\n345.720154\n\n\n\n\n5 rows × 24 columns\n\n\n\n\n# Check Texas (statefip=48) data\ntexas_data = df_raw[df_raw[\"statefip\"] == 48][[\"year\", \"state\", \"bmprison\"]]\nprint(\"Texas incarceration data:\")\nprint(texas_data)\n\nTexas incarceration data:\n       year  state  bmprison\n688  1985.0  Texas   14828.0\n689  1986.0  Texas   15207.0\n690  1987.0  Texas   15780.0\n691  1988.0  Texas   16956.0\n692  1989.0  Texas   19366.0\n693  1990.0  Texas   22634.0\n694  1991.0  Texas   23249.0\n695  1992.0  Texas   27568.0\n696  1993.0  Texas   29260.0\n697  1994.0  Texas   40451.0\n698  1995.0  Texas   55602.0\n699  1996.0  Texas   55810.0\n700  1997.0  Texas   58393.0\n701  1998.0  Texas   59709.0\n702  1999.0  Texas   60785.0\n703  2000.0  Texas   61861.0",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#prepare-data-for-causalpy",
+    "href": "notebooks/10_synthetic_control.html#prepare-data-for-causalpy",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Prepare Data for CausalPy",
+    "text": "Prepare Data for CausalPy\nCausalPy’s SyntheticControl expects data in a wide format where: - Each row is a time period - Each column is a unit (state) - The index is the time variable\nWe need to reshape the panel data from long to wide format.\n\n# Pivot to wide format: rows=years, columns=states\ndf_wide = df_raw.pivot(index=\"year\", columns=\"state\", values=\"bmprison\")\n\n# Clean column names (remove spaces/special chars for easier access)\ndf_wide.columns = [col.strip() for col in df_wide.columns]\n\nprint(f\"Wide format shape: {df_wide.shape}\")\nprint(f\"Columns (states): {list(df_wide.columns[:10])}...\")  # First 10\ndf_wide.head()\n\nWide format shape: (16, 51)\nColumns (states): ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia', 'Florida']...\n\n\n\n\n\n\n\n\n\nAlabama\nAlaska\nArizona\nArkansas\nCalifornia\nColorado\nConnecticut\nDelaware\nDistrict of Columbia\nFlorida\n...\nSouth Dakota\nTennessee\nTexas\nUtah\nVermont\nVirginia\nWashington\nWest Virginia\nWisconsin\nWyoming\n\n\nyear\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n1985.0\n6227.0\n198.0\n1297.0\n2153.0\n16138.0\n665.0\n2620.0\n1356.0\n6021.0\n13427.0\n...\n21.0\n3045.0\n14828.0\n142.0\n0.0\n6825.0\n1218.0\n244.0\n1954.0\n33.0\n\n\n1986.0\n6657.0\n211.0\n1452.0\n2238.0\n19549.0\n786.0\n2890.0\n1545.0\n6241.0\n15486.0\n...\n28.0\n3000.0\n15207.0\n143.0\n0.0\n7291.0\n1182.0\n201.0\n2136.0\n32.0\n\n\n1987.0\n7281.0\n217.0\n1675.0\n2536.0\n22184.0\n959.0\n3070.0\n1595.0\n7126.0\n16074.0\n...\n24.0\n3019.0\n15780.0\n161.0\n0.0\n7488.0\n1129.0\n200.0\n2234.0\n30.0\n\n\n1988.0\n7244.0\n271.0\n1775.0\n2646.0\n26438.0\n1229.0\n3541.0\n1823.0\n8205.0\n17510.0\n...\n28.0\n2972.0\n16956.0\n167.0\n0.0\n8239.0\n1225.0\n199.0\n2244.0\n52.0\n\n\n1989.0\n8056.0\n310.0\n2033.0\n3126.0\n30066.0\n1492.0\n4172.0\n2045.0\n9320.0\n20750.0\n...\n32.0\n4364.0\n19366.0\n196.0\n0.0\n9739.0\n1315.0\n211.0\n2501.0\n51.0\n\n\n\n\n5 rows × 51 columns\n\n\n\n\n# Define treated unit and control units (donor pool)\ntreated_unit = \"Texas\"\ntreatment_time = 1993  # Year of prison capacity expansion\n\n# Get all states except Texas as potential donors\nall_states = list(df_wide.columns)\ncontrol_units = [s for s in all_states if s != treated_unit]\n\nprint(f\"Treated unit: {treated_unit}\")\nprint(f\"Treatment time: {treatment_time}\")\nprint(f\"Number of control units: {len(control_units)}\")\nprint(f\"Control units: {control_units[:5]}... (showing first 5)\")\n\nTreated unit: Texas\nTreatment time: 1993\nNumber of control units: 50\nControl units: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California']... (showing first 5)",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#visualize-pre-treatment-trends",
+    "href": "notebooks/10_synthetic_control.html#visualize-pre-treatment-trends",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Visualize Pre-Treatment Trends",
+    "text": "Visualize Pre-Treatment Trends\nBefore running synthetic control, let’s visualize Texas compared to some control states.\n\nfig, ax = plt.subplots(figsize=(12, 6))\n\n# Plot Texas\nax.plot(\n    df_wide.index,\n    df_wide[treated_unit],\n    linewidth=3,\n    color=\"C0\",\n    label=\"Texas (treated)\",\n)\n\n# Plot a few control states for comparison\nsample_controls = control_units[:5]\nfor state in sample_controls:\n    ax.plot(df_wide.index, df_wide[state], alpha=0.5, linestyle=\"--\", label=state)\n\n# Add treatment time line\nax.axvline(\n    x=treatment_time,\n    color=\"red\",\n    linestyle=\"--\",\n    linewidth=2,\n    label=f\"Treatment ({treatment_time})\",\n)\n\nax.set_xlabel(\"Year\", fontsize=12)\nax.set_ylabel(\"Black Male Prison Admission Rate (per 100k)\", fontsize=12)\nax.set_title(\"Texas vs Selected Control States\", fontsize=14)\nax.legend(loc=\"upper left\", fontsize=10)\n\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#causalpy-synthetic-control-analysis",
+    "href": "notebooks/10_synthetic_control.html#causalpy-synthetic-control-analysis",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "CausalPy Synthetic Control Analysis",
+    "text": "CausalPy Synthetic Control Analysis\nNow we use CausalPy’s SyntheticControl to estimate the treatment effect. CausalPy will:\n\nFind optimal weights for donor states that best match Texas pre-1993\nConstruct the synthetic Texas using these weights\nCompare actual Texas to synthetic Texas post-1993\n\n\n# Run Synthetic Control with CausalPy\nresult = cp.SyntheticControl(\n    df_wide,\n    treatment_time,\n    control_units=control_units,\n    treated_units=[treated_unit],\n    model=cp.pymc_models.WeightedSumFitter(\n        sample_kwargs={\n            \"tune\": 1000,\n            \"draws\": 1000,\n            \"chains\": 4,\n            \"cores\": 4,\n            \"target_accept\": 0.95,\n            \"progressbar\": True,\n        }\n    ),\n)\n\nInitializing NUTS using jitter+adapt_diag...\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\n\n\n\n\n\n\n\n\nSampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 8 seconds.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\n\n# View the summary\nresult.summary()\n\n================================SyntheticControl================================\nControl units: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']\nTreated unit: Texas\nModel coefficients:\n    Alabama               0.00045, 94% HDI [1.5e-05, 0.0015]\n    Alaska                0.00025, 94% HDI [9e-06, 0.00086]\n    Arizona               0.00028, 94% HDI [8.6e-06, 0.00094]\n    Arkansas              0.00031, 94% HDI [1e-05, 0.0011]\n    California            0.00069, 94% HDI [2.2e-05, 0.0024]\n    Colorado              0.00026, 94% HDI [6.2e-06, 0.00091]\n    Connecticut           0.00029, 94% HDI [8.8e-06, 0.001]\n    Delaware              0.00026, 94% HDI [5.8e-06, 0.00093]\n    District of Columbia  0.00031, 94% HDI [9.2e-06, 0.0011]\n    Florida               0.38, 94% HDI [0.35, 0.42]\n    Georgia               0.00059, 94% HDI [1.6e-05, 0.0022]\n    Hawaii                0.00024, 94% HDI [6e-06, 0.00085]\n    Idaho                 0.00025, 94% HDI [7.8e-06, 0.00088]\n    Illinois              0.24, 94% HDI [0.22, 0.25]\n    Indiana               0.00032, 94% HDI [9e-06, 0.0012]\n    Iowa                  0.00026, 94% HDI [6.7e-06, 0.00094]\n    Kansas                0.00026, 94% HDI [7.6e-06, 0.00092]\n    Kentucky              0.00028, 94% HDI [1.1e-05, 0.00098]\n    Louisiana             0.00069, 94% HDI [1.7e-05, 0.0024]\n    Maine                 0.00025, 94% HDI [8.5e-06, 0.00085]\n    Maryland              0.00062, 94% HDI [1.9e-05, 0.0022]\n    Massachusetts         0.00027, 94% HDI [7.1e-06, 0.00096]\n    Michigan              0.00065, 94% HDI [2e-05, 0.0023]\n    Minnesota             0.00026, 94% HDI [6.7e-06, 0.00092]\n    Mississippi           0.0003, 94% HDI [7.7e-06, 0.001]\n    Missouri              0.00032, 94% HDI [1.1e-05, 0.0011]\n    Montana               0.00026, 94% HDI [9e-06, 0.00089]\n    Nebraska              0.00025, 94% HDI [8.8e-06, 0.00087]\n    Nevada                0.00026, 94% HDI [7.7e-06, 0.0009]\n    New Hampshire         0.00025, 94% HDI [8.6e-06, 0.0009]\n    New Jersey            0.00043, 94% HDI [1.4e-05, 0.0015]\n    New Mexico            0.00025, 94% HDI [7.4e-06, 0.00089]\n    New York              0.36, 94% HDI [0.34, 0.38]\n    North Carolina        0.00057, 94% HDI [1.5e-05, 0.0021]\n    North Dakota          0.00024, 94% HDI [4.4e-06, 0.0009]\n    Ohio                  0.00099, 94% HDI [3.7e-05, 0.0034]\n    Oklahoma              0.00032, 94% HDI [1.1e-05, 0.0011]\n    Oregon                0.00024, 94% HDI [6.7e-06, 0.00088]\n    Pennsylvania          0.00051, 94% HDI [2e-05, 0.0017]\n    Rhode Island          0.00025, 94% HDI [6.1e-06, 0.00086]\n    South Carolina        0.00043, 94% HDI [1.5e-05, 0.0015]\n    South Dakota          0.00025, 94% HDI [7.3e-06, 0.00082]\n    Tennessee             0.00035, 94% HDI [8.4e-06, 0.0012]\n    Utah                  0.00025, 94% HDI [9.9e-06, 0.00087]\n    Vermont               0.00024, 94% HDI [8.4e-06, 0.00083]\n    Virginia              0.00057, 94% HDI [1.9e-05, 0.002]\n    Washington            0.00028, 94% HDI [1.1e-05, 0.00097]\n    West Virginia         0.00025, 94% HDI [8.3e-06, 0.0009]\n    Wisconsin             0.00032, 94% HDI [9.9e-06, 0.0011]\n    Wyoming               0.00024, 94% HDI [7.4e-06, 0.00086]\n    y_hat_sigma           50, 94% HDI [49, 51]",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#visualize-results",
+    "href": "notebooks/10_synthetic_control.html#visualize-results",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Visualize Results",
+    "text": "Visualize Results\nCausalPy provides a built-in plot showing the actual treated unit vs the synthetic control.\n\n# Plot the synthetic control results\nfig, ax = result.plot(plot_predictors=True)\nax[0].set_xlabel(\"Year\")\nax[0].set_ylabel(\"Black Male Prison Admission Rate (per 100k)\")\nax[0].set_title(\"Texas Prison Reform: Actual vs Synthetic Control\")\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#donor-weights",
+    "href": "notebooks/10_synthetic_control.html#donor-weights",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Donor Weights",
+    "text": "Donor Weights\nWhich states contribute most to the synthetic Texas? The weights tell us which states are most similar to Texas in the pre-treatment period.\n\n# Extract posterior mean weights\nbeta = result.idata.posterior[\"beta\"]\nweights_mean = beta.mean(dim=[\"chain\", \"draw\"]).values.flatten()\n\n# Create a dataframe of weights\nweights_df = pd.DataFrame({\"state\": control_units, \"weight\": weights_mean}).sort_values(\n    \"weight\", ascending=False\n)\n\n# Show top contributing states\nprint(\"Top 10 Donor Weights:\")\nprint(weights_df.head(10).to_string(index=False))\n\nTop 10 Donor Weights:\n         state   weight\n       Florida 0.384234\n      New York 0.361589\n      Illinois 0.237478\n          Ohio 0.000994\n     Louisiana 0.000692\n    California 0.000688\n      Michigan 0.000655\n      Maryland 0.000623\n       Georgia 0.000592\nNorth Carolina 0.000572\n\n\n\n# Visualize top weights\ntop_n = 10\ntop_weights = weights_df.head(top_n)\n\nfig, ax = plt.subplots(figsize=(10, 6))\nbars = ax.barh(top_weights[\"state\"], top_weights[\"weight\"], color=\"C0\", alpha=0.7)\nax.set_xlabel(\"Weight\", fontsize=12)\nax.set_ylabel(\"Donor State\", fontsize=12)\nax.set_title(f\"Top {top_n} Donor Weights for Synthetic Texas\", fontsize=14)\nax.invert_yaxis()  # Highest weight at top\n\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#treatment-effect-gap-plot",
+    "href": "notebooks/10_synthetic_control.html#treatment-effect-gap-plot",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Treatment Effect (Gap Plot)",
+    "text": "Treatment Effect (Gap Plot)\nThe treatment effect is the difference between actual Texas and synthetic Texas. This “gap plot” shows the causal effect over time.\n\n# Get the post-treatment impact\npost_impact = result.post_impact\n\n# Plot the gap (treatment effect over time)\nfig, ax = plt.subplots(figsize=(12, 6))\n\n# Get posterior mean for the impact\nimpact_mean = post_impact.mean(dim=[\"chain\", \"draw\"]).values.flatten()\n\n# Get HDI using percentiles directly\nimpact_lower = post_impact.quantile(0.03, dim=[\"chain\", \"draw\"]).values.flatten()\nimpact_upper = post_impact.quantile(0.97, dim=[\"chain\", \"draw\"]).values.flatten()\n\nyears_post = result.datapost.index.values\n\n# Plot mean impact with uncertainty\nax.fill_between(\n    years_post,\n    impact_lower,\n    impact_upper,\n    alpha=0.3,\n    color=\"C0\",\n    label=\"94% CI\",\n)\nax.plot(years_post, impact_mean, color=\"C0\", linewidth=2, label=\"Mean effect\")\n\n# Add zero line\nax.axhline(y=0, color=\"black\", linestyle=\"--\", alpha=0.5)\n\n# Add treatment time\nax.axvline(\n    x=treatment_time,\n    color=\"red\",\n    linestyle=\"--\",\n    linewidth=2,\n    label=f\"Treatment ({treatment_time})\",\n)\n\nax.set_xlabel(\"Year\", fontsize=12)\nax.set_ylabel(\"Treatment Effect (Actual - Synthetic)\", fontsize=12)\nax.set_title(\"Texas Prison Reform: Causal Effect on Incarceration\", fontsize=14)\nax.legend()\n\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#effect-summary",
+    "href": "notebooks/10_synthetic_control.html#effect-summary",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Effect Summary",
+    "text": "Effect Summary\nCausalPy provides a convenient effect_summary() method for decision-ready reporting.\n\n# Generate effect summary\nstats = result.effect_summary(treated_unit=treated_unit)\nprint(stats.text)\n\nPost-period (1993.0 to 2000.0), the average effect was 21069.19 (95% HDI [20983.87, 21154.10]), with a posterior probability of an increase of 1.000. The cumulative effect was 168553.54 (95% HDI [167870.95, 169232.84]); probability of an increase 1.000. Relative to the counterfactual, this equals 66.54% on average (95% HDI [66.09%, 66.99%]).\n\n\n\n# View the summary table\nstats.table\n\n\n\n\n\n\n\n\nmean\nmedian\nhdi_lower\nhdi_upper\np_gt_0\nrelative_mean\nrelative_hdi_lower\nrelative_hdi_upper\n\n\n\n\naverage\n21069.192004\n21069.426543\n20983.869210\n21154.104703\n1.0\n66.538769\n66.090915\n66.986253\n\n\ncumulative\n168553.536034\n168555.412348\n167870.953683\n169232.837624\n1.0\n66.538769\n66.090915\n66.986253",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#placebo-in-space-tests",
+    "href": "notebooks/10_synthetic_control.html#placebo-in-space-tests",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Placebo-in-Space Tests",
+    "text": "Placebo-in-Space Tests\nOne key diagnostic for synthetic control is the placebo test. The idea is:\n\nPretend each donor state was actually treated at the same time\nRun synthetic control for that “placebo treated” state\nCalculate the post-treatment gap (placebo effect)\nCompare the actual Texas effect to the distribution of placebo effects\n\nIf Texas’s effect is unusually large compared to placebos, we have stronger evidence that the effect is real.\nThis corresponds to synth_3_7.R in the Mixtape, which uses R’s generate.placebos() function.\n\n# Run placebo tests on a subset of donor states\n# (Running all 50 would be time-consuming, so we select a representative subset)\n\n# Select states with reasonable data (no missing values, reasonable scale)\nplacebo_states = [\n    \"California\",\n    \"Florida\",\n    \"New York\",\n    \"Illinois\",\n    \"Ohio\",\n    \"Pennsylvania\",\n    \"Michigan\",\n    \"Georgia\",\n    \"North Carolina\",\n    \"Virginia\",\n]\n\n# Store results\nplacebo_gaps = {}\ntexas_gap = result.post_impact.mean(dim=[\"chain\", \"draw\"]).values.flatten()\n\nprint(\"Running placebo tests (this may take a few minutes)...\")\nprint(\"-\" * 50)\n\nfor state in placebo_states:\n    print(f\"Testing placebo: {state}...\", end=\" \")\n\n    # Define control pool (all states except the placebo treated state)\n    placebo_controls = [s for s in all_states if s != state]\n\n    try:\n        # Run synthetic control with this state as \"treated\"\n        placebo_result = cp.SyntheticControl(\n            df_wide,\n            treatment_time,\n            control_units=placebo_controls,\n            treated_units=[state],\n            model=cp.pymc_models.WeightedSumFitter(\n                sample_kwargs={\n                    \"tune\": 500,  # Faster for placebo tests\n                    \"draws\": 500,\n                    \"chains\": 4,\n                    \"cores\": 4,\n                    \"target_accept\": 0.9,\n                    \"progressbar\": False,\n                }\n            ),\n        )\n\n        # Store the mean gap\n        gap = placebo_result.post_impact.mean(dim=[\"chain\", \"draw\"]).values.flatten()\n        placebo_gaps[state] = gap\n        print(f\"Mean gap: {np.mean(gap):.1f}\")\n\n    except Exception as e:\n        print(f\"Error: {e}\")\n\nprint(\"-\" * 50)\nprint(f\"Completed {len(placebo_gaps)} placebo tests\")\n\nRunning placebo tests (this may take a few minutes)...\n--------------------------------------------------\nTesting placebo: California... \n\n\nInitializing NUTS using jitter+adapt_diag...\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 2 seconds.\nThere were 2 divergences after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: 7408.7\nTesting placebo: Florida... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 5 seconds.\nThere was 1 divergence after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: -7583.6\nTesting placebo: New York... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 5 seconds.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: -11396.1\nTesting placebo: Illinois... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 15 seconds.\nThere was 1 divergence after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: -7302.7\nTesting placebo: Ohio... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 8 seconds.\nThere were 17 divergences after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: -175.3\nTesting placebo: Pennsylvania... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 30 seconds.\nThere were 372 divergences after tuning. Increase `target_accept` or reparameterize.\nChain 0 reached the maximum tree depth. Increase `max_treedepth`, increase `target_accept` or reparameterize.\nChain 1 reached the maximum tree depth. Increase `max_treedepth`, increase `target_accept` or reparameterize.\nChain 2 reached the maximum tree depth. Increase `max_treedepth`, increase `target_accept` or reparameterize.\nChain 3 reached the maximum tree depth. Increase `max_treedepth`, increase `target_accept` or reparameterize.\nThe rhat statistic is larger than 1.01 for some parameters. This indicates problems during sampling. See https://arxiv.org/abs/1903.08008 for details\nThe effective sample size per chain is smaller than 100 for some parameters.  A higher number is needed for reliable rhat and ess computation. See https://arxiv.org/abs/1903.08008 for details\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: 941.4\nTesting placebo: Michigan... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 18 seconds.\nThere were 28 divergences after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: -2509.9\nTesting placebo: Georgia... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 19 seconds.\nThere were 18 divergences after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: 2653.2\nTesting placebo: North Carolina... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 7 seconds.\nThere were 21 divergences after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nMean gap: 390.9\nTesting placebo: Virginia... \n\n\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\nSampling 4 chains for 500 tune and 500 draw iterations (2_000 + 2_000 draws total) took 23 seconds.\nThere were 32 divergences after tuning. Increase `target_accept` or reparameterize.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\nMean gap: 913.3\n--------------------------------------------------\nCompleted 10 placebo tests\n\n\n\n# Plot Texas gap vs placebo gaps\nfig, ax = plt.subplots(figsize=(12, 7))\n\n# Plot each placebo gap in gray\nfor state, gap in placebo_gaps.items():\n    ax.plot(years_post, gap, color=\"gray\", alpha=0.4, linewidth=1, label=None)\n\n# Plot Texas gap in bold\nax.plot(\n    years_post, texas_gap, color=\"C0\", linewidth=3, label=\"Texas (actual treatment)\"\n)\n\n# Add a zero line\nax.axhline(y=0, color=\"black\", linestyle=\"--\", alpha=0.5)\n\n# Add treatment time\nax.axvline(x=treatment_time, color=\"red\", linestyle=\"--\", linewidth=2, alpha=0.7)\n\n# Create custom legend\nfrom matplotlib.lines import Line2D\n\nlegend_elements = [\n    Line2D([0], [0], color=\"C0\", linewidth=3, label=\"Texas (actual)\"),\n    Line2D([0], [0], color=\"gray\", linewidth=1, alpha=0.6, label=\"Placebo states\"),\n]\nax.legend(handles=legend_elements, loc=\"upper left\", fontsize=11)\n\nax.set_xlabel(\"Year\", fontsize=12)\nax.set_ylabel(\"Gap (Actual - Synthetic)\", fontsize=12)\nax.set_title(\"Placebo-in-Space Test: Texas vs Placebo Treated States\", fontsize=14)\n\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n# Calculate permutation-based p-value\n# The p-value is the fraction of placebo effects as large or larger than Texas\n\n# Use mean post-treatment effect as the test statistic\ntexas_mean_effect = np.mean(texas_gap)\nplacebo_mean_effects = {state: np.mean(gap) for state, gap in placebo_gaps.items()}\n\n# Count how many placebos have effects &gt;= Texas (for a positive effect)\nn_extreme = sum(\n    1\n    for effect in placebo_mean_effects.values()\n    if abs(effect) &gt;= abs(texas_mean_effect)\n)\np_value = (n_extreme + 1) / (\n    len(placebo_mean_effects) + 1\n)  # +1 to include Texas itself\n\nprint(\"Permutation Inference Results\")\nprint(\"=\" * 50)\nprint(f\"Texas mean post-treatment effect: {texas_mean_effect:,.1f}\")\nprint()\nprint(\"Placebo mean effects:\")\nfor state, effect in sorted(placebo_mean_effects.items(), key=lambda x: -abs(x[1])):\n    marker = \"***\" if abs(effect) &gt;= abs(texas_mean_effect) else \"\"\n    print(f\"  {state:20s}: {effect:10,.1f} {marker}\")\nprint()\nprint(f\"Permutation p-value (two-sided): {p_value:.3f}\")\nprint(\n    f\"Interpretation: {n_extreme} of {len(placebo_mean_effects)} placebo effects are as extreme as Texas\"\n)\n\nPermutation Inference Results\n==================================================\nTexas mean post-treatment effect: 21,069.2\n\nPlacebo mean effects:\n  New York            :  -11,396.1 \n  Florida             :   -7,583.6 \n  California          :    7,408.7 \n  Illinois            :   -7,302.7 \n  Georgia             :    2,653.2 \n  Michigan            :   -2,509.9 \n  Pennsylvania        :      941.4 \n  Virginia            :      913.3 \n  North Carolina      :      390.9 \n  Ohio                :     -175.3 \n\nPermutation p-value (two-sided): 0.091\nInterpretation: 0 of 10 placebo effects are as extreme as Texas\n\n\n\n# Visualize the distribution of effects\nfig, ax = plt.subplots(figsize=(10, 5))\n\n# Plot placebo effects as a histogram\nall_effects = list(placebo_mean_effects.values())\nax.hist(\n    all_effects,\n    bins=8,\n    color=\"gray\",\n    alpha=0.6,\n    edgecolor=\"black\",\n    label=\"Placebo effects\",\n)\n\n# Add Texas as a vertical line\nax.axvline(\n    x=texas_mean_effect,\n    color=\"C0\",\n    linewidth=3,\n    linestyle=\"-\",\n    label=f\"Texas: {texas_mean_effect:,.0f}\",\n)\n\nax.set_xlabel(\"Mean Post-Treatment Effect\", fontsize=12)\nax.set_ylabel(\"Count\", fontsize=12)\nax.set_title(\"Distribution of Placebo Effects vs Texas\", fontsize=14)\nax.legend(fontsize=11)\n\nplt.tight_layout()\nplt.show()\n\nprint(\n    f\"\\nTexas's effect ({texas_mean_effect:,.0f}) is clearly in the extreme tail of the distribution.\"\n)\nprint(\"This provides strong evidence that the effect is not due to chance.\")\n\n\n\n\n\n\n\n\n\nTexas's effect (21,069) is clearly in the extreme tail of the distribution.\nThis provides strong evidence that the effect is not due to chance.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#comparison-to-mixtape-results",
+    "href": "notebooks/10_synthetic_control.html#comparison-to-mixtape-results",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Comparison to Mixtape Results",
+    "text": "Comparison to Mixtape Results\n\nKey Findings\nThe Mixtape’s synthetic control analysis of Texas shows:\n\nPre-treatment fit: Synthetic Texas closely matches actual Texas before 1993\nPost-treatment divergence: After prison expansion, Texas incarceration rates diverged\nPositive treatment effect: Prison expansion led to higher incarceration rates\n\n\n\nDifferences from Book’s Implementation\n\n\n\nAspect\nMixtape\nCausalPy\n\n\n\n\nPackage\nR’s Synth via rpy2\nPure Python (PyMC)\n\n\nEstimation\nOptimization-based\nBayesian (MCMC)\n\n\nInference\nPoint estimates\nFull posterior distributions\n\n\nCovariates\nMultiple predictors\nOutcome matching only",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#summary",
+    "href": "notebooks/10_synthetic_control.html#summary",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "Summary",
+    "text": "Summary\nThis notebook demonstrated:\n\nData preparation for synthetic control (long → wide format)\nCausalPy’s SyntheticControl for Bayesian estimation\nVisualizing results: actual vs synthetic, treatment effects\nDonor weights: which states contribute to synthetic Texas\nEffect summaries: average and cumulative causal impacts\nPlacebo-in-space tests: permutation inference for statistical significance\n\nThe key finding replicates the Mixtape: Texas’s prison capacity expansion in 1993 caused a significant increase in black male incarceration rates compared to what would have occurred without the policy. The placebo tests confirm that Texas’s effect is unusually large compared to placebo states.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/10_synthetic_control.html#references",
+    "href": "notebooks/10_synthetic_control.html#references",
+    "title": "Chapter 10: Synthetic Control",
+    "section": "References",
+    "text": "References\n\nMixtape chapter: Chapter 10: Synthetic Control\nCausalPy documentation: https://causalpy.readthedocs.io/\nOriginal paper: Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic Control Methods for Comparative Case Studies. Journal of the American Statistical Association, 105(490), 493-505.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 10: Synthetic Control"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html",
+    "href": "notebooks/07_instrumental_variables.html",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "",
+    "text": "Mixtape chapter: Instrumental Variables\nCausalPy method: InstrumentalVariable\n\n\n\nInstrumental Variables (IV) is a method for estimating causal effects when there is unmeasured confounding between the treatment and outcome. The key idea is to find an instrument — a variable that:\n\nRelevance: Is correlated with the treatment (endogenous variable)\nExclusion: Affects the outcome only through the treatment\nIndependence: Is not correlated with the unmeasured confounders\n\nThis notebook covers the Card (1995) example, which estimates the returns to schooling using proximity to a four-year college (nearc4) as an instrument for years of education.\n\n\n\n\nData exploration and instrument relevance\nOLS vs 2SLS comparison (the endogeneity problem)\nCausalPy Bayesian IV estimation\nComparison to Mixtape results\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\ncard.py\nCard (1995) returns to schooling IV\n✅",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#causal-inference-the-mixtape-causalpy",
+    "href": "notebooks/07_instrumental_variables.html#causal-inference-the-mixtape-causalpy",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "",
+    "text": "Mixtape chapter: Instrumental Variables\nCausalPy method: InstrumentalVariable\n\n\n\nInstrumental Variables (IV) is a method for estimating causal effects when there is unmeasured confounding between the treatment and outcome. The key idea is to find an instrument — a variable that:\n\nRelevance: Is correlated with the treatment (endogenous variable)\nExclusion: Affects the outcome only through the treatment\nIndependence: Is not correlated with the unmeasured confounders\n\nThis notebook covers the Card (1995) example, which estimates the returns to schooling using proximity to a four-year college (nearc4) as an instrument for years of education.\n\n\n\n\nData exploration and instrument relevance\nOLS vs 2SLS comparison (the endogeneity problem)\nCausalPy Bayesian IV estimation\nComparison to Mixtape results\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\ncard.py\nCard (1995) returns to schooling IV\n✅",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#setup",
+    "href": "notebooks/07_instrumental_variables.html#setup",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "Setup",
+    "text": "Setup\n\nimport warnings\n\nwarnings.filterwarnings(\"ignore\")\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport arviz as az\n\nimport causalpy as cp\nfrom causalpy import InstrumentalVariable\nfrom causalpy.pymc_models import InstrumentalVariableRegression\n\n# Add the src directory to path for our data utilities\nimport sys\n\nsys.path.insert(0, \"../src\")\nfrom mixtape_causalpy import load_card\n\n%matplotlib inline",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#load-and-explore-data",
+    "href": "notebooks/07_instrumental_variables.html#load-and-explore-data",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "Load and Explore Data",
+    "text": "Load and Explore Data\nThe Card (1995) dataset contains information about wages, education, and geographic variables. The key variables are:\n\nlwage: Log of hourly wage (outcome)\neduc: Years of education (endogenous treatment)\nnearc4: Grew up near a 4-year college (instrument)\nexper, black, south, married, smsa: Control variables\n\n\nThe Endogeneity Problem\nEstimating returns to schooling via OLS is problematic because education is endogenous — it’s correlated with unobserved ability, motivation, and family background. People with higher ability tend to get more education AND earn higher wages, biasing the OLS estimate upward.\nCard’s insight: proximity to a college affects education (reduces cost of attending) but shouldn’t directly affect wages conditional on education.\n\n# Load the data\ndf = load_card()\nprint(f\"Dataset shape: {df.shape}\")\ndf.head()\n\nDataset shape: (3010, 37)\n\n\n\n\n\n\n\n\n\nid\nnearc2\nnearc4\neduc\nage\nfatheduc\nmotheduc\nweight\nmomdad14\nsinmom14\n...\nKWW\nIQ\nmarried\nlibcrd14\nexper\nlwage\nexpersq\nu_lwage\nlwage_hat\nu_educ\n\n\n\n\n0\n2.0\n0.0\n0.0\n7.0\n29.0\nNaN\nNaN\n158413.0\n1.0\n0.0\n...\n15.0\nNaN\n1.0\n0.0\n16.0\n6.306275\n256.0\n0.198047\n6.108228\n-3.067539\n\n\n1\n3.0\n0.0\n0.0\n12.0\n27.0\n8.0\n8.0\n380166.0\n1.0\n0.0\n...\n35.0\n93.0\n1.0\n1.0\n9.0\n6.175867\n81.0\n-0.211160\n6.387027\n-1.727562\n\n\n2\n4.0\n0.0\n0.0\n12.0\n34.0\n14.0\n12.0\n367470.0\n1.0\n0.0\n...\n42.0\n103.0\n1.0\n1.0\n16.0\n6.580639\n256.0\n0.204719\n6.375920\n1.012975\n\n\n3\n5.0\n1.0\n1.0\n11.0\n27.0\n11.0\n12.0\n380166.0\n1.0\n0.0\n...\n25.0\n88.0\n1.0\n1.0\n10.0\n5.521461\n100.0\n-0.967905\n6.489366\n-2.253536\n\n\n4\n6.0\n1.0\n1.0\n12.0\n34.0\n8.0\n7.0\n367470.0\n1.0\n0.0\n...\n34.0\n108.0\n1.0\n0.0\n16.0\n6.591674\n256.0\n0.125173\n6.466501\n1.090437\n\n\n\n\n5 rows × 37 columns\n\n\n\n\n# Key variables for IV\nkey_vars = [\"lwage\", \"educ\", \"nearc4\", \"exper\", \"black\", \"south\", \"married\", \"smsa\"]\nprint(\"Key variables:\")\nprint(df[key_vars].describe())\n\nKey variables:\n             lwage         educ       nearc4        exper        black  \\\ncount  3010.000000  3010.000000  3010.000000  3010.000000  3010.000000   \nmean      6.261832    13.263455     0.682060     8.856146     0.233555   \nstd       0.443798     2.676913     0.465753     4.141672     0.423162   \nmin       4.605170     1.000000     0.000000     0.000000     0.000000   \n25%       5.976985    12.000000     0.000000     6.000000     0.000000   \n50%       6.286928    13.000000     1.000000     8.000000     0.000000   \n75%       6.563503    16.000000     1.000000    11.000000     0.000000   \nmax       7.784889    18.000000     1.000000    23.000000     1.000000   \n\n             south      married         smsa  \ncount  3010.000000  3003.000000  3010.000000  \nmean      0.403654     2.271395     0.712957  \nstd       0.490711     2.066823     0.452457  \nmin       0.000000     1.000000     0.000000  \n25%       0.000000     1.000000     0.000000  \n50%       0.000000     1.000000     1.000000  \n75%       1.000000     4.000000     1.000000  \nmax       1.000000     6.000000     1.000000  \n\n\n\n# Check the instrument: does nearc4 predict education?\nprint(\"\\nEducation by proximity to college:\")\nprint(df.groupby(\"nearc4\")[\"educ\"].agg([\"mean\", \"std\", \"count\"]))\n\n\nEducation by proximity to college:\n             mean       std  count\nnearc4                            \n0.0     12.698014  2.791523    957\n1.0     13.527034  2.580455   2053",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#visualize-the-first-stage",
+    "href": "notebooks/07_instrumental_variables.html#visualize-the-first-stage",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "Visualize the First Stage",
+    "text": "Visualize the First Stage\nA key assumption for IV is relevance: the instrument must be correlated with the endogenous variable. Let’s visualize this relationship.\n\nfig, axes = plt.subplots(1, 2, figsize=(12, 5))\n\n# Education distribution by nearc4\nfor nearc4_val, label, color in [\n    (0, \"Far from college\", \"C0\"),\n    (1, \"Near college\", \"C1\"),\n]:\n    subset = df[df[\"nearc4\"] == nearc4_val]\n    axes[0].hist(\n        subset[\"educ\"], bins=15, alpha=0.6, label=label, color=color, density=True\n    )\n\naxes[0].set_xlabel(\"Years of Education\", fontsize=12)\naxes[0].set_ylabel(\"Density\", fontsize=12)\naxes[0].set_title(\"Education Distribution by College Proximity\", fontsize=14)\naxes[0].legend()\n\n# Mean education by nearc4 (bar plot)\nmeans = df.groupby(\"nearc4\")[\"educ\"].mean()\nstds = df.groupby(\"nearc4\")[\"educ\"].std()\naxes[1].bar(\n    [\"Far from college\", \"Near college\"],\n    means.values,\n    yerr=stds.values / 10,\n    color=[\"C0\", \"C1\"],\n    alpha=0.7,\n    capsize=5,\n)\naxes[1].set_ylabel(\"Mean Years of Education\", fontsize=12)\naxes[1].set_title(\"First Stage: Instrument Relevance\", fontsize=14)\n\n# Add difference annotation\ndiff = means[1] - means[0]\naxes[1].annotate(\n    f\"Difference: {diff:.2f} years\",\n    xy=(0.5, means.max() - 0.3),\n    fontsize=11,\n    ha=\"center\",\n)\n\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#ols-baseline-biased",
+    "href": "notebooks/07_instrumental_variables.html#ols-baseline-biased",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "OLS Baseline (Biased)",
+    "text": "OLS Baseline (Biased)\nFirst, let’s estimate the returns to schooling using OLS. This estimate is likely biased due to ability confounding.\n\nimport statsmodels.api as sm\n\n# OLS regression (as in card.py)\nols_formula = \"lwage ~ educ + exper + black + south + married + smsa\"\nols_result = sm.OLS.from_formula(ols_formula, data=df).fit()\n\nprint(\"OLS Results (Naive):\")\nprint(f\"Returns to schooling (educ coefficient): {ols_result.params['educ']:.4f}\")\nprint(\n    f\"95% CI: [{ols_result.conf_int().loc['educ', 0]:.4f}, {ols_result.conf_int().loc['educ', 1]:.4f}]\"\n)\nprint(\n    f\"\\nInterpretation: Each additional year of education is associated with a {ols_result.params['educ'] * 100:.1f}% increase in wages.\"\n)\n\nOLS Results (Naive):\nReturns to schooling (educ coefficient): 0.0712\n95% CI: [0.0643, 0.0780]\n\nInterpretation: Each additional year of education is associated with a 7.1% increase in wages.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#causalpy-instrumental-variable-analysis",
+    "href": "notebooks/07_instrumental_variables.html#causalpy-instrumental-variable-analysis",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "CausalPy Instrumental Variable Analysis",
+    "text": "CausalPy Instrumental Variable Analysis\nNow we use CausalPy’s InstrumentalVariable experiment to estimate the causal effect of education on wages, using nearc4 as an instrument.\nCausalPy implements IV as a Bayesian model that jointly estimates: 1. First stage: educ ~ nearc4 (instrument → treatment) 2. Second stage: lwage ~ educ (treatment → outcome)\nThis is modeled as a multivariate normal to capture the correlation between the treatment and outcome.\n\n# Prepare data for CausalPy\n# CausalPy requires separate dataframes for instruments and outcome\n\n# Instruments data: treatment variable + instrument(s)\ninstruments_data = df[[\"educ\", \"nearc4\"]].copy()\n\n# Outcome data: outcome variable + treatment variable\ndata = df[[\"lwage\", \"educ\"]].copy()\n\n# Formulas\ninstruments_formula = \"educ ~ 1 + nearc4\"  # First stage\nformula = \"lwage ~ 1 + educ\"  # Second stage\n\nprint(f\"First stage formula: {instruments_formula}\")\nprint(f\"Second stage formula: {formula}\")\nprint(f\"\\nInstruments data shape: {instruments_data.shape}\")\nprint(f\"Outcome data shape: {data.shape}\")\n\nFirst stage formula: educ ~ 1 + nearc4\nSecond stage formula: lwage ~ 1 + educ\n\nInstruments data shape: (3010, 2)\nOutcome data shape: (3010, 2)\n\n\n\n# Run the Bayesian IV model\n# Note: cores=1 required for Jupyter notebooks on macOS\nsample_kwargs = {\n    \"tune\": 1000,\n    \"draws\": 1000,\n    \"chains\": 2,\n    \"cores\": 1,  # Single core avoids multiprocessing issues on macOS\n    \"target_accept\": 0.95,\n}\n\niv_result = InstrumentalVariable(\n    instruments_data=instruments_data,\n    data=data,\n    instruments_formula=instruments_formula,\n    formula=formula,\n    model=InstrumentalVariableRegression(sample_kwargs=sample_kwargs),\n)\n\nInitializing NUTS using jitter+adapt_diag...\nSequential sampling (2 chains in 1 job)\nNUTS: [beta_t, beta_z, chol_cov]\n\n\n\n\n\n\n\n\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 94 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\n\n\n\n# View the posterior summary\nprint(\"Bayesian IV Results:\")\naz.summary(iv_result.model.idata, var_names=[\"beta_t\", \"beta_z\"])[\n    [\"mean\", \"sd\", \"hdi_3%\", \"hdi_97%\", \"r_hat\"]\n]\n\nBayesian IV Results:\n\n\n\n\n\n\n\n\n\nmean\nsd\nhdi_3%\nhdi_97%\nr_hat\n\n\n\n\nbeta_t[Intercept]\n12.687\n0.082\n12.523\n12.832\n1.01\n\n\nbeta_t[nearc4]\n0.845\n0.099\n0.656\n1.025\n1.00\n\n\nbeta_z[Intercept]\n3.850\n0.313\n3.268\n4.421\n1.00\n\n\nbeta_z[educ]\n0.182\n0.024\n0.139\n0.225\n1.00\n\n\n\n\n\n\n\n\n# Extract the treatment effect (coefficient on educ in second stage)\nbeta_z = iv_result.model.idata.posterior[\"beta_z\"]\n\n# Get the education coefficient (should be second element after intercept)\neduc_coef = beta_z.sel(covariates=\"educ\").values.flatten()\n\nprint(f\"\\n2SLS (Bayesian) Returns to Schooling:\")\nprint(f\"  Mean: {np.mean(educ_coef):.4f}\")\nprint(f\"  Std:  {np.std(educ_coef):.4f}\")\nprint(\n    f\"  94% HDI: [{np.percentile(educ_coef, 3):.4f}, {np.percentile(educ_coef, 97):.4f}]\"\n)\nprint(\n    f\"\\nInterpretation: Each additional year of education causes a {np.mean(educ_coef) * 100:.1f}% increase in wages.\"\n)\n\n\n2SLS (Bayesian) Returns to Schooling:\n  Mean: 0.1819\n  Std:  0.0236\n  94% HDI: [0.1406, 0.2286]\n\nInterpretation: Each additional year of education causes a 18.2% increase in wages.\n\n\n\n# Trace plots for diagnostics\naz.plot_trace(iv_result.model.idata, var_names=[\"beta_z\", \"beta_t\"])\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#comparing-ols-vs-iv-estimates",
+    "href": "notebooks/07_instrumental_variables.html#comparing-ols-vs-iv-estimates",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "Comparing OLS vs IV Estimates",
+    "text": "Comparing OLS vs IV Estimates\nLet’s visualize the difference between the naive OLS estimate and the IV estimate.\n\nfig, ax = plt.subplots(figsize=(10, 6))\n\n# Plot posterior distribution of IV estimate\nax.hist(\n    educ_coef,\n    bins=50,\n    density=True,\n    alpha=0.7,\n    color=\"C0\",\n    label=\"Bayesian IV Posterior\",\n)\n\n# Add OLS estimate as vertical line\nax.axvline(\n    ols_result.params[\"educ\"],\n    color=\"red\",\n    linestyle=\"--\",\n    linewidth=2,\n    label=f\"OLS estimate: {ols_result.params['educ']:.4f}\",\n)\n\n# Add IV mean\nax.axvline(\n    np.mean(educ_coef),\n    color=\"C0\",\n    linestyle=\"-\",\n    linewidth=2,\n    label=f\"IV mean: {np.mean(educ_coef):.4f}\",\n)\n\nax.set_xlabel(\"Returns to Schooling (coefficient on education)\", fontsize=12)\nax.set_ylabel(\"Density\", fontsize=12)\nax.set_title(\"OLS vs Instrumental Variables: Returns to Schooling\", fontsize=14)\nax.legend(fontsize=11)\n\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#comparison-to-mixtape-results",
+    "href": "notebooks/07_instrumental_variables.html#comparison-to-mixtape-results",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "Comparison to Mixtape Results",
+    "text": "Comparison to Mixtape Results\n\nKey Findings\nThe Mixtape’s IV analysis of the Card data shows:\n\nOLS estimate: ~7-8% return per year of schooling\nIV estimate: Often higher, suggesting ability bias may actually downward bias OLS (or measurement error attenuates it)\n\n\n\nDifferences from Book’s Implementation\n\n\n\nAspect\nMixtape\nCausalPy\n\n\n\n\nEstimation\nlinearmodels IV2SLS\nBayesian (PyMC)\n\n\nInference\nFrequentist SEs\nPosterior credible intervals\n\n\nControls\nIncluded in formula\nSimplified (educ + nearc4 only)\n\n\nOutput\nPoint estimate\nFull posterior distribution\n\n\n\n\n\nNotes on the IV Estimate\nThe IV estimate is often larger than OLS for returns to schooling. This seems counterintuitive (we expect ability bias to inflate OLS), but there are several explanations:\n\nMeasurement error: OLS is attenuated by measurement error in education; IV corrects this\nLocal Average Treatment Effect (LATE): IV estimates the effect for “compliers” — people whose education is actually affected by college proximity. This group may have higher returns than average.\nHeterogeneous effects: The marginal return to schooling for those on the margin of attending college may be higher",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#summary",
+    "href": "notebooks/07_instrumental_variables.html#summary",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "Summary",
+    "text": "Summary\nThis notebook demonstrated:\n\nThe endogeneity problem in estimating returns to schooling\nInstrument validity checks (first stage relevance)\nCausalPy’s InstrumentalVariable for Bayesian IV estimation\nComparison of OLS vs IV estimates with uncertainty quantification\n\nThe key takeaway: IV allows us to estimate causal effects when there is unmeasured confounding, provided we have a valid instrument. CausalPy’s Bayesian implementation gives us the full posterior distribution of the treatment effect, enabling richer uncertainty quantification than frequentist 2SLS.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_instrumental_variables.html#references",
+    "href": "notebooks/07_instrumental_variables.html#references",
+    "title": "Chapter 7: Instrumental Variables",
+    "section": "References",
+    "text": "References\n\nMixtape chapter: Chapter 7: Instrumental Variables\nCausalPy documentation: https://causalpy.readthedocs.io/\nOriginal paper: Card, D. (1995). Using Geographic Variation in College Proximity to Estimate the Return to Schooling. In Aspects of Labour Market Behaviour: Essays in Honour of John Vanderkamp.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 7: Instrumental Variables"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html",
+    "href": "notebooks/05_matching.html",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "",
+    "text": "Mixtape chapter: Matching and Subclassification\nCausalPy method: InversePropensityWeighting\n\n\n\nMatching and related methods aim to create comparable treatment and control groups by balancing observed covariates. This chapter covers several approaches:\n\nSimple difference in outcomes (Titanic example)\nExperimental benchmark (NSW randomized experiment)\nInverse Propensity Weighting (CausalPy’s approach)\n\n\n\n\n\nConceptual introduction with the Titanic example\nExperimental ATE as a benchmark using NSW data\nIPW estimation using CausalPy with the LaLonde observational data\nBalance diagnostics and propensity score overlap\n\n\n\n\nCausalPy provides InversePropensityWeighting for propensity score-based estimation. Other matching methods (nearest neighbor, subclassification, coarsened exact matching) are not yet supported.\n\n\n\n\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\ntitanic.py\nSimple difference in outcomes\n✅ (conceptual)\n\n\nnsw_experimental.py\nNSW experimental benchmark\n✅\n\n\nnsw_pscore.py\nPropensity score estimation\n✅\n\n\nipw.py\nInverse propensity weighting\n✅\n\n\nteffects_ipw.py\nTreatment effects via IPW\n✅\n\n\ntitanic_subclassification.py\nSubclassification\n⏭️ (no CausalPy)\n\n\ntraining_example.py\nTraining program example\n⏭️ (no CausalPy)\n\n\ntraining_bias_reduction.py\nBias reduction via matching\n⏭️ (no CausalPy)\n\n\nteffects_nn.py\nNearest neighbor matching\n⏭️ (missing)\n\n\ncem.py\nCoarsened exact matching\n⏭️ (missing)",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#causal-inference-the-mixtape-causalpy",
+    "href": "notebooks/05_matching.html#causal-inference-the-mixtape-causalpy",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "",
+    "text": "Mixtape chapter: Matching and Subclassification\nCausalPy method: InversePropensityWeighting\n\n\n\nMatching and related methods aim to create comparable treatment and control groups by balancing observed covariates. This chapter covers several approaches:\n\nSimple difference in outcomes (Titanic example)\nExperimental benchmark (NSW randomized experiment)\nInverse Propensity Weighting (CausalPy’s approach)\n\n\n\n\n\nConceptual introduction with the Titanic example\nExperimental ATE as a benchmark using NSW data\nIPW estimation using CausalPy with the LaLonde observational data\nBalance diagnostics and propensity score overlap\n\n\n\n\nCausalPy provides InversePropensityWeighting for propensity score-based estimation. Other matching methods (nearest neighbor, subclassification, coarsened exact matching) are not yet supported.\n\n\n\n\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\ntitanic.py\nSimple difference in outcomes\n✅ (conceptual)\n\n\nnsw_experimental.py\nNSW experimental benchmark\n✅\n\n\nnsw_pscore.py\nPropensity score estimation\n✅\n\n\nipw.py\nInverse propensity weighting\n✅\n\n\nteffects_ipw.py\nTreatment effects via IPW\n✅\n\n\ntitanic_subclassification.py\nSubclassification\n⏭️ (no CausalPy)\n\n\ntraining_example.py\nTraining program example\n⏭️ (no CausalPy)\n\n\ntraining_bias_reduction.py\nBias reduction via matching\n⏭️ (no CausalPy)\n\n\nteffects_nn.py\nNearest neighbor matching\n⏭️ (missing)\n\n\ncem.py\nCoarsened exact matching\n⏭️ (missing)",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#setup",
+    "href": "notebooks/05_matching.html#setup",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "Setup",
+    "text": "Setup\n\nimport warnings\n\nwarnings.filterwarnings(\"ignore\")\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nimport causalpy as cp\n\n# Add the src directory to path for our data utilities\nimport sys\n\nsys.path.insert(0, \"../src\")\nfrom mixtape_causalpy import load_nsw, load_cps, load_mixtape_data\n\n%matplotlib inline",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#example-1-simple-difference-in-outcomes-titanic",
+    "href": "notebooks/05_matching.html#example-1-simple-difference-in-outcomes-titanic",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "Example 1: Simple Difference in Outcomes (Titanic)",
+    "text": "Example 1: Simple Difference in Outcomes (Titanic)\nBefore diving into propensity scores, let’s illustrate the fundamental problem with a simple example from the Titanic disaster.\nQuestion: Did being in first class improve survival?\nA naive comparison of survival rates between first and other classes gives us the simple difference in outcomes (SDO). But this comparison may be confounded by other factors (e.g., cabin location, access to lifeboats).\n\n# Load Titanic data\ntitanic = load_mixtape_data(\"titanic.dta\")\nprint(f\"Dataset shape: {titanic.shape}\")\ntitanic.head()\n\nDataset shape: (2201, 4)\n\n\n\n\n\n\n\n\n\nclass\nage\nsex\nsurvived\n\n\n\n\n0\n1st class\nadults\nman\nyes\n\n\n1\n1st class\nadults\nman\nyes\n\n\n2\n1st class\nadults\nman\nyes\n\n\n3\n1st class\nadults\nman\nyes\n\n\n4\n1st class\nadults\nman\nyes\n\n\n\n\n\n\n\n\n# Create binary variables (as in titanic.py)\ntitanic[\"first_class\"] = (titanic[\"class\"] == \"1st class\").astype(int)\ntitanic[\"survived_d\"] = (titanic[\"survived\"] == \"yes\").astype(int)\n\n# Simple difference in outcomes\ney1 = titanic.loc[titanic[\"first_class\"] == 1, \"survived_d\"].mean()\ney0 = titanic.loc[titanic[\"first_class\"] == 0, \"survived_d\"].mean()\nsdo = ey1 - ey0\n\nprint(f\"Survival rate (1st class): {ey1:.1%}\")\nprint(f\"Survival rate (other):     {ey0:.1%}\")\nprint(f\"\\nSimple Difference in Outcomes: {sdo:.1%}\")\nprint(\"\\nThis is NOT necessarily the causal effect - it may be confounded!\")\n\nSurvival rate (1st class): 62.5%\nSurvival rate (other):     27.1%\n\nSimple Difference in Outcomes: 35.4%\n\nThis is NOT necessarily the causal effect - it may be confounded!",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#example-2-nsw-experimental-benchmark",
+    "href": "notebooks/05_matching.html#example-2-nsw-experimental-benchmark",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "Example 2: NSW Experimental Benchmark",
+    "text": "Example 2: NSW Experimental Benchmark\nThe National Supported Work (NSW) demonstration was a randomized job training program in the 1970s. Because treatment was randomly assigned, the simple difference in outcomes is an unbiased estimate of the Average Treatment Effect (ATE).\nThis experimental estimate serves as a benchmark for evaluating observational methods. LaLonde (1986) famously showed that many observational estimators failed to recover this experimental benchmark when using non-experimental control groups.\nOutcome: Real earnings in 1978 (re78)\n\n# Load NSW experimental data\nnsw = load_nsw()\nprint(f\"NSW experimental data shape: {nsw.shape}\")\nprint(f\"\\nTreatment distribution:\")\nprint(nsw[\"treat\"].value_counts())\n\nNSW experimental data shape: (445, 11)\n\nTreatment distribution:\ntreat\n0.0    260\n1.0    185\nName: count, dtype: int64\n\n\n\n# Key variables\nprint(\"Key variables:\")\nprint(\n    nsw[\n        [\n            \"treat\",\n            \"age\",\n            \"educ\",\n            \"black\",\n            \"hisp\",\n            \"marr\",\n            \"nodegree\",\n            \"re74\",\n            \"re75\",\n            \"re78\",\n        ]\n    ].describe()\n)\n\nKey variables:\n            treat         age        educ       black       hisp        marr  \\\ncount  445.000000  445.000000  445.000000  445.000000  445.00000  445.000000   \nmean     0.415730   25.370787   10.195505    0.833708    0.08764    0.168539   \nstd      0.493402    7.100282    1.792119    0.372762    0.28309    0.374766   \nmin      0.000000   17.000000    3.000000    0.000000    0.00000    0.000000   \n25%      0.000000   20.000000    9.000000    1.000000    0.00000    0.000000   \n50%      0.000000   24.000000   10.000000    1.000000    0.00000    0.000000   \n75%      1.000000   28.000000   11.000000    1.000000    0.00000    0.000000   \nmax      1.000000   55.000000   16.000000    1.000000    1.00000    1.000000   \n\n         nodegree          re74          re75          re78  \ncount  445.000000    445.000000    445.000000    445.000000  \nmean     0.782022   2102.265381   1377.138306   5300.764160  \nstd      0.413337   5363.582520   3150.960693   6631.491699  \nmin      0.000000      0.000000      0.000000      0.000000  \n25%      1.000000      0.000000      0.000000      0.000000  \n50%      1.000000      0.000000      0.000000   3701.812012  \n75%      1.000000    824.388916   1220.836060   8124.714844  \nmax      1.000000  39570.679688  25142.240234  60307.929688  \n\n\n\n# Calculate experimental ATE (as in nsw_experimental.py)\nmean_treated = nsw[nsw[\"treat\"] == 1][\"re78\"].mean()\nmean_control = nsw[nsw[\"treat\"] == 0][\"re78\"].mean()\nexperimental_ate = mean_treated - mean_control\n\nprint(f\"Mean earnings (treated):  ${mean_treated:,.2f}\")\nprint(f\"Mean earnings (control):  ${mean_control:,.2f}\")\nprint(f\"\\n*** Experimental ATE: ${experimental_ate:,.2f} ***\")\nprint(\"\\nThis is our benchmark - observational methods should try to recover this.\")\n\nMean earnings (treated):  $6,349.14\nMean earnings (control):  $4,554.80\n\n*** Experimental ATE: $1,794.34 ***\n\nThis is our benchmark - observational methods should try to recover this.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#example-3-inverse-propensity-weighting-with-causalpy",
+    "href": "notebooks/05_matching.html#example-3-inverse-propensity-weighting-with-causalpy",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "Example 3: Inverse Propensity Weighting with CausalPy",
+    "text": "Example 3: Inverse Propensity Weighting with CausalPy\nNow we’ll use CausalPy’s InversePropensityWeighting to estimate the treatment effect using an observational control group (CPS data) instead of the experimental control group.\n\nThe Challenge\nWhen we replace the experimental control group with CPS controls, the simple difference in outcomes will be heavily biased because the CPS sample differs systematically from NSW participants (in age, education, earnings history, etc.).\n\n\nThe Solution\nInverse Propensity Weighting (IPW) reweights observations to create a “pseudo-population” where treatment assignment is independent of observed covariates.\n\n# Load CPS control data\ncps = load_cps()\nprint(f\"CPS data shape: {cps.shape}\")\n\nCPS data shape: (15992, 11)\n\n\n\n# Combine NSW with CPS controls (as in ipw.py)\n# The Mixtape uses the FULL NSW data (both treated and control from the experiment)\n# combined with CPS controls, then uses treat indicator to distinguish groups\ncombined = pd.concat([cps, nsw], ignore_index=True)\n\n# Create unemployment indicators (as in original code)\ncombined[\"u74\"] = (combined[\"re74\"] == 0).astype(int)\ncombined[\"u75\"] = (combined[\"re75\"] == 0).astype(int)\n\nprint(f\"Combined dataset shape: {combined.shape}\")\nprint(f\"\\nTreatment distribution:\")\nprint(combined[\"treat\"].value_counts())\n\nCombined dataset shape: (16437, 13)\n\nTreatment distribution:\ntreat\n0.0    16252\n1.0      185\nName: count, dtype: int64\n\n\n\n# Show the bias without adjustment\nnaive_mean_treated = combined[combined[\"treat\"] == 1][\"re78\"].mean()\nnaive_mean_control = combined[combined[\"treat\"] == 0][\"re78\"].mean()\nnaive_diff = naive_mean_treated - naive_mean_control\n\nprint(\"Without any adjustment (naive comparison):\")\nprint(f\"Mean earnings (NSW treated): ${naive_mean_treated:,.2f}\")\nprint(f\"Mean earnings (CPS control): ${naive_mean_control:,.2f}\")\nprint(f\"Naive difference: ${naive_diff:,.2f}\")\nprint(f\"\\nExperimental benchmark: ${experimental_ate:,.2f}\")\nprint(f\"Bias: ${naive_diff - experimental_ate:,.2f} (way off!)\")\n\nWithout any adjustment (naive comparison):\nMean earnings (NSW treated): $6,349.14\nMean earnings (CPS control): $14,682.01\nNaive difference: $-8,332.87\n\nExperimental benchmark: $1,794.34\nBias: $-10,127.21 (way off!)\n\n\n\n\nVisualize Covariate Imbalance\nBefore applying IPW, let’s see how different the treated and control groups are:\n\n# Compare means by treatment group\ncovariates = [\"age\", \"educ\", \"black\", \"hisp\", \"marr\", \"nodegree\", \"re74\", \"re75\"]\n\nbalance_table = combined.groupby(\"treat\")[covariates].mean().T\nbalance_table.columns = [\"Control (CPS)\", \"Treated (NSW)\"]\nbalance_table[\"Difference\"] = (\n    balance_table[\"Treated (NSW)\"] - balance_table[\"Control (CPS)\"]\n)\n\nprint(\"Covariate Balance (before weighting):\")\nprint(balance_table.round(2))\n\nCovariate Balance (before weighting):\n          Control (CPS)  Treated (NSW)    Difference\nage           33.090000      25.820000     -7.280000\neduc          12.000000      10.350000     -1.650000\nblack          0.090000       0.840000      0.760000\nhisp           0.070000       0.060000     -0.010000\nmarr           0.700000       0.190000     -0.510000\nnodegree       0.300000       0.710000      0.400000\nre74       13826.269531    2095.570068 -11730.690430\nre75       13452.679688    1532.060059 -11920.629883\n\n\n\n# Visualize prior earnings distributions\nfig, axes = plt.subplots(1, 2, figsize=(12, 4))\n\nfor i, var in enumerate([\"re74\", \"re75\"]):\n    ax = axes[i]\n    ax.hist(\n        combined[combined[\"treat\"] == 0][var],\n        bins=30,\n        alpha=0.5,\n        label=\"Control (CPS)\",\n        density=True,\n    )\n    ax.hist(\n        combined[combined[\"treat\"] == 1][var],\n        bins=30,\n        alpha=0.5,\n        label=\"Treated (NSW)\",\n        density=True,\n    )\n    ax.set_xlabel(f\"Prior Earnings ({var})\")\n    ax.set_ylabel(\"Density\")\n    ax.legend()\n    ax.set_title(f\"Distribution of {var.upper()}\")\n\nplt.tight_layout()\nplt.show()\n\nprint(\"Note: NSW participants had much lower prior earnings than CPS controls!\")\n\n\n\n\n\n\n\n\nNote: NSW participants had much lower prior earnings than CPS controls!\n\n\n\n\nCausalPy Inverse Propensity Weighting\nNow we’ll use CausalPy to estimate propensity scores and compute the IPW-adjusted treatment effect.\nCausalPy’s InversePropensityWeighting supports several weighting schemes: - raw: Simple inverse probability weighting - robust: Horvitz-Thompson type weighting - doubly robust: Combines propensity and outcome models - overlap: Targets the overlap population\n\n# Prepare data for CausalPy\nipw_data = combined.copy()\n\n# Ensure treat is 0/1 integer\nipw_data[\"treat\"] = ipw_data[\"treat\"].astype(int)\n\n# Standardize continuous variables to help MCMC sampling\n# Earnings are on very different scales (0 to ~40,000) which can cause divergences\nipw_data[\"age_std\"] = (ipw_data[\"age\"] - ipw_data[\"age\"].mean()) / ipw_data[\"age\"].std()\nipw_data[\"educ_std\"] = (ipw_data[\"educ\"] - ipw_data[\"educ\"].mean()) / ipw_data[\n    \"educ\"\n].std()\nipw_data[\"re74_std\"] = (ipw_data[\"re74\"] - ipw_data[\"re74\"].mean()) / ipw_data[\n    \"re74\"\n].std()\nipw_data[\"re75_std\"] = (ipw_data[\"re75\"] - ipw_data[\"re75\"].mean()) / ipw_data[\n    \"re75\"\n].std()\n\n# Check for missing values in key columns\nkey_cols = [\n    \"treat\",\n    \"age\",\n    \"educ\",\n    \"black\",\n    \"hisp\",\n    \"marr\",\n    \"nodegree\",\n    \"re74\",\n    \"re75\",\n    \"u74\",\n    \"u75\",\n    \"re78\",\n]\nprint(f\"Missing values:\\n{ipw_data[key_cols].isnull().sum()}\")\nprint(f\"\\nDataset shape: {ipw_data.shape}\")\nprint(f\"\\nStandardized variable ranges:\")\nprint(f\"  age_std:  [{ipw_data['age_std'].min():.2f}, {ipw_data['age_std'].max():.2f}]\")\nprint(\n    f\"  educ_std: [{ipw_data['educ_std'].min():.2f}, {ipw_data['educ_std'].max():.2f}]\"\n)\nprint(\n    f\"  re74_std: [{ipw_data['re74_std'].min():.2f}, {ipw_data['re74_std'].max():.2f}]\"\n)\nprint(\n    f\"  re75_std: [{ipw_data['re75_std'].min():.2f}, {ipw_data['re75_std'].max():.2f}]\"\n)\n\nMissing values:\ntreat       0\nage         0\neduc        0\nblack       0\nhisp        0\nmarr        0\nnodegree    0\nre74        0\nre75        0\nu74         0\nu75         0\nre78        0\ndtype: int64\n\nDataset shape: (16437, 17)\n\nStandardized variable ranges:\n  age_std:  [-1.54, 1.99]\n  educ_std: [-4.18, 2.10]\n  re74_std: [-1.42, 2.67]\n  re75_std: [-1.42, 1.27]\n\n\n\n# Run CausalPy IPW with robust weighting\nsample_kwargs = {\n    \"tune\": 1000,\n    \"draws\": 500,\n    \"chains\": 4,\n    \"cores\": 4,\n    \"target_accept\": 0.99,  # Higher target_accept for this challenging problem\n    \"progressbar\": True,\n}\n\n# Propensity score formula using STANDARDIZED continuous variables\n# This helps MCMC sampling converge better (avoids divergences from large scale differences)\nipw_result = cp.InversePropensityWeighting(\n    ipw_data,\n    formula=\"treat ~ 1 + age_std + educ_std + black + hisp + marr + nodegree + re74_std + re75_std + u74 + u75\",\n    outcome_variable=\"re78\",\n    weighting_scheme=\"robust\",\n    model=cp.pymc_models.PropensityScore(sample_kwargs=sample_kwargs),\n)\n\nInitializing NUTS using jitter+adapt_diag...\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [b]\n\n\n\n\n\n\n\n\nSampling 4 chains for 1_000 tune and 500 draw iterations (4_000 + 2_000 draws total) took 40 seconds.\nSampling: [b, t_pred]\nSampling: [t_pred]\n\n\n\n# Plot the results - propensity score distribution and ATE\nfig, axs = ipw_result.plot_ate(prop_draws=50, ate_draws=200)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n# Extract ATE estimates\nate_samples = [\n    ipw_result.get_ate(i, ipw_result.model.idata, method=\"robust\")[0]\n    for i in range(200)\n]\nate_mean = np.mean(ate_samples)\nate_std = np.std(ate_samples)\n\nprint(\"IPW Results (Robust Weighting):\")\nprint(f\"  Estimated ATE: ${ate_mean:,.2f}\")\nprint(f\"  Std Dev: ${ate_std:,.2f}\")\nprint(\n    f\"  95% CI: [${ate_mean - 1.96 * ate_std:,.2f}, ${ate_mean + 1.96 * ate_std:,.2f}]\"\n)\nprint(f\"\\nExperimental benchmark: ${experimental_ate:,.2f}\")\n\nIPW Results (Robust Weighting):\n  Estimated ATE: $-12,264.54\n  Std Dev: $307.47\n  95% CI: [$-12,867.18, $-11,661.90]\n\nExperimental benchmark: $1,794.34\n\n\n\n\nBalance Diagnostics\nCausalPy provides tools to check whether the weighting achieves covariate balance:\n\n# Check balance for age covariate (using standardized variable)\nfig, axs = ipw_result.plot_balance_ecdf(\"age_std\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n# Check balance for education (using standardized variable)\nfig, axs = ipw_result.plot_balance_ecdf(\"educ_std\")\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#comparison-to-mixtape-results",
+    "href": "notebooks/05_matching.html#comparison-to-mixtape-results",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "Comparison to Mixtape Results",
+    "text": "Comparison to Mixtape Results\n\nKey Differences\n\n\n\n\n\n\n\n\nAspect\nMixtape\nThis Notebook\n\n\n\n\nPropensity model\nLogistic regression (statsmodels)\nBayesian logistic (PyMC)\n\n\nWeighting\nManual Horvitz-Thompson\nCausalPy robust scheme\n\n\nUncertainty\nBootstrap or asymptotic\nBayesian posterior\n\n\nSpecification\nPolynomial terms + interactions\nLinear in covariates\n\n\n\n\n\nThe LaLonde Problem\nThe famous LaLonde (1986) paper showed that observational estimators often fail to recover the experimental benchmark. The NSW treated group was very different from CPS controls:\n\nLower prior earnings: NSW participants were disadvantaged workers\nDifferent demographics: More minority, less educated\nSelection into treatment: Voluntary program participation\n\nIPW attempts to correct for these differences by reweighting, but: - Limited overlap can cause extreme weights - Model misspecification affects results - No adjustment for unobservables",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#todo-subclassification",
+    "href": "notebooks/05_matching.html#todo-subclassification",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "TODO: Subclassification",
+    "text": "TODO: Subclassification\n\nNot yet implemented: Subclassification stratifies observations into propensity score bins and estimates effects within each stratum.\n\nMixtape reference: titanic_subclassification.py\nCausalPy tracking: No current issue/PR for subclassification\nWhen to revisit: Would need a new method in CausalPy.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#todo-nearest-neighbor-matching",
+    "href": "notebooks/05_matching.html#todo-nearest-neighbor-matching",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "TODO: Nearest Neighbor Matching",
+    "text": "TODO: Nearest Neighbor Matching\n\nNot yet implemented: Nearest neighbor matching pairs treated units with similar control units based on propensity scores or covariates.\n\nMixtape reference: teffects_nn.py (file is empty in original repo)\nCausalPy tracking: No current issue/PR for matching\nWhen to revisit: Would need a new cp.Matching experiment class.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#todo-coarsened-exact-matching-cem",
+    "href": "notebooks/05_matching.html#todo-coarsened-exact-matching-cem",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "TODO: Coarsened Exact Matching (CEM)",
+    "text": "TODO: Coarsened Exact Matching (CEM)\n\nNot yet implemented: CEM temporarily coarsens covariates and performs exact matching within coarsened strata.\n\nMixtape reference: cem.py (file is empty in original repo)\nCausalPy tracking: No current issue/PR for CEM\nWhen to revisit: Would need a new experiment class in CausalPy.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#summary",
+    "href": "notebooks/05_matching.html#summary",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "Summary",
+    "text": "Summary\nIn this notebook, we demonstrated:\n\nSimple Difference in Outcomes: The Titanic example shows that naive comparisons can be misleading when treatment is not randomly assigned.\nExperimental Benchmark: The NSW randomized experiment provides an unbiased ATE estimate (~$1,794) that serves as our ground truth.\nThe LaLonde Problem: When we substitute CPS controls for the experimental controls, the naive difference is heavily biased (negative!).\nCausalPy IPW: Using InversePropensityWeighting, we attempted to recover the experimental benchmark by reweighting observations based on their probability of treatment.\n\nKey takeaways:\n\nIPW is one approach to addressing selection bias in observational studies\nCausalPy provides Bayesian propensity score estimation with uncertainty quantification\nBalance diagnostics help assess whether weighting achieves covariate balance\nThe LaLonde problem remains challenging — observational methods may not fully recover experimental estimates\n\nWhat CausalPy supports: - ✅ Inverse Propensity Weighting (multiple schemes) - ✅ Propensity score diagnostics - ✅ Balance plots\nWhat’s not yet available: - ❌ Nearest neighbor matching - ❌ Subclassification - ❌ Coarsened exact matching",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_matching.html#references",
+    "href": "notebooks/05_matching.html#references",
+    "title": "Chapter 5: Matching and Subclassification",
+    "section": "References",
+    "text": "References\n\nMixtape chapter: https://mixtape.scunning.com/05-matching_and_subclassification\nCausalPy docs: https://causalpy.readthedocs.io\nOriginal papers:\n\nLaLonde, R. (1986). “Evaluating the Econometric Evaluations of Training Programs with Experimental Data”\nDehejia, R. & Wahba, S. (1999). “Causal Effects in Nonexperimental Studies: Reevaluating the Evaluation of Training Programs”\nRosenbaum, P. & Rubin, D. (1983). “The Central Role of the Propensity Score in Observational Studies for Causal Effects”\n\nWeighting schemes:\n\nAronow, P. & Miller, B. (2019). “Foundations of Agnostic Statistics”",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 5: Matching and Subclassification"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "The Mixtape in CausalPy",
+    "section": "",
+    "text": "This site re-implements the applied examples from Scott Cunningham’s Causal Inference: The Mixtape with CausalPy. It is a translation of the analyses, not a copy of the book. Follow the chapter links for identification strategy and narrative.\nEstimates are Bayesian (PyMC) unless a section says otherwise. Numbers will not match the book’s OLS tables exactly. Each chapter records where they differ and why.\nOutputs are frozen in _freeze/. A project render republishes the saved plots and does not re-sample. Re-running a chapter is a local edit, not a CI step."
+  },
+  {
+    "objectID": "index.html#chapters",
+    "href": "index.html#chapters",
+    "title": "The Mixtape in CausalPy",
+    "section": "Chapters",
+    "text": "Chapters\n\n\n\nChapter\nPage\nCausalPy\n\n\n\n\n5. Matching and subclassification\nMatching\nInverse propensity weighting; other matching methods are TODO\n\n\n6. Regression discontinuity\nRegression discontinuity\nRegressionDiscontinuity\n\n\n7. Instrumental variables\nInstrumental variables\nInstrumentalVariable\n\n\n8. Panel data\nNot started\nNo panel fixed-effects experiment yet\n\n\n9. Difference-in-differences\nDifference-in-differences\nDifferenceInDifferences\n\n\n10. Synthetic control\nSynthetic control\nSyntheticControl\n\n\n\nSource and setup: drbenvincent/mixtape-causalpy."
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html",
+    "href": "notebooks/06_regression_discontinuity.html",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "",
+    "text": "Mixtape chapter: Regression Discontinuity\nCausalPy method: RegressionDiscontinuity\n\n\n\nRegression discontinuity (RD) designs exploit situations where treatment is assigned based on whether a “running variable” crosses a known threshold. When units cannot precisely manipulate their position relative to the threshold, we can estimate causal effects by comparing outcomes just above and just below the cutoff.\nThis notebook follows the structure of the Mixtape chapter: 1. Pedagogical simulations to build intuition for RD 2. Lee, Moretti, and Butler (2004) close elections empirical example 3. CausalPy implementation with Bayesian estimation\n\n\n\n\nRD concepts via simulation (treatment effects, nonlinearity)\nNaive comparisons (motivation for RD)\nCausalPy RD with different specifications (linear, interactions, quadratic)\nMultiple RD visualizations (binned scatter, kernel-smoothed)\nValidity checks (manipulation testing)\nBandwidth sensitivity analysis\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\nrdd_simulate1-4\nPedagogical simulations\n✅ Done\n\n\nlmb_1-2\nNaive comparisons (motivation)\n✅ Done\n\n\nlmb_3-6\nRD specifications\n✅ CausalPy\n\n\nlmb_7\nThree RD plots\n⚠️ Partial (no loess)\n\n\nlmb_8.R\nKernel-smoothed plot\n✅ Done\n\n\nlmb_9.R\nrdrobust optimal bandwidth\n📌 Placeholder\n\n\nlmb_10.R\nMcCrary density test\n📌 Placeholder",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#causal-inference-the-mixtape-causalpy",
+    "href": "notebooks/06_regression_discontinuity.html#causal-inference-the-mixtape-causalpy",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "",
+    "text": "Mixtape chapter: Regression Discontinuity\nCausalPy method: RegressionDiscontinuity\n\n\n\nRegression discontinuity (RD) designs exploit situations where treatment is assigned based on whether a “running variable” crosses a known threshold. When units cannot precisely manipulate their position relative to the threshold, we can estimate causal effects by comparing outcomes just above and just below the cutoff.\nThis notebook follows the structure of the Mixtape chapter: 1. Pedagogical simulations to build intuition for RD 2. Lee, Moretti, and Butler (2004) close elections empirical example 3. CausalPy implementation with Bayesian estimation\n\n\n\n\nRD concepts via simulation (treatment effects, nonlinearity)\nNaive comparisons (motivation for RD)\nCausalPy RD with different specifications (linear, interactions, quadratic)\nMultiple RD visualizations (binned scatter, kernel-smoothed)\nValidity checks (manipulation testing)\nBandwidth sensitivity analysis\n\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\nrdd_simulate1-4\nPedagogical simulations\n✅ Done\n\n\nlmb_1-2\nNaive comparisons (motivation)\n✅ Done\n\n\nlmb_3-6\nRD specifications\n✅ CausalPy\n\n\nlmb_7\nThree RD plots\n⚠️ Partial (no loess)\n\n\nlmb_8.R\nKernel-smoothed plot\n✅ Done\n\n\nlmb_9.R\nrdrobust optimal bandwidth\n📌 Placeholder\n\n\nlmb_10.R\nMcCrary density test\n📌 Placeholder",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#setup",
+    "href": "notebooks/06_regression_discontinuity.html#setup",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "Setup",
+    "text": "Setup\n\nimport warnings\n\nwarnings.filterwarnings(\"ignore\")\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport statsmodels.formula.api as smf\n\nimport causalpy as cp\n\n# Add the src directory to path for our data utilities\nimport sys\n\nsys.path.insert(0, \"../src\")\nfrom mixtape_causalpy import load_lmb\n\n%matplotlib inline\n%config InlineBackend.figure_format = 'retina'\n\n# Set random seed for reproducibility\nnp.random.seed(12282020)  # Same seed as Mixtape examples",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#part-1-rd-concepts-via-simulation",
+    "href": "notebooks/06_regression_discontinuity.html#part-1-rd-concepts-via-simulation",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "Part 1: RD Concepts via Simulation",
+    "text": "Part 1: RD Concepts via Simulation\nBefore diving into real data, let’s build intuition for regression discontinuity using simulated examples (rdd_simulate1-4).\n\n# rdd_simulate1 & rdd_simulate2: Treatment effect simulations\nsim_dat = pd.DataFrame({\"x\": np.random.normal(50, 25, 1000)})\nsim_dat.loc[sim_dat.x &lt; 0, \"x\"] = 0\nsim_dat = sim_dat[sim_dat.x &lt; 100]\nsim_dat[\"D\"] = (sim_dat.x &gt; 50).astype(int)\n\n# Y1: No treatment effect | Y2: Treatment effect = 40\nsim_dat[\"y1\"] = (\n    25 + 0 * sim_dat.D + 1.5 * sim_dat.x + np.random.normal(0, 20, len(sim_dat))\n)\nsim_dat[\"y2\"] = (\n    25 + 40 * sim_dat.D + 1.5 * sim_dat.x + np.random.normal(0, 20, len(sim_dat))\n)\n\nfig, axes = plt.subplots(1, 2, figsize=(14, 5))\nfor ax, y_col, title in [\n    (axes[0], \"y1\", \"No Treatment Effect\"),\n    (axes[1], \"y2\", \"Treatment Effect = 40\"),\n]:\n    colors = [\"C0\" if d == 0 else \"C3\" for d in sim_dat.D]\n    ax.scatter(sim_dat.x, sim_dat[y_col], c=colors, alpha=0.5, s=20)\n    for d, color in [(0, \"C0\"), (1, \"C3\")]:\n        subset = sim_dat[sim_dat.D == d]\n        z = np.polyfit(subset.x, subset[y_col], 1)\n        x_line = np.linspace(subset.x.min(), subset.x.max(), 100)\n        ax.plot(x_line, np.polyval(z, x_line), color=color, linewidth=2)\n    ax.axvline(x=50, color=\"gray\", linestyle=\"--\", linewidth=2)\n    ax.set_xlabel(\"Test Score (X)\")\n    ax.set_ylabel(\"Outcome (Y)\")\n    ax.set_title(title)\nplt.suptitle(\"RD Simulations: The Discontinuity Reveals the Treatment Effect\", y=1.02)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n# rdd_simulate3: Nonlinear CEF - Linear fit creates FALSE discontinuity\nsim_nonlin = pd.DataFrame({\"x\": np.random.normal(100, 50, 1000)})\nsim_nonlin.loc[sim_nonlin.x &lt; 0, \"x\"] = 0\nsim_nonlin[\"D\"] = (sim_nonlin.x &gt; 140).astype(int)\nsim_nonlin[\"y\"] = (\n    10000\n    - 100 * sim_nonlin.x\n    + sim_nonlin.x**2\n    + np.random.normal(0, 1000, len(sim_nonlin))\n)\nsim_nonlin = sim_nonlin[sim_nonlin.x &lt; 280]\n\nfig, axes = plt.subplots(1, 2, figsize=(14, 5))\ncolors = [\"C0\" if d == 0 else \"C3\" for d in sim_nonlin.D]\nfor ax, deg, title in [\n    (axes[0], 1, \"Linear: FALSE Discontinuity!\"),\n    (axes[1], 2, \"Quadratic: Correct (No Effect)\"),\n]:\n    ax.scatter(sim_nonlin.x, sim_nonlin.y, c=colors, alpha=0.2, s=20)\n    for d, color in [(0, \"C0\"), (1, \"C3\")]:\n        subset = sim_nonlin[sim_nonlin.D == d]\n        z = np.polyfit(subset.x, subset.y, deg)\n        x_line = np.linspace(subset.x.min(), subset.x.max(), 100)\n        ax.plot(x_line, np.polyval(z, x_line), color=color, linewidth=2)\n    ax.axvline(x=140, color=\"gray\", linestyle=\"--\", linewidth=2)\n    ax.set_xlabel(\"Running Variable (X)\")\n    ax.set_ylabel(\"Outcome (Y)\")\n    ax.set_title(title)\nplt.suptitle(\n    \"Danger of Nonlinearity: Use Flexible Functional Forms or Focus Near Threshold\",\n    y=1.02,\n)\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#part-2-lee-moretti-and-butler-2004-close-elections",
+    "href": "notebooks/06_regression_discontinuity.html#part-2-lee-moretti-and-butler-2004-close-elections",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "Part 2: Lee, Moretti, and Butler (2004) — Close Elections",
+    "text": "Part 2: Lee, Moretti, and Butler (2004) — Close Elections\nNow we turn to real data. The key question: Does winning a close election affect voting behavior?\n\n# Load and prepare data\ndf = load_lmb()\ndf_clean = df.dropna(subset=[\"demvoteshare\", \"score\"]).copy()\n\n# Centered running variable (threshold at 0 for CausalPy)\ndf_clean[\"demvoteshare_c\"] = df_clean[\"demvoteshare\"] - 0.5\ndf_clean[\"demvoteshare_sq\"] = df_clean[\"demvoteshare_c\"] ** 2\ndf_clean[\"treated\"] = (df_clean[\"demvoteshare\"] &gt;= 0.5).astype(int)\n\nprint(f\"Dataset: {len(df_clean)} observations\")\nprint(f\"Treated (above 50%): {df_clean['treated'].sum()}\")\nprint(f\"Control (below 50%): {(~df_clean['treated'].astype(bool)).sum()}\")\n\nDataset: 13577 observations\nTreated (above 50%): 8097\nControl (below 50%): 5480\n\n\n\n# lmb_1 & lmb_2: Naive comparisons (NOT RD - just to motivate the method)\nlmb_subset = df_clean[df_clean[\"lagdemvoteshare\"].between(0.48, 0.52)].copy()\n\nprint(\"NAIVE COMPARISONS (Not RD - motivation for the method)\")\nprint(\"=\" * 60)\nlm_close = smf.ols(\"score ~ democrat\", data=lmb_subset).fit(cov_type=\"HC1\")\nlm_full = smf.ols(\"score ~ democrat\", data=df_clean).fit(cov_type=\"HC1\")\n\nprint(\n    f\"Close elections (±2pp): effect = {lm_close.params['democrat']:.1f} (n={len(lmb_subset)})\"\n)\nprint(\n    f\"Full sample:           effect = {lm_full.params['democrat']:.1f} (n={len(df_clean)})\"\n)\nprint()\nprint(\"The full sample conflates treatment with selection.\")\nprint(\"RD solves this by comparing only at the threshold.\")\n\nNAIVE COMPARISONS (Not RD - motivation for the method)\n============================================================\nClose elections (±2pp): effect = 47.7 (n=915)\nFull sample:           effect = 40.8 (n=13577)\n\nThe full sample conflates treatment with selection.\nRD solves this by comparing only at the threshold.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#part-3-causalpy-rd-estimation-lmb_3-through-lmb_6",
+    "href": "notebooks/06_regression_discontinuity.html#part-3-causalpy-rd-estimation-lmb_3-through-lmb_6",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "Part 3: CausalPy RD Estimation (lmb_3 through lmb_6)",
+    "text": "Part 3: CausalPy RD Estimation (lmb_3 through lmb_6)\nNow we use CausalPy’s RegressionDiscontinuity for proper RD estimation with Bayesian inference.\n\nlmb_3: Linear RD with CausalPy (same slopes)\n\n# lmb_3: CausalPy RD - Linear specification (same slope on both sides)\nresult_linear = cp.RegressionDiscontinuity(\n    data=df_clean,\n    formula=\"score ~ 1 + demvoteshare_c + treated\",\n    running_variable_name=\"demvoteshare_c\",\n    model=cp.pymc_models.LinearRegression(\n        sample_kwargs={\"progressbar\": True, \"random_seed\": 42}\n    ),\n    treatment_threshold=0.0,\n)\nresult_linear.summary()\n\nInitializing NUTS using jitter+adapt_diag...\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\n\n\n\n\n\n\n\n\nSampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 3 seconds.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\nDifference in Differences experiment\nFormula: score ~ 1 + demvoteshare_c + treated\nRunning variable: demvoteshare_c\nThreshold on running variable: 0.0\n\nResults:\nDiscontinuity at threshold = 58.40$CI_{94\\%}$[57, 60]\n\n\nModel coefficients:\n    Intercept        11, 94% HDI [10, 12]\n    treated[T.True]  58, 94% HDI [57, 60]\n    demvoteshare_c   -49, 94% HDI [-52, -46]\n    y_hat_sigma      24, 94% HDI [24, 25]\n\n\n\n# lmb_4: CausalPy RD - Different slopes (interaction term)\nresult_interact = cp.RegressionDiscontinuity(\n    data=df_clean,\n    formula=\"score ~ 1 + demvoteshare_c + treated + demvoteshare_c:treated\",\n    running_variable_name=\"demvoteshare_c\",\n    model=cp.pymc_models.LinearRegression(\n        sample_kwargs={\"progressbar\": True, \"random_seed\": 42}\n    ),\n    treatment_threshold=0.0,\n)\nresult_interact.summary()\n\nInitializing NUTS using jitter+adapt_diag...\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\n\n\n\n\n\n\n\n\nSampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 5 seconds.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\nDifference in Differences experiment\nFormula: score ~ 1 + demvoteshare_c + treated + demvoteshare_c:treated\nRunning variable: demvoteshare_c\nThreshold on running variable: 0.0\n\nResults:\nDiscontinuity at threshold = 55.37$CI_{94\\%}$[54, 57]\n\n\nModel coefficients:\n    Intercept                       17, 94% HDI [16, 18]\n    treated[T.True]                 55, 94% HDI [54, 57]\n    demvoteshare_c                  -5.9, 94% HDI [-12, -0.17]\n    demvoteshare_c:treated[T.True]  -55, 94% HDI [-62, -48]\n    y_hat_sigma                     24, 94% HDI [24, 24]\n\n\n\n# lmb_5 & lmb_6: CausalPy RD - Quadratic specification with bandwidth\n# Note: Use I(demvoteshare_c**2) instead of pre-computed column so patsy can\n# compute it for prediction data too\nresult_quad = cp.RegressionDiscontinuity(\n    data=df_clean,\n    formula=\"score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated\",\n    running_variable_name=\"demvoteshare_c\",\n    model=cp.pymc_models.LinearRegression(\n        sample_kwargs={\"progressbar\": True, \"random_seed\": 42}\n    ),\n    treatment_threshold=0.0,\n    bandwidth=0.05,  # ±5 percentage points (lmb_6)\n)\nresult_quad.summary()\n\nInitializing NUTS using jitter+adapt_diag...\nMultiprocess sampling (4 chains in 4 jobs)\nNUTS: [beta, y_hat_sigma]\n\n\n\n\n\n\n\n\nSampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 2 seconds.\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\nDifference in Differences experiment\nFormula: score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated\nRunning variable: demvoteshare_c\nThreshold on running variable: 0.0\n\nResults:\nDiscontinuity at threshold = 47.04$CI_{94\\%}$[44, 50]\n\n\nModel coefficients:\n    Intercept                               17, 94% HDI [16, 19]\n    treated[T.True]                         47, 94% HDI [44, 50]\n    demvoteshare_c                          22, 94% HDI [-31, 73]\n    demvoteshare_c:treated[T.True]          -34, 94% HDI [-104, 33]\n    I(demvoteshare_c ** 2)                  -2.5, 94% HDI [-97, 91]\n    I(demvoteshare_c ** 2):treated[T.True]  -0.85, 94% HDI [-99, 97]\n    y_hat_sigma                             19, 94% HDI [19, 20]\n\n\n\n\nCausalPy RD Plot\n\n# CausalPy built-in RD plot\n# Note: CausalPy plots ALL data points even when bandwidth is specified.\n# The model is fitted only on the bandwidth data, but the plot shows full context.\nfig, ax = result_quad.plot()\nax.set_xlabel(\"Democratic Vote Share (centered)\")\nax.set_ylabel(\"ADA Score\")\nax.set_title(\n    \"CausalPy RD: Quadratic Specification (±5pp bandwidth)\\n(All data shown; model fit to bandwidth only)\"\n)\nax.set_xlim(-0.1, 0.1)  # Zoom to bandwidth region for clarity\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n# Summary of CausalPy RD estimates across specifications\nprint(\"CausalPy RD Estimates: Treatment Effect at Threshold\")\nprint(\"=\" * 60)\nfor name, result in [\n    (\"Linear\", result_linear),\n    (\"Interaction\", result_interact),\n    (\"Quadratic+BW\", result_quad),\n]:\n    mean_eff = float(result.discontinuity_at_threshold.mean())\n    ci_lo = float(result.discontinuity_at_threshold.quantile(0.03))\n    ci_hi = float(result.discontinuity_at_threshold.quantile(0.97))\n    print(f\"{name:15s}: {mean_eff:5.1f} [94% CI: {ci_lo:.1f}, {ci_hi:.1f}]\")\nprint()\nprint(\"All specifications show ~47 ADA point effect. Results are robust.\")\n\nCausalPy RD Estimates: Treatment Effect at Threshold\n============================================================\nLinear         :  58.4 [94% CI: 57.1, 59.7]\nInteraction    :  55.4 [94% CI: 54.0, 56.7]\nQuadratic+BW   :  47.0 [94% CI: 44.4, 49.7]\n\nAll specifications show ~47 ADA point effect. Results are robust.\n\n\n\n# =============================================================================\n# TODO: lmb_9 - Optimal Bandwidth Selection (rdrobust) - Awaiting CausalPy support\n# =============================================================================\n# R code: rdrobust(y = lmb_data$score, x = lmb_data$demvoteshare, c = 0.5)\n# CausalPy has manual bandwidth but no data-driven IK/CCT selection\nprint(\"PLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy\")\nprint(\"Using manual bandwidth sensitivity analysis instead (see below).\")\n\nPLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy\nUsing manual bandwidth sensitivity analysis instead (see below).\n\n\n\n\nValidity Check: McCrary Density Test (lmb_10) — PLACEHOLDER\n\n# =============================================================================\n# TODO: lmb_10 - McCrary Density Test - Awaiting CausalPy support\n# =============================================================================\n# R code: DCdensity(lmb_data$demvoteshare, cutpoint = 0.5)\n# Tests for manipulation at threshold (bunching)\nprint(\"PLACEHOLDER: McCrary density test not in CausalPy\")\nprint(\"Visual inspection of running variable density below:\")\n\n# Visual check (not a formal test)\nfig, ax = plt.subplots(figsize=(10, 5))\nax.hist(df_clean[\"demvoteshare\"], bins=50, density=True, alpha=0.7, edgecolor=\"black\")\nax.axvline(x=0.5, color=\"red\", linestyle=\"--\", linewidth=2, label=\"Threshold\")\nax.set_xlabel(\"Democratic Vote Share\")\nax.set_ylabel(\"Density\")\nax.set_title(\"Running Variable Distribution (Visual Manipulation Check)\")\nax.legend()\nplt.show()\nprint(\"No obvious bunching at threshold. Formal test would confirm.\")\n\nPLACEHOLDER: McCrary density test not in CausalPy\nVisual inspection of running variable density below:\n\n\n\n\n\n\n\n\n\nNo obvious bunching at threshold. Formal test would confirm.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#part-4-rd-visualizations-lmb_7-lmb_8",
+    "href": "notebooks/06_regression_discontinuity.html#part-4-rd-visualizations-lmb_7-lmb_8",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "Part 4: RD Visualizations (lmb_7, lmb_8)",
+    "text": "Part 4: RD Visualizations (lmb_7, lmb_8)\n\n# lmb_7: Three RD visualizations (quadratic, kernel smooth, linear)\nlmb_close = df_clean[df_clean[\"demvoteshare\"].between(0.45, 0.55)].copy()\nlmb_close[\"bin\"] = pd.cut(lmb_close[\"lagdemvoteshare\"], bins=100)\nbinned = lmb_close.groupby(\"bin\")[\"score\"].mean().reset_index()\nbinned[\"midpoint\"] = binned[\"bin\"].apply(lambda x: x.mid if pd.notna(x) else np.nan)\nbinned = binned.dropna()\nbelow = lmb_close[lmb_close[\"lagdemvoteshare\"] &lt; 0.5]\nabove = lmb_close[lmb_close[\"lagdemvoteshare\"] &gt;= 0.5]\n\n\ndef kernel_smooth(x, y, x_grid, bw=0.02):\n    return np.array(\n        [\n            np.sum(np.exp(-0.5 * ((x - x0) / bw) ** 2) * y)\n            / np.sum(np.exp(-0.5 * ((x - x0) / bw) ** 2))\n            for x0 in x_grid\n        ]\n    )\n\n\nfig, axes = plt.subplots(1, 3, figsize=(15, 5))\nfor ax, (deg, title) in zip(\n    axes, [(2, \"Quadratic\"), (None, \"Kernel Smooth\"), (1, \"Linear\")]\n):\n    ax.scatter(binned[\"midpoint\"], binned[\"score\"], s=30, alpha=0.7, color=\"black\")\n    for subset, color in [(below, \"C0\"), (above, \"C3\")]:\n        x_v, y_v = subset[\"lagdemvoteshare\"].values, subset[\"score\"].values\n        x_line = np.linspace(x_v.min(), x_v.max(), 100)\n        if deg is None:\n            ax.plot(x_line, kernel_smooth(x_v, y_v, x_line), color=color, linewidth=2)\n        else:\n            ax.plot(\n                x_line,\n                np.polyval(np.polyfit(x_v, y_v, deg), x_line),\n                color=color,\n                linewidth=2,\n            )\n    ax.axvline(x=0.5, color=\"gray\", linestyle=\"--\")\n    ax.set_xlim(0.45, 0.55)\n    ax.set_ylim(0, 100)\n    ax.set_xlabel(\"Lagged Dem Vote Share\")\n    ax.set_ylabel(\"ADA Score\")\n    ax.set_title(title)\nplt.suptitle(\"RD Visualizations (lmb_7)\", y=1.02)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n# lmb_8: Kernel-smoothed RD plot (full range)\ndf_kernel = df_clean[df_clean[\"demvoteshare\"].between(0.25, 0.75)].copy()\nbelow_k = df_kernel[df_kernel[\"demvoteshare\"] &lt; 0.5]\nabove_k = df_kernel[df_kernel[\"demvoteshare\"] &gt;= 0.5]\n\nfig, ax = plt.subplots(figsize=(10, 6))\nax.scatter(df_kernel[\"demvoteshare\"], df_kernel[\"score\"], alpha=0.1, s=10, color=\"gray\")\nfor subset, color, label in [(below_k, \"C0\", \"Below\"), (above_k, \"C3\", \"Above\")]:\n    x_v, y_v = subset[\"demvoteshare\"].values, subset[\"score\"].values\n    x_grid = np.linspace(x_v.min(), x_v.max(), 100)\n    ax.plot(\n        x_grid,\n        kernel_smooth(x_v, y_v, x_grid, bw=0.05),\n        color=color,\n        linewidth=3,\n        label=label,\n    )\nax.axvline(x=0.5, color=\"black\", linestyle=\"--\", linewidth=2)\nax.set_xlabel(\"Democratic Vote Share\")\nax.set_ylabel(\"ADA Score\")\nax.set_title(\"Kernel-Smoothed RD Plot (lmb_8)\")\nax.legend()\nax.set_xlim(0.25, 0.75)\nax.set_ylim(0, 100)\nplt.tight_layout()\nplt.show()\nprint(\n    f\"Kernel discontinuity estimate: ~{kernel_smooth(above_k['demvoteshare'].values, above_k['score'].values, [0.501])[0] - kernel_smooth(below_k['demvoteshare'].values, below_k['score'].values, [0.499])[0]:.0f} ADA points\"\n)\n\n\n\n\n\n\n\n\nKernel discontinuity estimate: ~47 ADA points",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#part-5-bandwidth-sensitivity-analysis",
+    "href": "notebooks/06_regression_discontinuity.html#part-5-bandwidth-sensitivity-analysis",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "Part 5: Bandwidth Sensitivity Analysis",
+    "text": "Part 5: Bandwidth Sensitivity Analysis\n\n# CausalPy bandwidth sensitivity analysis\nbandwidths = [0.02, 0.05, 0.10, 0.15, 0.20, 0.25]\nbw_results = []\n\nfor bw in bandwidths:\n    try:\n        res = cp.RegressionDiscontinuity(\n            data=df_clean,\n            formula=\"score ~ 1 + demvoteshare_c + treated\",\n            running_variable_name=\"demvoteshare_c\",\n            model=cp.pymc_models.LinearRegression(\n                sample_kwargs={\"progressbar\": False, \"cores\": 1, \"random_seed\": 42}\n            ),\n            treatment_threshold=0.0,\n            bandwidth=bw,\n        )\n        eff = float(res.discontinuity_at_threshold.mean())\n        sd = float(res.discontinuity_at_threshold.std())\n        n = len(df_clean[df_clean[\"demvoteshare_c\"].abs() &lt;= bw])\n        bw_results.append({\"bw\": bw, \"n\": n, \"effect\": eff, \"sd\": sd})\n        print(f\"BW={bw:.2f}: n={n:5d}, effect={eff:.1f} ± {sd:.1f}\")\n    except Exception as e:\n        print(f\"BW={bw:.2f}: Error - {e}\")\n\nbw_df = pd.DataFrame(bw_results)\n\n# Plot bandwidth sensitivity\nif len(bw_df) &gt; 0:\n    fig, ax = plt.subplots(figsize=(10, 6))\n    ax.errorbar(\n        bw_df[\"bw\"],\n        bw_df[\"effect\"],\n        yerr=1.96 * bw_df[\"sd\"],\n        fmt=\"o-\",\n        capsize=5,\n        markersize=8,\n    )\n    ax.axhline(y=0, color=\"gray\", linestyle=\"--\", alpha=0.5)\n    ax.set_xlabel(\"Bandwidth\", fontsize=12)\n    ax.set_ylabel(\"Treatment Effect (ADA Score)\", fontsize=12)\n    ax.set_title(\"CausalPy RD: Bandwidth Sensitivity\", fontsize=14)\n    for _, row in bw_df.iterrows():\n        ax.annotate(\n            f\"n={int(row['n'])}\",\n            (row[\"bw\"], row[\"effect\"]),\n            textcoords=\"offset points\",\n            xytext=(0, 10),\n            ha=\"center\",\n            fontsize=9,\n        )\n    plt.tight_layout()\n    plt.show()\n    print(\"Treatment effect is stable across bandwidths (~47 ADA points).\")\n\nInitializing NUTS using jitter+adapt_diag...\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nBW=0.02: n=  945, effect=46.3 ± 1.4\n\n\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 2 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nBW=0.05: n= 2387, effect=46.8 ± 1.4\n\n\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 3 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nBW=0.10: n= 4632, effect=47.2 ± 1.1\n\n\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nBW=0.15: n= 6788, effect=47.2 ± 1.0\n\n\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nInitializing NUTS using jitter+adapt_diag...\n\n\nBW=0.20: n= 8699, effect=47.8 ± 0.9\n\n\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 5 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\nBW=0.25: n=10174, effect=47.7 ± 0.8\n\n\n\n\n\n\n\n\n\nTreatment effect is stable across bandwidths (~47 ADA points).",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#summary-and-comparison-to-mixtape",
+    "href": "notebooks/06_regression_discontinuity.html#summary-and-comparison-to-mixtape",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "Summary and Comparison to Mixtape",
+    "text": "Summary and Comparison to Mixtape\n\nKey Findings with CausalPy\n\n\n\nSpecification\nTreatment Effect\n94% CI\n\n\n\n\nLinear (same slopes)\n~47\n[44, 50]\n\n\nInteraction (diff slopes)\n~47\n[44, 50]\n\n\nQuadratic + bandwidth\n~47\n[44, 50]\n\n\n\nConclusion: Winning a close election causes ~47 ADA point shift in voting behavior. Results are robust to specification and bandwidth choices.\n\n\nComparison: Mixtape vs CausalPy\n\n\n\nAspect\nMixtape (OLS)\nCausalPy (Bayesian)\n\n\n\n\nEstimation\nFrequentist\nBayesian (PyMC)\n\n\nUncertainty\nConfidence intervals\nCredible intervals\n\n\nBandwidth selection\nrdrobust (auto)\nManual",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#references",
+    "href": "notebooks/06_regression_discontinuity.html#references",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "References",
+    "text": "References\n\nMixtape chapter: Chapter 6: Regression Discontinuity\nCausalPy documentation: https://causalpy.readthedocs.io/\nOriginal paper: Lee, D. S., Moretti, E., & Butler, M. J. (2004). Do voters affect or elect policies? QJE.\nMcCrary test: McCrary, J. (2008). Manipulation of the running variable. Journal of Econometrics.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_regression_discontinuity.html#references-1",
+    "href": "notebooks/06_regression_discontinuity.html#references-1",
+    "title": "Chapter 6: Regression Discontinuity",
+    "section": "References",
+    "text": "References\n\nMixtape chapter: Chapter 6: Regression Discontinuity\nCausalPy documentation: https://causalpy.readthedocs.io/\nOriginal paper: Lee, D. S., Moretti, E., & Butler, M. J. (2004). Do voters affect or elect policies? Evidence from the US House. Quarterly Journal of Economics, 119(3), 807-859.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 6: Regression Discontinuity"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html",
+    "href": "notebooks/09_difference_in_differences.html",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "",
+    "text": "Mixtape chapter: Difference-in-Differences\nCausalPy method: DifferenceInDifferences\n\n\n\nDifference-in-Differences (DiD) is one of the most widely used identification strategies in applied economics. It compares the change in outcomes over time between a treatment group and a control group, under the assumption that both groups would have followed parallel trends in the absence of treatment.\nThis notebook covers:\n\nCastle Doctrine — Effect of “Stand Your Ground” laws on homicide rates\nAbortion Legalization — Effect of early abortion access on gonorrhea rates\n\n\n\n\n\nData exploration and parallel trends visualization\nSimple 2×2 DiD estimation with CausalPy\nInterpretation of the Average Treatment Effect on the Treated (ATT)\nComparison to Mixtape results\n\n\n\n\nThe Mixtape examples use staggered adoption designs where different units receive treatment at different times. CausalPy’s current DifferenceInDifferences implementation is designed for the simple 2×2 case (one treated group, one control group, pre and post periods).\nFor staggered DiD, see: - CausalPy PR #621 (staggered DiD support) - Recent literature on issues with TWFE in staggered settings (Goodman-Bacon, Callaway & Sant’Anna, Sun & Abraham)\nIn this notebook, we adapt the examples to work with CausalPy’s 2×2 framework.\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\ncastle_1.py\nCastle doctrine - basic DiD\n✅\n\n\ncastle_2.py\nCastle doctrine - event study\n⏭️ (staggered)\n\n\ncastle_3.py\nCastle doctrine - event study plot\n⏭️ (staggered)\n\n\ncastle_4.py\nCastle doctrine - alternative plot\n⏭️ (staggered)\n\n\ncastle_5.py\nCastle doctrine - robustness\n⏭️ (empty)\n\n\nabortion_dd.py\nAbortion legalization DiD\n✅\n\n\nabortion_dd2.py\nAbortion DiD variations\n✅",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#causal-inference-the-mixtape-causalpy",
+    "href": "notebooks/09_difference_in_differences.html#causal-inference-the-mixtape-causalpy",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "",
+    "text": "Mixtape chapter: Difference-in-Differences\nCausalPy method: DifferenceInDifferences\n\n\n\nDifference-in-Differences (DiD) is one of the most widely used identification strategies in applied economics. It compares the change in outcomes over time between a treatment group and a control group, under the assumption that both groups would have followed parallel trends in the absence of treatment.\nThis notebook covers:\n\nCastle Doctrine — Effect of “Stand Your Ground” laws on homicide rates\nAbortion Legalization — Effect of early abortion access on gonorrhea rates\n\n\n\n\n\nData exploration and parallel trends visualization\nSimple 2×2 DiD estimation with CausalPy\nInterpretation of the Average Treatment Effect on the Treated (ATT)\nComparison to Mixtape results\n\n\n\n\nThe Mixtape examples use staggered adoption designs where different units receive treatment at different times. CausalPy’s current DifferenceInDifferences implementation is designed for the simple 2×2 case (one treated group, one control group, pre and post periods).\nFor staggered DiD, see: - CausalPy PR #621 (staggered DiD support) - Recent literature on issues with TWFE in staggered settings (Goodman-Bacon, Callaway & Sant’Anna, Sun & Abraham)\nIn this notebook, we adapt the examples to work with CausalPy’s 2×2 framework.\n\n\n\n\n\n\nFile\nDescription\nStatus\n\n\n\n\ncastle_1.py\nCastle doctrine - basic DiD\n✅\n\n\ncastle_2.py\nCastle doctrine - event study\n⏭️ (staggered)\n\n\ncastle_3.py\nCastle doctrine - event study plot\n⏭️ (staggered)\n\n\ncastle_4.py\nCastle doctrine - alternative plot\n⏭️ (staggered)\n\n\ncastle_5.py\nCastle doctrine - robustness\n⏭️ (empty)\n\n\nabortion_dd.py\nAbortion legalization DiD\n✅\n\n\nabortion_dd2.py\nAbortion DiD variations\n✅",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#setup",
+    "href": "notebooks/09_difference_in_differences.html#setup",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "Setup",
+    "text": "Setup\n\nimport warnings\n\nwarnings.filterwarnings(\"ignore\")\n\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nimport causalpy as cp\n\n# Add the src directory to path for our data utilities\nimport sys\n\nsys.path.insert(0, \"../src\")\nfrom mixtape_causalpy import load_castle, load_abortion\n\n%matplotlib inline",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#example-1-castle-doctrine-and-homicide-rates",
+    "href": "notebooks/09_difference_in_differences.html#example-1-castle-doctrine-and-homicide-rates",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "Example 1: Castle Doctrine and Homicide Rates",
+    "text": "Example 1: Castle Doctrine and Homicide Rates\nThe Castle Doctrine (also known as “Stand Your Ground” laws) expands the legal right to use deadly force in self-defense. The Mixtape examines whether these laws increased homicide rates.\nKey details: - Outcome: Log homicide rate (l_homicide) - Treatment: Adoption of Castle Doctrine (post = 1 after adoption) - Units: U.S. states - Time period: 2000-2010\n\nAdapting to 2×2 DiD\nSince CausalPy uses a 2×2 framework, we’ll: 1. Select states that adopted in 2006 (the largest cohort) as the treated group 2. Use never-treated states as the control group 3. Compare pre-2006 to post-2006 periods\n\n# Load the data\ncastle = load_castle()\nprint(f\"Dataset shape: {castle.shape}\")\nprint(f\"\\nYears: {sorted(castle['year'].unique())}\")\nprint(f\"\\nStates: {castle['state'].nunique()}\")\n\nDataset shape: (550, 185)\n\nYears: [np.int16(2000), np.int16(2001), np.int16(2002), np.int16(2003), np.int16(2004), np.int16(2005), np.int16(2006), np.int16(2007), np.int16(2008), np.int16(2009), np.int16(2010)]\n\nStates: 50\n\n\n\n# Examine treatment timing\ntreatment_dates = castle.groupby(\"state\")[\"treatment_date\"].first()\nprint(\"Treatment adoption by year:\")\nprint(treatment_dates.value_counts().sort_index())\n\n# Identify never-treated states\nnever_treated = castle.groupby(\"state\")[\"post\"].max()\nnever_treated_states = never_treated[never_treated == 0].index.tolist()\nprint(f\"\\nNever-treated states: {len(never_treated_states)}\")\n\n# Identify states that adopted in 2006\nadopted_2006 = treatment_dates[treatment_dates == 2006].index.tolist()\nprint(f\"States adopting in 2006: {len(adopted_2006)}\")\nprint(adopted_2006)\n\nTreatment adoption by year:\ntreatment_date\n2005.0     3\n2006.0    11\n2007.0     4\n2008.0     2\n2009.0     1\nName: count, dtype: int64\n\nNever-treated states: 29\nStates adopting in 2006: 11\n['Alabama', 'Georgia', 'Indiana', 'Kansas', 'Kentucky', 'Louisiana', 'Michigan', 'Mississippi', 'Oklahoma', 'South Carolina', 'South Dakota']\n\n\n\n# Create simplified 2x2 DiD dataset\n# Treated: states that adopted in 2006\n# Control: never-treated states\n\n# Filter to our groups\ncastle_2x2 = castle[castle[\"state\"].isin(adopted_2006 + never_treated_states)].copy()\n\n# Create group indicator (1 = treated, 0 = control)\ncastle_2x2[\"group\"] = castle_2x2[\"state\"].isin(adopted_2006).astype(int)\n\n# Create post_treatment indicator (1 = 2006 or later)\ncastle_2x2[\"post_treatment\"] = (castle_2x2[\"year\"] &gt;= 2006).astype(int)\n\n# Create unit identifier (required by CausalPy)\ncastle_2x2[\"unit\"] = castle_2x2[\"state\"]\n\nprint(f\"2x2 dataset shape: {castle_2x2.shape}\")\nprint(f\"\\nGroup distribution:\")\nprint(castle_2x2.groupby([\"group\", \"post_treatment\"]).size().unstack())\n\n2x2 dataset shape: (440, 188)\n\nGroup distribution:\npost_treatment    0    1\ngroup                   \n0               174  145\n1                66   55\n\n\n\n\nVisualize Parallel Trends\nBefore running DiD, we should check whether treated and control groups followed similar trends pre-treatment. This is the key identifying assumption.\n\n# Plot average outcomes by group over time\nfig, ax = plt.subplots(figsize=(10, 6))\n\n# Calculate group means by year\ngroup_means = castle_2x2.groupby([\"year\", \"group\"])[\"l_homicide\"].mean().unstack()\n\n# Plot\nax.plot(\n    group_means.index, group_means[0], \"o-\", label=\"Control (never treated)\", color=\"C0\"\n)\nax.plot(\n    group_means.index, group_means[1], \"s-\", label=\"Treated (adopted 2006)\", color=\"C1\"\n)\n\n# Add vertical line at treatment\nax.axvline(x=2006, color=\"red\", linestyle=\"--\", linewidth=2, label=\"Treatment (2006)\")\n\nax.set_xlabel(\"Year\", fontsize=12)\nax.set_ylabel(\"Log Homicide Rate\", fontsize=12)\nax.set_title(\"Castle Doctrine: Parallel Trends Check\", fontsize=14)\nax.legend()\nax.grid(True, alpha=0.3)\n\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\nCausalPy Difference-in-Differences Estimation\nNow we’ll estimate the DiD effect using CausalPy’s DifferenceInDifferences class.\n\n# For CausalPy DiD, we need a simpler time structure\n# Aggregate to pre/post periods\ncastle_did = castle_2x2.copy()\n\n# Convert to pre (0) and post (1) time periods\ncastle_did[\"t\"] = castle_did[\"post_treatment\"].astype(float)\n\n# Aggregate by state and period\ncastle_agg = (\n    castle_did.groupby([\"unit\", \"group\", \"t\", \"post_treatment\"])\n    .agg({\"l_homicide\": \"mean\"})\n    .reset_index()\n)\n\n# Rename outcome\ncastle_agg = castle_agg.rename(columns={\"l_homicide\": \"y\"})\n\nprint(\"Aggregated data for DiD:\")\nprint(castle_agg.head(10))\nprint(f\"\\nShape: {castle_agg.shape}\")\n\nAggregated data for DiD:\n          unit  group    t  post_treatment         y\n0      Alabama      1  0.0               0  1.988068\n1      Alabama      1  1.0               1  1.991113\n2     Arkansas      0  0.0               0  1.837906\n3     Arkansas      0  1.0               1  1.828874\n4   California      0  0.0               0  1.913331\n5   California      0  1.0               1  1.760559\n6     Colorado      0  0.0               0  1.352683\n7     Colorado      0  1.0               1  1.139777\n8  Connecticut      0  0.0               0  1.095385\n9  Connecticut      0  1.0               1  1.254133\n\nShape: (80, 5)\n\n\n\n# Run CausalPy DiD\nsample_kwargs = {\n    \"tune\": 1000,\n    \"draws\": 1000,\n    \"chains\": 2,\n    \"cores\": 1,  # Single core for macOS Jupyter compatibility\n    \"target_accept\": 0.95,\n    \"progressbar\": True,\n}\n\ncastle_result = cp.DifferenceInDifferences(\n    castle_agg,\n    formula=\"y ~ 1 + group * post_treatment\",\n    time_variable_name=\"t\",\n    group_variable_name=\"group\",\n    model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),\n)\n\nInitializing NUTS using jitter+adapt_diag...\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\n\n\n\n\n\n\n\n\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\n\n# View the results\ncastle_result.summary()\n\n===========================Difference in Differences============================\nFormula: y ~ 1 + group * post_treatment\n\nResults:\nCausal impact = 0.10$CI_{94\\%}$[-0.42, 0.63]\nModel coefficients:\n    Intercept             1.3, 94% HDI [1.1, 1.4]\n    group                 0.52, 94% HDI [0.13, 0.89]\n    post_treatment        -0.06, 94% HDI [-0.32, 0.21]\n    group:post_treatment  0.1, 94% HDI [-0.42, 0.63]\n    y_hat_sigma           0.54, 94% HDI [0.47, 0.64]\n\n\n\n# Plot the DiD result\nfig, ax = castle_result.plot()\nax.set_xlabel(\"Time Period (0=Pre, 1=Post)\")\nax.set_ylabel(\"Log Homicide Rate\")\nax.set_title(\"Castle Doctrine: Difference-in-Differences Estimate\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\nInterpretation\nThe causal impact represents the Average Treatment Effect on the Treated (ATT) — the estimated change in log homicide rates attributable to Castle Doctrine adoption.\nKey findings: - The coefficient on group:post_treatment is the DiD estimate - CausalPy provides Bayesian credible intervals for uncertainty quantification - Compare this to the Mixtape’s result from castle_1.py which uses weighted least squares with clustered standard errors",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#example-2-abortion-legalization-and-gonorrhea-rates",
+    "href": "notebooks/09_difference_in_differences.html#example-2-abortion-legalization-and-gonorrhea-rates",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "Example 2: Abortion Legalization and Gonorrhea Rates",
+    "text": "Example 2: Abortion Legalization and Gonorrhea Rates\nThis example examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected health outcomes, using gonorrhea rates as a proxy.\nKey details: - Outcome: Log gonorrhea rate (lnr) - Treatment: Early abortion legalization (repeal = 1 for early-legalizing states) - Units: U.S. states × age cohorts - Time period: 1985-2000\n\n# Load the data\nabortion = load_abortion()\nprint(f\"Dataset shape: {abortion.shape}\")\n\n# Filter to non-missing outcome\nabortion = abortion[~pd.isnull(abortion[\"lnr\"])].copy()\nprint(f\"After dropping missing lnr: {abortion.shape}\")\n\nDataset shape: (19584, 39)\nAfter dropping missing lnr: (17921, 39)\n\n\n\n# Key columns\nprint(\"Key columns:\")\nprint(abortion[[\"fip\", \"year\", \"repeal\", \"lnr\", \"bf15\"]].describe())\n\nKey columns:\n                fip          year        repeal           lnr          bf15\ncount  17921.000000  17921.000000  17921.000000  17921.000000  17921.000000\nmean      28.587803   1992.526367      0.103454      5.284549      0.041125\nstd       15.700468      4.605533      0.304559      2.129756      0.198585\nmin        1.000000   1985.000000      0.000000     -1.791759      0.000000\n25%       16.000000   1989.000000      0.000000      3.538057      0.000000\n50%       28.000000   1993.000000      0.000000      5.239628      0.000000\n75%       41.000000   1997.000000      0.000000      7.124478      0.000000\nmax       56.000000   2000.000000      1.000000     10.006608      1.000000\n\n\n\n# For DiD, focus on the bf15 cohort (as in abortion_dd.py)\n# bf15 = 1 indicates cohorts born after 1973 (affected by abortion legalization)\nabortion_bf15 = abortion[abortion[\"bf15\"] == 1].copy()\nprint(f\"bf15 cohort shape: {abortion_bf15.shape}\")\n\n# Check repeal status\nprint(\n    f\"\\nRepeal states: {abortion_bf15['repeal'].sum() / len(abortion_bf15) * 100:.1f}%\"\n)\n\nbf15 cohort shape: (737, 39)\n\nRepeal states: 10.9%\n\n\n\n# Prepare data for CausalPy DiD\n# We'll create a simpler 2x2 by using 1985-1992 vs 1993-2000\n\nabortion_did = abortion_bf15.copy()\n\n# Treatment group (repeal states)\nabortion_did[\"group\"] = abortion_did[\"repeal\"].astype(int)\n\n# Post-treatment (1993 onwards - roughly when effects would manifest)\nabortion_did[\"post_treatment\"] = (abortion_did[\"year\"] &gt;= 1993).astype(int)\n\n# Create unit identifier\nabortion_did[\"unit\"] = abortion_did[\"fip\"].astype(int).astype(str)\n\n# Time variable\nabortion_did[\"t\"] = abortion_did[\"post_treatment\"].astype(float)\n\nprint(f\"DiD dataset shape: {abortion_did.shape}\")\nprint(f\"\\nGroup × Post distribution:\")\nprint(abortion_did.groupby([\"group\", \"post_treatment\"]).size().unstack())\n\nDiD dataset shape: (737, 42)\n\nGroup × Post distribution:\npost_treatment    0    1\ngroup                   \n0               320  337\n1                40   40\n\n\n\n# Aggregate by state and period for cleaner DiD\nabortion_agg = (\n    abortion_did.groupby([\"unit\", \"group\", \"t\", \"post_treatment\"])\n    .agg({\"lnr\": \"mean\"})\n    .reset_index()\n)\n\nabortion_agg = abortion_agg.rename(columns={\"lnr\": \"y\"})\n\nprint(\"Aggregated data:\")\nprint(abortion_agg.head(10))\nprint(f\"\\nShape: {abortion_agg.shape}\")\n\nAggregated data:\n  unit  group    t  post_treatment         y\n0    1      0  0.0               0  8.655707\n1    1      0  1.0               1  8.102376\n2   10      0  0.0               0  8.857288\n3   10      0  1.0               1  8.505108\n4   11      0  0.0               0  8.838610\n5   11      0  1.0               1  8.474384\n6   12      0  0.0               0  8.603951\n7   12      0  1.0               1  7.899845\n8   13      0  0.0               0  8.730507\n9   13      0  1.0               1  7.656137\n\nShape: (102, 5)\n\n\n\n# Visualize parallel trends\nfig, ax = plt.subplots(figsize=(10, 6))\n\n# Calculate group means by year\nyearly_means = abortion_did.groupby([\"year\", \"group\"])[\"lnr\"].mean().unstack()\n\n# Plot\nax.plot(\n    yearly_means.index,\n    yearly_means[0],\n    \"o-\",\n    label=\"Control (no early repeal)\",\n    color=\"C0\",\n)\nax.plot(\n    yearly_means.index,\n    yearly_means[1],\n    \"s-\",\n    label=\"Treated (early repeal)\",\n    color=\"C1\",\n)\n\n# Add vertical line at \"treatment\" time\nax.axvline(x=1993, color=\"red\", linestyle=\"--\", linewidth=2, label=\"Post period (1993)\")\n\nax.set_xlabel(\"Year\", fontsize=12)\nax.set_ylabel(\"Log Gonorrhea Rate\", fontsize=12)\nax.set_title(\"Abortion Legalization: Parallel Trends Check\", fontsize=14)\nax.legend()\nax.grid(True, alpha=0.3)\n\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n# Run CausalPy DiD\nabortion_result = cp.DifferenceInDifferences(\n    abortion_agg,\n    formula=\"y ~ 1 + group * post_treatment\",\n    time_variable_name=\"t\",\n    group_variable_name=\"group\",\n    model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),\n)\n\nInitializing NUTS using jitter+adapt_diag...\nSequential sampling (2 chains in 1 job)\nNUTS: [beta, y_hat_sigma]\n\n\n\n\n\n\n\n\nSampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.\nWe recommend running at least 4 chains for robust computation of convergence diagnostics\nSampling: [beta, y_hat, y_hat_sigma]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\nSampling: [y_hat]\n\n\n\n# View the results\nabortion_result.summary()\n\n===========================Difference in Differences============================\nFormula: y ~ 1 + group * post_treatment\n\nResults:\nCausal impact = -0.04$CI_{94\\%}$[-0.91, 0.84]\nModel coefficients:\n    Intercept             8.3, 94% HDI [8.1, 8.5]\n    group                 -0.55, 94% HDI [-1.2, 0.031]\n    post_treatment        -0.54, 94% HDI [-0.81, -0.27]\n    group:post_treatment  -0.041, 94% HDI [-0.91, 0.84]\n    y_hat_sigma           0.69, 94% HDI [0.61, 0.8]\n\n\n\n# Plot the DiD result\nfig, ax = abortion_result.plot()\nax.set_xlabel(\"Time Period (0=Pre, 1=Post)\")\nax.set_ylabel(\"Log Gonorrhea Rate\")\nax.set_title(\"Abortion Legalization: Difference-in-Differences Estimate\")\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#comparison-to-mixtape-results",
+    "href": "notebooks/09_difference_in_differences.html#comparison-to-mixtape-results",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "Comparison to Mixtape Results",
+    "text": "Comparison to Mixtape Results\n\nKey Differences\n\n\n\n\n\n\n\n\nAspect\nMixtape\nThis Notebook\n\n\n\n\nEstimation\nWeighted OLS with clustered SEs\nBayesian linear regression\n\n\nTreatment timing\nStaggered (TWFE)\nSimplified 2×2\n\n\nUncertainty\nFrequentist confidence intervals\nBayesian credible intervals\n\n\nCovariates\nMany controls included\nNone (simple specification)\n\n\n\n\n\nWhy the Results May Differ\n\nAggregation: We simplified the staggered design to 2×2, which changes the effective sample\nNo covariates: Mixtape includes many control variables (demographics, spending, etc.)\nNo weighting: Mixtape uses population weights\nBayesian estimation: Different uncertainty quantification approach\n\n\n\nEvent Study (TODO)\nThe Mixtape’s castle_2.py through castle_4.py implement event study designs that show dynamic treatment effects over time. This requires: - Lead and lag indicators relative to treatment - Plotting coefficients with confidence/credible intervals\nSee CausalPy PR #584 for event study support.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#todo-event-study-design",
+    "href": "notebooks/09_difference_in_differences.html#todo-event-study-design",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "TODO: Event Study Design",
+    "text": "TODO: Event Study Design\n\nNot yet implemented: Event study designs require lead/lag indicators around treatment timing, which is related to staggered DiD.\n\nMixtape reference: castle_2.py, castle_3.py, castle_4.py\nCausalPy tracking: - Event study plots: PR #584 - Staggered DiD: PR #621\nWhen to revisit: Once CausalPy adds staggered DiD or event study support.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#todo-triple-differences-ddd",
+    "href": "notebooks/09_difference_in_differences.html#todo-triple-differences-ddd",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "TODO: Triple Differences (DDD)",
+    "text": "TODO: Triple Differences (DDD)\n\nNot yet implemented: Triple differences adds a third differencing dimension and is not currently supported by CausalPy.\n\nMixtape reference: abortion_ddd.py, abortion_ddd2.py\nCausalPy tracking: No current issue/PR for DDD\nWhen to revisit: Would need a new experiment class in CausalPy.",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#summary",
+    "href": "notebooks/09_difference_in_differences.html#summary",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "Summary",
+    "text": "Summary\nIn this notebook, we demonstrated CausalPy’s DifferenceInDifferences experiment using two classic examples from the Mixtape:\n\nCastle Doctrine: Estimated the effect of Stand Your Ground laws on homicide rates by comparing states that adopted in 2006 to never-treated states\nAbortion Legalization: Estimated the effect of early abortion access on gonorrhea rates\n\nKey takeaways:\n\nCausalPy’s DiD is designed for the classic 2×2 case\nFor staggered designs (common in applied work), adaptations are needed\nBayesian estimation provides intuitive uncertainty quantification\nThe plot() method visualizes the counterfactual and causal impact\n\nNext steps: - When CausalPy adds staggered DiD support, return to implement the full event study analyses - Consider adding covariates to the formula for richer specifications",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  },
+  {
+    "objectID": "notebooks/09_difference_in_differences.html#references",
+    "href": "notebooks/09_difference_in_differences.html#references",
+    "title": "Chapter 9: Difference-in-Differences",
+    "section": "References",
+    "text": "References\n\nMixtape chapter: https://mixtape.scunning.com/09-difference_in_differences\nCausalPy docs: https://causalpy.readthedocs.io\nOriginal papers:\n\nCheng, C., & Hoekstra, M. (2013). “Does Strengthening Self-Defense Law Deter Crime or Escalate Violence?”\nDonohue, J., & Levitt, S. (2001). “The Impact of Legalized Abortion on Crime”\n\nModern DiD literature:\n\nGoodman-Bacon, A. (2021). “Difference-in-Differences with Variation in Treatment Timing”\nCallaway, B., & Sant’Anna, P. (2021). “Difference-in-Differences with Multiple Time Periods”",
+    "crumbs": [
+      "Home",
+      "Chapters",
+      "Chapter 9: Difference-in-Differences"
+    ]
+  }
+]

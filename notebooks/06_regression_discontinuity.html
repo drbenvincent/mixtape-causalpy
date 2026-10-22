@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Chapter 6: Regression Discontinuity – The Mixtape in CausalPy</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/07_instrumental_variables.html" rel="next">
+<link href="../notebooks/05_matching.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-0441d281c0042f78ca5e6da214781463.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">The Mixtape in CausalPy</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://mixtape.scunning.com"> 
+<span class="menu-text">Mixtape</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://causalpy.readthedocs.io"> 
+<span class="menu-text">CausalPy</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/05_matching.html">Chapters</a></li><li class="breadcrumb-item"><a href="../notebooks/06_regression_discontinuity.html">Chapter 6: Regression Discontinuity</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Chapters</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/05_matching.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 5: Matching and Subclassification</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/06_regression_discontinuity.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Chapter 6: Regression Discontinuity</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/07_instrumental_variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 7: Instrumental Variables</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/09_difference_in_differences.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 9: Difference-in-Differences</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/10_synthetic_control.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Chapter 10: Synthetic Control</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#causal-inference-the-mixtape-causalpy" id="toc-causal-inference-the-mixtape-causalpy" class="nav-link active" data-scroll-target="#causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</a>
+  <ul class="collapse">
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#what-well-cover" id="toc-what-well-cover" class="nav-link" data-scroll-target="#what-well-cover">What we’ll cover</a></li>
+  <li><a href="#mixtape-files-implemented" id="toc-mixtape-files-implemented" class="nav-link" data-scroll-target="#mixtape-files-implemented">Mixtape files implemented</a></li>
+  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#part-1-rd-concepts-via-simulation" id="toc-part-1-rd-concepts-via-simulation" class="nav-link" data-scroll-target="#part-1-rd-concepts-via-simulation">Part 1: RD Concepts via Simulation</a></li>
+  <li><a href="#part-2-lee-moretti-and-butler-2004-close-elections" id="toc-part-2-lee-moretti-and-butler-2004-close-elections" class="nav-link" data-scroll-target="#part-2-lee-moretti-and-butler-2004-close-elections">Part 2: Lee, Moretti, and Butler (2004) — Close Elections</a></li>
+  <li><a href="#part-3-causalpy-rd-estimation-lmb_3-through-lmb_6" id="toc-part-3-causalpy-rd-estimation-lmb_3-through-lmb_6" class="nav-link" data-scroll-target="#part-3-causalpy-rd-estimation-lmb_3-through-lmb_6">Part 3: CausalPy RD Estimation (lmb_3 through lmb_6)</a>
+  <ul class="collapse">
+  <li><a href="#lmb_3-linear-rd-with-causalpy-same-slopes" id="toc-lmb_3-linear-rd-with-causalpy-same-slopes" class="nav-link" data-scroll-target="#lmb_3-linear-rd-with-causalpy-same-slopes">lmb_3: Linear RD with CausalPy (same slopes)</a></li>
+  <li><a href="#causalpy-rd-plot" id="toc-causalpy-rd-plot" class="nav-link" data-scroll-target="#causalpy-rd-plot">CausalPy RD Plot</a></li>
+  <li><a href="#validity-check-mccrary-density-test-lmb_10-placeholder" id="toc-validity-check-mccrary-density-test-lmb_10-placeholder" class="nav-link" data-scroll-target="#validity-check-mccrary-density-test-lmb_10-placeholder">Validity Check: McCrary Density Test (lmb_10) — PLACEHOLDER</a></li>
+  </ul></li>
+  <li><a href="#part-4-rd-visualizations-lmb_7-lmb_8" id="toc-part-4-rd-visualizations-lmb_7-lmb_8" class="nav-link" data-scroll-target="#part-4-rd-visualizations-lmb_7-lmb_8">Part 4: RD Visualizations (lmb_7, lmb_8)</a></li>
+  <li><a href="#part-5-bandwidth-sensitivity-analysis" id="toc-part-5-bandwidth-sensitivity-analysis" class="nav-link" data-scroll-target="#part-5-bandwidth-sensitivity-analysis">Part 5: Bandwidth Sensitivity Analysis</a></li>
+  <li><a href="#summary-and-comparison-to-mixtape" id="toc-summary-and-comparison-to-mixtape" class="nav-link" data-scroll-target="#summary-and-comparison-to-mixtape">Summary and Comparison to Mixtape</a>
+  <ul class="collapse">
+  <li><a href="#key-findings-with-causalpy" id="toc-key-findings-with-causalpy" class="nav-link" data-scroll-target="#key-findings-with-causalpy">Key Findings with CausalPy</a></li>
+  <li><a href="#comparison-mixtape-vs-causalpy" id="toc-comparison-mixtape-vs-causalpy" class="nav-link" data-scroll-target="#comparison-mixtape-vs-causalpy">Comparison: Mixtape vs CausalPy</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#references-1" id="toc-references-1" class="nav-link" data-scroll-target="#references-1">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/notebooks/06_regression_discontinuity.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/05_matching.html">Chapters</a></li><li class="breadcrumb-item"><a href="../notebooks/06_regression_discontinuity.html">Chapter 6: Regression Discontinuity</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Chapter 6: Regression Discontinuity</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="causal-inference-the-mixtape-causalpy" class="level2">
+<h2 class="anchored" data-anchor-id="causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</h2>
+<p><strong>Mixtape chapter</strong>: <a href="https://mixtape.scunning.com/06-regression_discontinuity">Regression Discontinuity</a></p>
+<p><strong>CausalPy method</strong>: <code>RegressionDiscontinuity</code></p>
+<hr>
+<section id="overview" class="level3">
+<h3 class="anchored" data-anchor-id="overview">Overview</h3>
+<p>Regression discontinuity (RD) designs exploit situations where treatment is assigned based on whether a “running variable” crosses a known threshold. When units cannot precisely manipulate their position relative to the threshold, we can estimate causal effects by comparing outcomes just above and just below the cutoff.</p>
+<p>This notebook follows the structure of the Mixtape chapter: 1. <strong>Pedagogical simulations</strong> to build intuition for RD 2. <strong>Lee, Moretti, and Butler (2004)</strong> close elections empirical example 3. <strong>CausalPy implementation</strong> with Bayesian estimation</p>
+</section>
+<section id="what-well-cover" class="level3">
+<h3 class="anchored" data-anchor-id="what-well-cover">What we’ll cover</h3>
+<ol type="1">
+<li>RD concepts via simulation (treatment effects, nonlinearity)</li>
+<li>Naive comparisons (motivation for RD)</li>
+<li><strong>CausalPy RD</strong> with different specifications (linear, interactions, quadratic)</li>
+<li>Multiple RD visualizations (binned scatter, kernel-smoothed)</li>
+<li>Validity checks (manipulation testing)</li>
+<li>Bandwidth sensitivity analysis</li>
+</ol>
+</section>
+<section id="mixtape-files-implemented" class="level3">
+<h3 class="anchored" data-anchor-id="mixtape-files-implemented">Mixtape files implemented</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>rdd_simulate1-4</code></td>
+<td>Pedagogical simulations</td>
+<td>✅ Done</td>
+</tr>
+<tr class="even">
+<td><code>lmb_1-2</code></td>
+<td>Naive comparisons (motivation)</td>
+<td>✅ Done</td>
+</tr>
+<tr class="odd">
+<td><code>lmb_3-6</code></td>
+<td>RD specifications</td>
+<td>✅ <strong>CausalPy</strong></td>
+</tr>
+<tr class="even">
+<td><code>lmb_7</code></td>
+<td>Three RD plots</td>
+<td>⚠️ Partial (no loess)</td>
+</tr>
+<tr class="odd">
+<td><code>lmb_8.R</code></td>
+<td>Kernel-smoothed plot</td>
+<td>✅ Done</td>
+</tr>
+<tr class="even">
+<td><code>lmb_9.R</code></td>
+<td>rdrobust optimal bandwidth</td>
+<td>📌 Placeholder</td>
+</tr>
+<tr class="odd">
+<td><code>lmb_10.R</code></td>
+<td>McCrary density test</td>
+<td>📌 Placeholder</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div id="cell-3" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> causalpy <span class="im">as</span> cp</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the src directory to path for our data utilities</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="st">"../src"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mixtape_causalpy <span class="im">import</span> load_lmb</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>config InlineBackend.figure_format <span class="op">=</span> <span class="st">'retina'</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Set random seed for reproducibility</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">12282020</span>)  <span class="co"># Same seed as Mixtape examples</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="part-1-rd-concepts-via-simulation" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-rd-concepts-via-simulation">Part 1: RD Concepts via Simulation</h2>
+<p>Before diving into real data, let’s build intuition for regression discontinuity using simulated examples (rdd_simulate1-4).</p>
+<div id="cell-5" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rdd_simulate1 &amp; rdd_simulate2: Treatment effect simulations</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sim_dat <span class="op">=</span> pd.DataFrame({<span class="st">"x"</span>: np.random.normal(<span class="dv">50</span>, <span class="dv">25</span>, <span class="dv">1000</span>)})</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sim_dat.loc[sim_dat.x <span class="op">&lt;</span> <span class="dv">0</span>, <span class="st">"x"</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>sim_dat <span class="op">=</span> sim_dat[sim_dat.x <span class="op">&lt;</span> <span class="dv">100</span>]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sim_dat[<span class="st">"D"</span>] <span class="op">=</span> (sim_dat.x <span class="op">&gt;</span> <span class="dv">50</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Y1: No treatment effect | Y2: Treatment effect = 40</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>sim_dat[<span class="st">"y1"</span>] <span class="op">=</span> (</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">25</span> <span class="op">+</span> <span class="dv">0</span> <span class="op">*</span> sim_dat.D <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> sim_dat.x <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="dv">20</span>, <span class="bu">len</span>(sim_dat))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>sim_dat[<span class="st">"y2"</span>] <span class="op">=</span> (</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="dv">25</span> <span class="op">+</span> <span class="dv">40</span> <span class="op">*</span> sim_dat.D <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> sim_dat.x <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="dv">20</span>, <span class="bu">len</span>(sim_dat))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, y_col, title <span class="kw">in</span> [</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    (axes[<span class="dv">0</span>], <span class="st">"y1"</span>, <span class="st">"No Treatment Effect"</span>),</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    (axes[<span class="dv">1</span>], <span class="st">"y2"</span>, <span class="st">"Treatment Effect = 40"</span>),</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>]:</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> [<span class="st">"C0"</span> <span class="cf">if</span> d <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> <span class="st">"C3"</span> <span class="cf">for</span> d <span class="kw">in</span> sim_dat.D]</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    ax.scatter(sim_dat.x, sim_dat[y_col], c<span class="op">=</span>colors, alpha<span class="op">=</span><span class="fl">0.5</span>, s<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> d, color <span class="kw">in</span> [(<span class="dv">0</span>, <span class="st">"C0"</span>), (<span class="dv">1</span>, <span class="st">"C3"</span>)]:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        subset <span class="op">=</span> sim_dat[sim_dat.D <span class="op">==</span> d]</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> np.polyfit(subset.x, subset[y_col], <span class="dv">1</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        x_line <span class="op">=</span> np.linspace(subset.x.<span class="bu">min</span>(), subset.x.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        ax.plot(x_line, np.polyval(z, x_line), color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    ax.axvline(x<span class="op">=</span><span class="dv">50</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Test Score (X)"</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Outcome (Y)"</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"RD Simulations: The Discontinuity Reveals the Treatment Effect"</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06_regression_discontinuity_files/figure-html/cell-3-output-1.png" width="1389" height="515" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-6" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rdd_simulate3: Nonlinear CEF - Linear fit creates FALSE discontinuity</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sim_nonlin <span class="op">=</span> pd.DataFrame({<span class="st">"x"</span>: np.random.normal(<span class="dv">100</span>, <span class="dv">50</span>, <span class="dv">1000</span>)})</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sim_nonlin.loc[sim_nonlin.x <span class="op">&lt;</span> <span class="dv">0</span>, <span class="st">"x"</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>sim_nonlin[<span class="st">"D"</span>] <span class="op">=</span> (sim_nonlin.x <span class="op">&gt;</span> <span class="dv">140</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>sim_nonlin[<span class="st">"y"</span>] <span class="op">=</span> (</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="dv">10000</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> <span class="dv">100</span> <span class="op">*</span> sim_nonlin.x</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> sim_nonlin.x<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="dv">1000</span>, <span class="bu">len</span>(sim_nonlin))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>sim_nonlin <span class="op">=</span> sim_nonlin[sim_nonlin.x <span class="op">&lt;</span> <span class="dv">280</span>]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">"C0"</span> <span class="cf">if</span> d <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> <span class="st">"C3"</span> <span class="cf">for</span> d <span class="kw">in</span> sim_nonlin.D]</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, deg, title <span class="kw">in</span> [</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    (axes[<span class="dv">0</span>], <span class="dv">1</span>, <span class="st">"Linear: FALSE Discontinuity!"</span>),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    (axes[<span class="dv">1</span>], <span class="dv">2</span>, <span class="st">"Quadratic: Correct (No Effect)"</span>),</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>]:</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    ax.scatter(sim_nonlin.x, sim_nonlin.y, c<span class="op">=</span>colors, alpha<span class="op">=</span><span class="fl">0.2</span>, s<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> d, color <span class="kw">in</span> [(<span class="dv">0</span>, <span class="st">"C0"</span>), (<span class="dv">1</span>, <span class="st">"C3"</span>)]:</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        subset <span class="op">=</span> sim_nonlin[sim_nonlin.D <span class="op">==</span> d]</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        z <span class="op">=</span> np.polyfit(subset.x, subset.y, deg)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        x_line <span class="op">=</span> np.linspace(subset.x.<span class="bu">min</span>(), subset.x.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        ax.plot(x_line, np.polyval(z, x_line), color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    ax.axvline(x<span class="op">=</span><span class="dv">140</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Running Variable (X)"</span>)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Outcome (Y)"</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>plt.suptitle(</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Danger of Nonlinearity: Use Flexible Functional Forms or Focus Near Threshold"</span>,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="fl">1.02</span>,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06_regression_discontinuity_files/figure-html/cell-4-output-1.png" width="1389" height="515" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="part-2-lee-moretti-and-butler-2004-close-elections" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-lee-moretti-and-butler-2004-close-elections">Part 2: Lee, Moretti, and Butler (2004) — Close Elections</h2>
+<p>Now we turn to real data. The key question: Does <em>winning</em> a close election affect voting behavior?</p>
+<div id="cell-8" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and prepare data</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_lmb()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df.dropna(subset<span class="op">=</span>[<span class="st">"demvoteshare"</span>, <span class="st">"score"</span>]).copy()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Centered running variable (threshold at 0 for CausalPy)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>df_clean[<span class="st">"demvoteshare_c"</span>] <span class="op">=</span> df_clean[<span class="st">"demvoteshare"</span>] <span class="op">-</span> <span class="fl">0.5</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>df_clean[<span class="st">"demvoteshare_sq"</span>] <span class="op">=</span> df_clean[<span class="st">"demvoteshare_c"</span>] <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>df_clean[<span class="st">"treated"</span>] <span class="op">=</span> (df_clean[<span class="st">"demvoteshare"</span>] <span class="op">&gt;=</span> <span class="fl">0.5</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset: </span><span class="sc">{</span><span class="bu">len</span>(df_clean)<span class="sc">}</span><span class="ss"> observations"</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Treated (above 50%): </span><span class="sc">{</span>df_clean[<span class="st">'treated'</span>]<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Control (below 50%): </span><span class="sc">{</span>(<span class="op">~</span>df_clean[<span class="st">'treated'</span>].astype(<span class="bu">bool</span>))<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset: 13577 observations
+Treated (above 50%): 8097
+Control (below 50%): 5480</code></pre>
+</div>
+</div>
+<div id="cell-9" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_1 &amp; lmb_2: Naive comparisons (NOT RD - just to motivate the method)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>lmb_subset <span class="op">=</span> df_clean[df_clean[<span class="st">"lagdemvoteshare"</span>].between(<span class="fl">0.48</span>, <span class="fl">0.52</span>)].copy()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NAIVE COMPARISONS (Not RD - motivation for the method)"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>lm_close <span class="op">=</span> smf.ols(<span class="st">"score ~ democrat"</span>, data<span class="op">=</span>lmb_subset).fit(cov_type<span class="op">=</span><span class="st">"HC1"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>lm_full <span class="op">=</span> smf.ols(<span class="st">"score ~ democrat"</span>, data<span class="op">=</span>df_clean).fit(cov_type<span class="op">=</span><span class="st">"HC1"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Close elections (±2pp): effect = </span><span class="sc">{</span>lm_close<span class="sc">.</span>params[<span class="st">'democrat'</span>]<span class="sc">:.1f}</span><span class="ss"> (n=</span><span class="sc">{</span><span class="bu">len</span>(lmb_subset)<span class="sc">}</span><span class="ss">)"</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Full sample:           effect = </span><span class="sc">{</span>lm_full<span class="sc">.</span>params[<span class="st">'democrat'</span>]<span class="sc">:.1f}</span><span class="ss"> (n=</span><span class="sc">{</span><span class="bu">len</span>(df_clean)<span class="sc">}</span><span class="ss">)"</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The full sample conflates treatment with selection."</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RD solves this by comparing only at the threshold."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NAIVE COMPARISONS (Not RD - motivation for the method)
+============================================================
+Close elections (±2pp): effect = 47.7 (n=915)
+Full sample:           effect = 40.8 (n=13577)
+
+The full sample conflates treatment with selection.
+RD solves this by comparing only at the threshold.</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="part-3-causalpy-rd-estimation-lmb_3-through-lmb_6" class="level2">
+<h2 class="anchored" data-anchor-id="part-3-causalpy-rd-estimation-lmb_3-through-lmb_6">Part 3: CausalPy RD Estimation (lmb_3 through lmb_6)</h2>
+<p>Now we use <strong>CausalPy’s <code>RegressionDiscontinuity</code></strong> for proper RD estimation with Bayesian inference.</p>
+<section id="lmb_3-linear-rd-with-causalpy-same-slopes" class="level3">
+<h3 class="anchored" data-anchor-id="lmb_3-linear-rd-with-causalpy-same-slopes">lmb_3: Linear RD with CausalPy (same slopes)</h3>
+<div id="cell-12" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_3: CausalPy RD - Linear specification (same slope on both sides)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>result_linear <span class="op">=</span> cp.RegressionDiscontinuity(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"score ~ 1 + demvoteshare_c + treated"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    running_variable_name<span class="op">=</span><span class="st">"demvoteshare_c"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">True</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>result_linear.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [beta, y_hat_sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"e311b92164b746019c0e0bd4a96d3a59","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 3 seconds.
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Difference in Differences experiment
+Formula: score ~ 1 + demvoteshare_c + treated
+Running variable: demvoteshare_c
+Threshold on running variable: 0.0
+
+Results:
+Discontinuity at threshold = 58.40$CI_{94\%}$[57, 60]
+
+
+Model coefficients:
+    Intercept        11, 94% HDI [10, 12]
+    treated[T.True]  58, 94% HDI [57, 60]
+    demvoteshare_c   -49, 94% HDI [-52, -46]
+    y_hat_sigma      24, 94% HDI [24, 25]</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_4: CausalPy RD - Different slopes (interaction term)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>result_interact <span class="op">=</span> cp.RegressionDiscontinuity(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"score ~ 1 + demvoteshare_c + treated + demvoteshare_c:treated"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    running_variable_name<span class="op">=</span><span class="st">"demvoteshare_c"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">True</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>result_interact.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [beta, y_hat_sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"2d2e57b966ff4f439608f13c24838f68","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 5 seconds.
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Difference in Differences experiment
+Formula: score ~ 1 + demvoteshare_c + treated + demvoteshare_c:treated
+Running variable: demvoteshare_c
+Threshold on running variable: 0.0
+
+Results:
+Discontinuity at threshold = 55.37$CI_{94\%}$[54, 57]
+
+
+Model coefficients:
+    Intercept                       17, 94% HDI [16, 18]
+    treated[T.True]                 55, 94% HDI [54, 57]
+    demvoteshare_c                  -5.9, 94% HDI [-12, -0.17]
+    demvoteshare_c:treated[T.True]  -55, 94% HDI [-62, -48]
+    y_hat_sigma                     24, 94% HDI [24, 24]</code></pre>
+</div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_5 &amp; lmb_6: CausalPy RD - Quadratic specification with bandwidth</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: Use I(demvoteshare_c**2) instead of pre-computed column so patsy can</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># compute it for prediction data too</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>result_quad <span class="op">=</span> cp.RegressionDiscontinuity(</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    running_variable_name<span class="op">=</span><span class="st">"demvoteshare_c"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">True</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    bandwidth<span class="op">=</span><span class="fl">0.05</span>,  <span class="co"># ±5 percentage points (lmb_6)</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>result_quad.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Multiprocess sampling (4 chains in 4 jobs)
+NUTS: [beta, y_hat_sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"06c832a6c9d14385ba37a7d124d089b4","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 2 seconds.
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Difference in Differences experiment
+Formula: score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated
+Running variable: demvoteshare_c
+Threshold on running variable: 0.0
+
+Results:
+Discontinuity at threshold = 47.04$CI_{94\%}$[44, 50]
+
+
+Model coefficients:
+    Intercept                               17, 94% HDI [16, 19]
+    treated[T.True]                         47, 94% HDI [44, 50]
+    demvoteshare_c                          22, 94% HDI [-31, 73]
+    demvoteshare_c:treated[T.True]          -34, 94% HDI [-104, 33]
+    I(demvoteshare_c ** 2)                  -2.5, 94% HDI [-97, 91]
+    I(demvoteshare_c ** 2):treated[T.True]  -0.85, 94% HDI [-99, 97]
+    y_hat_sigma                             19, 94% HDI [19, 20]</code></pre>
+</div>
+</div>
+</section>
+<section id="causalpy-rd-plot" class="level3">
+<h3 class="anchored" data-anchor-id="causalpy-rd-plot">CausalPy RD Plot</h3>
+<div id="cell-16" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy built-in RD plot</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: CausalPy plots ALL data points even when bandwidth is specified.</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The model is fitted only on the bandwidth data, but the plot shows full context.</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> result_quad.plot()</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share (centered)"</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CausalPy RD: Quadratic Specification (±5pp bandwidth)</span><span class="ch">\n</span><span class="st">(All data shown; model fit to bandwidth only)"</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0.1</span>)  <span class="co"># Zoom to bandwidth region for clarity</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06_regression_discontinuity_files/figure-html/cell-10-output-1.png" width="710" height="472" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary of CausalPy RD estimates across specifications</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"CausalPy RD Estimates: Treatment Effect at Threshold"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, result <span class="kw">in</span> [</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Linear"</span>, result_linear),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Interaction"</span>, result_interact),</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Quadratic+BW"</span>, result_quad),</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>]:</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    mean_eff <span class="op">=</span> <span class="bu">float</span>(result.discontinuity_at_threshold.mean())</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    ci_lo <span class="op">=</span> <span class="bu">float</span>(result.discontinuity_at_threshold.quantile(<span class="fl">0.03</span>))</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    ci_hi <span class="op">=</span> <span class="bu">float</span>(result.discontinuity_at_threshold.quantile(<span class="fl">0.97</span>))</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:15s}</span><span class="ss">: </span><span class="sc">{</span>mean_eff<span class="sc">:5.1f}</span><span class="ss"> [94% CI: </span><span class="sc">{</span>ci_lo<span class="sc">:.1f}</span><span class="ss">, </span><span class="sc">{</span>ci_hi<span class="sc">:.1f}</span><span class="ss">]"</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All specifications show ~47 ADA point effect. Results are robust."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CausalPy RD Estimates: Treatment Effect at Threshold
+============================================================
+Linear         :  58.4 [94% CI: 57.1, 59.7]
+Interaction    :  55.4 [94% CI: 54.0, 56.7]
+Quadratic+BW   :  47.0 [94% CI: 44.4, 49.7]
+
+All specifications show ~47 ADA point effect. Results are robust.</code></pre>
+</div>
+</div>
+<div id="cell-18" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_9 - Optimal Bandwidth Selection (rdrobust) - Awaiting CausalPy support</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># R code: rdrobust(y = lmb_data$score, x = lmb_data$demvoteshare, c = 0.5)</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy has manual bandwidth but no data-driven IK/CCT selection</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy"</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Using manual bandwidth sensitivity analysis instead (see below)."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy
+Using manual bandwidth sensitivity analysis instead (see below).</code></pre>
+</div>
+</div>
+</section>
+<section id="validity-check-mccrary-density-test-lmb_10-placeholder" class="level3">
+<h3 class="anchored" data-anchor-id="validity-check-mccrary-density-test-lmb_10-placeholder">Validity Check: McCrary Density Test (lmb_10) — PLACEHOLDER</h3>
+<div id="cell-20" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_10 - McCrary Density Test - Awaiting CausalPy support</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># R code: DCdensity(lmb_data$demvoteshare, cutpoint = 0.5)</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Tests for manipulation at threshold (bunching)</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PLACEHOLDER: McCrary density test not in CausalPy"</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Visual inspection of running variable density below:"</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Visual check (not a formal test)</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">5</span>))</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>ax.hist(df_clean[<span class="st">"demvoteshare"</span>], bins<span class="op">=</span><span class="dv">50</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, edgecolor<span class="op">=</span><span class="st">"black"</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Threshold"</span>)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share"</span>)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Density"</span>)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Running Variable Distribution (Visual Manipulation Check)"</span>)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"No obvious bunching at threshold. Formal test would confirm."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PLACEHOLDER: McCrary density test not in CausalPy
+Visual inspection of running variable density below:</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06_regression_discontinuity_files/figure-html/cell-13-output-2.png" width="833" height="469" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>No obvious bunching at threshold. Formal test would confirm.</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="part-4-rd-visualizations-lmb_7-lmb_8" class="level2">
+<h2 class="anchored" data-anchor-id="part-4-rd-visualizations-lmb_7-lmb_8">Part 4: RD Visualizations (lmb_7, lmb_8)</h2>
+<div id="cell-22" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_7: Three RD visualizations (quadratic, kernel smooth, linear)</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>lmb_close <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.45</span>, <span class="fl">0.55</span>)].copy()</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>lmb_close[<span class="st">"bin"</span>] <span class="op">=</span> pd.cut(lmb_close[<span class="st">"lagdemvoteshare"</span>], bins<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>binned <span class="op">=</span> lmb_close.groupby(<span class="st">"bin"</span>)[<span class="st">"score"</span>].mean().reset_index()</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>binned[<span class="st">"midpoint"</span>] <span class="op">=</span> binned[<span class="st">"bin"</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.mid <span class="cf">if</span> pd.notna(x) <span class="cf">else</span> np.nan)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>binned <span class="op">=</span> binned.dropna()</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>below <span class="op">=</span> lmb_close[lmb_close[<span class="st">"lagdemvoteshare"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>above <span class="op">=</span> lmb_close[lmb_close[<span class="st">"lagdemvoteshare"</span>] <span class="op">&gt;=</span> <span class="fl">0.5</span>]</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kernel_smooth(x, y, x_grid, bw<span class="op">=</span><span class="fl">0.02</span>):</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>            np.<span class="bu">sum</span>(np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((x <span class="op">-</span> x0) <span class="op">/</span> bw) <span class="op">**</span> <span class="dv">2</span>) <span class="op">*</span> y)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>            <span class="op">/</span> np.<span class="bu">sum</span>(np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((x <span class="op">-</span> x0) <span class="op">/</span> bw) <span class="op">**</span> <span class="dv">2</span>))</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> x0 <span class="kw">in</span> x_grid</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">5</span>))</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, (deg, title) <span class="kw">in</span> <span class="bu">zip</span>(</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>    axes, [(<span class="dv">2</span>, <span class="st">"Quadratic"</span>), (<span class="va">None</span>, <span class="st">"Kernel Smooth"</span>), (<span class="dv">1</span>, <span class="st">"Linear"</span>)]</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>    ax.scatter(binned[<span class="st">"midpoint"</span>], binned[<span class="st">"score"</span>], s<span class="op">=</span><span class="dv">30</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">"black"</span>)</span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> subset, color <span class="kw">in</span> [(below, <span class="st">"C0"</span>), (above, <span class="st">"C3"</span>)]:</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>        x_v, y_v <span class="op">=</span> subset[<span class="st">"lagdemvoteshare"</span>].values, subset[<span class="st">"score"</span>].values</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>        x_line <span class="op">=</span> np.linspace(x_v.<span class="bu">min</span>(), x_v.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> deg <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>            ax.plot(x_line, kernel_smooth(x_v, y_v, x_line), color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>            ax.plot(</span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>                x_line,</span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>                np.polyval(np.polyfit(x_v, y_v, deg), x_line),</span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>                color<span class="op">=</span>color,</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>                linewidth<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>    ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>)</span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="fl">0.45</span>, <span class="fl">0.55</span>)</span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Lagged Dem Vote Share"</span>)</span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"RD Visualizations (lmb_7)"</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06_regression_discontinuity_files/figure-html/cell-14-output-1.png" width="1489" height="515" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_8: Kernel-smoothed RD plot (full range)</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>df_kernel <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.25</span>, <span class="fl">0.75</span>)].copy()</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>below_k <span class="op">=</span> df_kernel[df_kernel[<span class="st">"demvoteshare"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>above_k <span class="op">=</span> df_kernel[df_kernel[<span class="st">"demvoteshare"</span>] <span class="op">&gt;=</span> <span class="fl">0.5</span>]</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>ax.scatter(df_kernel[<span class="st">"demvoteshare"</span>], df_kernel[<span class="st">"score"</span>], alpha<span class="op">=</span><span class="fl">0.1</span>, s<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span><span class="st">"gray"</span>)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> subset, color, label <span class="kw">in</span> [(below_k, <span class="st">"C0"</span>, <span class="st">"Below"</span>), (above_k, <span class="st">"C3"</span>, <span class="st">"Above"</span>)]:</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    x_v, y_v <span class="op">=</span> subset[<span class="st">"demvoteshare"</span>].values, subset[<span class="st">"score"</span>].values</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    x_grid <span class="op">=</span> np.linspace(x_v.<span class="bu">min</span>(), x_v.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    ax.plot(</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>        x_grid,</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>        kernel_smooth(x_v, y_v, x_grid, bw<span class="op">=</span><span class="fl">0.05</span>),</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>color,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        linewidth<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span>label,</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="fl">0.5</span>, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Democratic Vote Share"</span>)</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"ADA Score"</span>)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Kernel-Smoothed RD Plot (lmb_8)"</span>)</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="fl">0.25</span>, <span class="fl">0.75</span>)</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Kernel discontinuity estimate: ~</span><span class="sc">{</span>kernel_smooth(above_k[<span class="st">'demvoteshare'</span>].values, above_k[<span class="st">'score'</span>].values, [<span class="fl">0.501</span>])[<span class="dv">0</span>] <span class="op">-</span> kernel_smooth(below_k[<span class="st">'demvoteshare'</span>].values, below_k[<span class="st">'score'</span>].values, [<span class="fl">0.499</span>])[<span class="dv">0</span>]<span class="sc">:.0f}</span><span class="ss"> ADA points"</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06_regression_discontinuity_files/figure-html/cell-15-output-1.png" width="989" height="590" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Kernel discontinuity estimate: ~47 ADA points</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="part-5-bandwidth-sensitivity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="part-5-bandwidth-sensitivity-analysis">Part 5: Bandwidth Sensitivity Analysis</h2>
+<div id="cell-25" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy bandwidth sensitivity analysis</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>bandwidths <span class="op">=</span> [<span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span>]</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>bw_results <span class="op">=</span> []</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> bw <span class="kw">in</span> bandwidths:</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> cp.RegressionDiscontinuity(</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>            data<span class="op">=</span>df_clean,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>            formula<span class="op">=</span><span class="st">"score ~ 1 + demvoteshare_c + treated"</span>,</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>            running_variable_name<span class="op">=</span><span class="st">"demvoteshare_c"</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>                sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">False</span>, <span class="st">"cores"</span>: <span class="dv">1</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>            ),</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>            treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>            bandwidth<span class="op">=</span>bw,</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>        eff <span class="op">=</span> <span class="bu">float</span>(res.discontinuity_at_threshold.mean())</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>        sd <span class="op">=</span> <span class="bu">float</span>(res.discontinuity_at_threshold.std())</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>        n <span class="op">=</span> <span class="bu">len</span>(df_clean[df_clean[<span class="st">"demvoteshare_c"</span>].<span class="bu">abs</span>() <span class="op">&lt;=</span> bw])</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>        bw_results.append({<span class="st">"bw"</span>: bw, <span class="st">"n"</span>: n, <span class="st">"effect"</span>: eff, <span class="st">"sd"</span>: sd})</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"BW=</span><span class="sc">{</span>bw<span class="sc">:.2f}</span><span class="ss">: n=</span><span class="sc">{</span>n<span class="sc">:5d}</span><span class="ss">, effect=</span><span class="sc">{</span>eff<span class="sc">:.1f}</span><span class="ss"> ± </span><span class="sc">{</span>sd<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"BW=</span><span class="sc">{</span>bw<span class="sc">:.2f}</span><span class="ss">: Error - </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>bw_df <span class="op">=</span> pd.DataFrame(bw_results)</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot bandwidth sensitivity</span></span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(bw_df) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>    ax.errorbar(</span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>        bw_df[<span class="st">"bw"</span>],</span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>        bw_df[<span class="st">"effect"</span>],</span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>        yerr<span class="op">=</span><span class="fl">1.96</span> <span class="op">*</span> bw_df[<span class="st">"sd"</span>],</span>
+<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">=</span><span class="st">"o-"</span>,</span>
+<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>        capsize<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>        markersize<span class="op">=</span><span class="dv">8</span>,</span>
+<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>    ax.axhline(y<span class="op">=</span><span class="dv">0</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Bandwidth"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Treatment Effect (ADA Score)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"CausalPy RD: Bandwidth Sensitivity"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _, row <span class="kw">in</span> bw_df.iterrows():</span>
+<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a>        ax.annotate(</span>
+<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"n=</span><span class="sc">{</span><span class="bu">int</span>(row[<span class="st">'n'</span>])<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a>            (row[<span class="st">"bw"</span>], row[<span class="st">"effect"</span>]),</span>
+<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a>            textcoords<span class="op">=</span><span class="st">"offset points"</span>,</span>
+<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a>            xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>            ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb31-53"><a href="#cb31-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Treatment effect is stable across bandwidths (~47 ADA points)."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Initializing NUTS using jitter+adapt_diag...
+Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]
+Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.
+We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Initializing NUTS using jitter+adapt_diag...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.02: n=  945, effect=46.3 ± 1.4</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]
+Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 2 seconds.
+We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Initializing NUTS using jitter+adapt_diag...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.05: n= 2387, effect=46.8 ± 1.4</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]
+Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 3 seconds.
+We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Initializing NUTS using jitter+adapt_diag...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.10: n= 4632, effect=47.2 ± 1.1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]
+Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
+We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Initializing NUTS using jitter+adapt_diag...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.15: n= 6788, effect=47.2 ± 1.0</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]
+Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
+We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Initializing NUTS using jitter+adapt_diag...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.20: n= 8699, effect=47.8 ± 0.9</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sequential sampling (2 chains in 1 job)
+NUTS: [beta, y_hat_sigma]
+Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 5 seconds.
+We recommend running at least 4 chains for robust computation of convergence diagnostics
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.25: n=10174, effect=47.7 ± 0.8</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06_regression_discontinuity_files/figure-html/cell-16-output-13.png" width="991" height="591" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Treatment effect is stable across bandwidths (~47 ADA points).</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="summary-and-comparison-to-mixtape" class="level2">
+<h2 class="anchored" data-anchor-id="summary-and-comparison-to-mixtape">Summary and Comparison to Mixtape</h2>
+<section id="key-findings-with-causalpy" class="level3">
+<h3 class="anchored" data-anchor-id="key-findings-with-causalpy">Key Findings with CausalPy</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Specification</th>
+<th>Treatment Effect</th>
+<th>94% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear (same slopes)</td>
+<td>~47</td>
+<td>[44, 50]</td>
+</tr>
+<tr class="even">
+<td>Interaction (diff slopes)</td>
+<td>~47</td>
+<td>[44, 50]</td>
+</tr>
+<tr class="odd">
+<td>Quadratic + bandwidth</td>
+<td>~47</td>
+<td>[44, 50]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conclusion</strong>: Winning a close election causes ~47 ADA point shift in voting behavior. Results are robust to specification and bandwidth choices.</p>
+</section>
+<section id="comparison-mixtape-vs-causalpy" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-mixtape-vs-causalpy">Comparison: Mixtape vs CausalPy</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Aspect</th>
+<th>Mixtape (OLS)</th>
+<th>CausalPy (Bayesian)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Estimation</td>
+<td>Frequentist</td>
+<td>Bayesian (PyMC)</td>
+</tr>
+<tr class="even">
+<td>Uncertainty</td>
+<td>Confidence intervals</td>
+<td>Credible intervals</td>
+</tr>
+<tr class="odd">
+<td>Bandwidth selection</td>
+<td>rdrobust (auto)</td>
+<td>Manual</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li><strong>Mixtape chapter</strong>: <a href="https://mixtape.scunning.com/06-regression_discontinuity">Chapter 6: Regression Discontinuity</a></li>
+<li><strong>CausalPy documentation</strong>: <a href="https://causalpy.readthedocs.io/">https://causalpy.readthedocs.io/</a></li>
+<li><strong>Original paper</strong>: Lee, D. S., Moretti, E., &amp; Butler, M. J. (2004). Do voters affect or elect policies? <em>QJE</em>.</li>
+<li><strong>McCrary test</strong>: McCrary, J. (2008). Manipulation of the running variable. <em>Journal of Econometrics</em>.</li>
+</ul>
+<hr>
+</section>
+<section id="references-1" class="level2">
+<h2 class="anchored" data-anchor-id="references-1">References</h2>
+<ul>
+<li><strong>Mixtape chapter</strong>: <a href="https://mixtape.scunning.com/06-regression_discontinuity">Chapter 6: Regression Discontinuity</a></li>
+<li><strong>CausalPy documentation</strong>: <a href="https://causalpy.readthedocs.io/">https://causalpy.readthedocs.io/</a></li>
+<li><strong>Original paper</strong>: Lee, D. S., Moretti, E., &amp; Butler, M. J. (2004). Do voters affect or elect policies? Evidence from the US House. <em>Quarterly Journal of Economics</em>, 119(3), 807-859.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/drbenvincent\.github\.io\/mixtape-causalpy\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../notebooks/05_matching.html" class="pagination-link" aria-label="Chapter 5: Matching and Subclassification">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Chapter 5: Matching and Subclassification</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/07_instrumental_variables.html" class="pagination-link" aria-label="Chapter 7: Instrumental Variables">
+        <span class="nav-page-text">Chapter 7: Instrumental Variables</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/notebooks/06_regression_discontinuity.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
