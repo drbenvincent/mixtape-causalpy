@@ -3,6 +3,7 @@ title: "The Mixtape in CausalPy"
 author:
   - name: Benjamin T. Vincent
     url: https://drbenvincent.github.io/
+suppress-bibliography: true
 ---
 
 Unofficial. This site is not affiliated with, endorsed by, or authorized by Scott Cunningham, Baylor University, Yale University Press, or PyMC Labs. It re-implements code examples from the first edition of Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) (Yale University Press, 2021) with [CausalPy](https://causalpy.readthedocs.io). It is a translation of the analyses, not a copy of the book. Credit, dataset citations, and the upstream license notice are on the [attribution page](attribution.qmd).

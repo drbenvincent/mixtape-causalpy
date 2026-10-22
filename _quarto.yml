@@ -44,12 +44,15 @@ website:
           - notebooks/09_difference_in_differences.qmd
           - notebooks/10_synthetic_control.qmd
 
+bibliography: references.bib
+
 format:
   html:
     theme: cosmo
     toc: true
     code-copy: true
     code-overflow: wrap
+    link-citations: true
     open-graph: true
     twitter-card: true
 

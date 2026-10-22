@@ -13,9 +13,9 @@ jupyter: mixtape-causalpy
 
 ### Overview
 
-Synthetic control is a method for estimating causal effects in comparative case studies where a single treated unit is compared to a weighted combination of control units. The key idea is to construct a "synthetic" control that closely matches the treated unit's pre-intervention trajectory.
+Synthetic control is a method for estimating causal effects in comparative case studies where a single treated unit is compared to a weighted combination of control units [@abadie2010]. The key idea is to construct a "synthetic" control that closely matches the treated unit's pre-intervention trajectory.
 
-This notebook covers the **Texas prison reform** example from Cunningham (2021), which examines the effect of prison capacity expansion on incarceration rates.
+This notebook covers the **Texas prison reform** example from @cunningham2021, which examines the effect of prison capacity expansion on incarceration rates.
 
 ### What we'll cover
 
@@ -537,9 +537,14 @@ Texas's post-1993 incarceration rate is higher than the synthetic control, and t
 
 ---
 
+::: {.callout-note}
+## Further reading
+
+- First edition: [Chapter 10: Synthetic Control](https://mixtape-1ed.netlify.app/10-synthetic_control.html)
+- CausalPy: [Synthetic control](https://causalpy.readthedocs.io/en/latest/notebooks/synthetic-control-pymc.html)
+:::
+
 ## References
 
-- **Mixtape chapter**: [Chapter 10: Synthetic Control](https://mixtape-1ed.netlify.app/10-synthetic_control.html)
-- **CausalPy documentation**: [https://causalpy.readthedocs.io/](https://causalpy.readthedocs.io/)
-- **Original paper**: Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic Control Methods for Comparative Case Studies. *Journal of the American Statistical Association*, 105(490), 493-505.
-
+::: {#refs}
+:::

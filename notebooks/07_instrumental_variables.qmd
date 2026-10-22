@@ -19,7 +19,7 @@ Instrumental Variables (IV) is a method for estimating causal effects when there
 2. **Exclusion**: Affects the outcome only through the treatment
 3. **Independence**: Is not correlated with the unmeasured confounders
 
-This notebook covers the **Card (1995)** example, which estimates the returns to schooling using proximity to a four-year college (`nearc4`) as an instrument for years of education.
+This notebook covers the @card1995 example, which estimates the returns to schooling using proximity to a four-year college (`nearc4`) as an instrument for years of education.
 
 ### What we'll cover
 
@@ -32,7 +32,7 @@ This notebook covers the **Card (1995)** example, which estimates the returns to
 
 | File | Description | Status |
 |------|-------------|--------|
-| `card.py` | Card (1995) returns to schooling IV | ✅ |
+| `card.py` | @card1995 returns to schooling IV | ✅ |
 
 
 ## Setup
@@ -62,7 +62,7 @@ from mixtape_causalpy import load_card
 
 ## Load and Explore Data
 
-The Card (1995) dataset contains information about wages, education, and geographic variables. The key variables are:
+The @card1995 dataset contains information about wages, education, and geographic variables. The key variables are:
 
 - **`lwage`**: Log of hourly wage (outcome)
 - **`educ`**: Years of education (endogenous treatment)
@@ -339,9 +339,14 @@ The key takeaway: IV allows us to estimate causal effects when there is unmeasur
 
 ---
 
+::: {.callout-note}
+## Further reading
+
+- First edition: [Chapter 7: Instrumental Variables](https://mixtape-1ed.netlify.app/07-instrumental_variables.html)
+- CausalPy: [Instrumental variables](https://causalpy.readthedocs.io/en/latest/notebooks/instrumental-variables-pymc.html)
+:::
+
 ## References
 
-- **Mixtape chapter**: [Chapter 7: Instrumental Variables](https://mixtape-1ed.netlify.app/07-instrumental_variables.html)
-- **CausalPy documentation**: [https://causalpy.readthedocs.io/](https://causalpy.readthedocs.io/)
-- **Original paper**: Card, D. (1995). Using Geographic Variation in College Proximity to Estimate the Return to Schooling. In *Aspects of Labour Market Behaviour: Essays in Honour of John Vanderkamp*.
-
+::: {#refs}
+:::
