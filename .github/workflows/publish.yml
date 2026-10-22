@@ -21,47 +21,8 @@ jobs:
       # execution. The name only has to exist; committed `_freeze/` is what renders.
       - name: Register freeze kernel name
         run: |
-          set -euo pipefail
-          py=$(quarto check jupyter | sed -n 's/^[[:space:]]*Path: //p' | head -1)
-          test -n "$py"
-          test -x "$py"
-          echo "quarto python: $py"
-          QUARTO_PY="$py" "$py" - <<'PY'
-          import json, os, shutil, subprocess
-          from pathlib import Path
-          py = os.environ["QUARTO_PY"]
-          out = subprocess.check_output([py, "-m", "jupyter", "--paths", "--json"], text=True)
-          data_paths = [Path(p) for p in json.loads(out)["data"]]
-          src = next(
-              (
-                  p / "kernels" / "python3" / "kernel.json"
-                  for p in data_paths
-                  if (p / "kernels" / "python3" / "kernel.json").is_file()
-              ),
-              None,
-          )
-          dest_parent = None
-          for p in data_paths:
-              try:
-                  (p / "kernels").mkdir(parents=True, exist_ok=True)
-              except OSError:
-                  continue
-              dest_parent = p / "kernels"
-              break
-          if dest_parent is None:
-              raise SystemExit("no writable Jupyter data path")
-          dest = dest_parent / "mixtape-causalpy"
-          dest.mkdir(parents=True, exist_ok=True)
-          if src is not None:
-              shutil.copy(src, dest / "kernel.json")
-          else:
-              (dest / "kernel.json").write_text(json.dumps({
-                  "argv": [py, "-m", "ipykernel_launcher", "-f", "{connection_file}"],
-                  "display_name": "Mixtape CausalPy",
-                  "language": "python",
-              }))
-          print(f"registered {dest}")
-          PY
+          python3 -m pip install --user --break-system-packages ipykernel
+          python3 -m ipykernel install --user --name mixtape-causalpy --display-name "Mixtape CausalPy"
 
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
