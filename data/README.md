@@ -33,6 +33,7 @@ To clear the cache, simply delete this directory.
 | Abortion | `abortion.dta` | Ch 9: DiD | Abortion legalization effects |
 | CPS | `cps_mixtape.dta` | Ch 5: Matching | CPS control group for matching |
 | SASP | `sasp_panel.dta` | Ch 8: Panel | Cunningham & Kendall sex-worker survey; panel of recent client sessions. Provenance: Mixtape repo (`scunning1975/mixtape`). |
+| Titanic | `titanic.dta` | Ch 5: Matching | Simple difference in outcomes example. Fetched for `python/titanic.py`. The script names no paper. Not committed and not relicensed here. |
 
 ## Original sources
 
@@ -53,6 +54,7 @@ Files are not committed to this repository. They are fetched at runtime from Sco
 | `abortion.dta` | Donohue and Levitt (2001). Cite the paper. |
 | `texas.dta` | Texas prison synthetic control. Cite the Mixtape code repository and the series source used there (`python/synth_1.py`, `Do/synth_1.do`: black male prisoners (per capita), `bmprison`). Do not invent a public-domain claim. |
 | `sasp_panel.dta` | Cunningham and Kendall, Survey of Adult Service Providers. Panel of recent client sessions. Fetched from the Mixtape code repository. Not relicensed here. |
+| `titanic.dta` | Fetched at runtime for the `python/titanic.py` example. The Mixtape script names no paper. Not committed, not a license grant from this project, and not labeled MIT or public domain here. |
 
 ## Alternative: causaldata package
 
