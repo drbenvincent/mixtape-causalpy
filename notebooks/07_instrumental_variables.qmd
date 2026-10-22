@@ -5,7 +5,7 @@ jupyter: mixtape-causalpy
 
 ## Causal Inference: The Mixtape → CausalPy
 
-**Mixtape chapter**: [Instrumental Variables](https://mixtape.scunning.com/07-instrumental_variables)
+**Mixtape chapter**: [Instrumental Variables](https://mixtape-1ed.netlify.app/07-instrumental_variables.html)
 
 **CausalPy method**: `InstrumentalVariable`
 
@@ -333,7 +333,7 @@ The key takeaway: IV allows us to estimate causal effects when there is unmeasur
 
 ## References
 
-- **Mixtape chapter**: [Chapter 7: Instrumental Variables](https://mixtape.scunning.com/07-instrumental_variables)
+- **Mixtape chapter**: [Chapter 7: Instrumental Variables](https://mixtape-1ed.netlify.app/07-instrumental_variables.html)
 - **CausalPy documentation**: [https://causalpy.readthedocs.io/](https://causalpy.readthedocs.io/)
 - **Original paper**: Card, D. (1995). Using Geographic Variation in College Proximity to Estimate the Return to Schooling. In *Aspects of Labour Market Behaviour: Essays in Honour of John Vanderkamp*.
 

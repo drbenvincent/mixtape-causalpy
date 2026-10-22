@@ -1,16 +1,16 @@
 """
 Data loading utilities for Mixtape-CausalPy examples.
 
-Primary sources (in order of preference):
-1. causaldata package - clean, documented, permissively licensed
-2. Mixtape GitHub repo - direct download from scunning1975/mixtape
-3. Local cache - downloaded once, cached in ~/.cache/mixtape-causalpy/
+Datasets are fetched at runtime from https://github.com/scunning1975/mixtape
+and cached under ~/.cache/mixtape-causalpy/. They are not committed and not
+relicensed here. Rights stay with the original authors. See NOTICE.
 """
 
 from pathlib import Path
 
 import pandas as pd
 
+# Fetched from scunning1975/mixtape; not relicensed here. See NOTICE.
 MIXTAPE_BASE_URL = "https://github.com/scunning1975/mixtape/raw/master/"
 CACHE_DIR = Path.home() / ".cache" / "mixtape-causalpy"
 

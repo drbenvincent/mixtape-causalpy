@@ -2,7 +2,9 @@
 title: "The Mixtape in CausalPy"
 ---
 
-This site re-implements the applied examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape.scunning.com) with [CausalPy](https://causalpy.readthedocs.io). It is a translation of the analyses, not a copy of the book. Follow the chapter links for identification strategy and narrative.
+Unofficial. This site is not affiliated with, endorsed by, or authorized by Scott Cunningham, Baylor University, Yale University Press, or PyMC Labs. It re-implements code examples from the first edition of Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) (Yale University Press, 2021) with [CausalPy](https://causalpy.readthedocs.io). It is a translation of the analyses, not a copy of the book. Credit, dataset citations, and the upstream license notice are on the [attribution page](attribution.qmd).
+
+This site does not cover the second edition, [*Causal Inference: The Remix*](https://mixtape.scunning.com/). Identification narrative stays on the first-edition book site.
 
 Estimates are Bayesian (PyMC) unless a section says otherwise. Numbers will not match the book's OLS tables exactly. Each chapter records where they differ and why.
 

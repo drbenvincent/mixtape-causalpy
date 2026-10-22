@@ -5,18 +5,21 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mixtape-causalpy"
 version = "0.1.0"
-description = "CausalPy implementations of Causal Inference: The Mixtape examples"
+description = "Unofficial CausalPy translations of code examples from Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
+authors = [
+  { name = "Benjamin Vincent" },
+]
 dependencies = [
     "pandas>=2.0.0",
 ]
 
 [project.urls]
-"Mixtape Book" = "https://mixtape.scunning.com"
+"Mixtape Book (1st ed.)" = "https://mixtape-1ed.netlify.app/"
 "CausalPy" = "https://causalpy.readthedocs.io"
-"Repository" = "https://github.com/pymc-labs/CausalPy"
+"Repository" = "https://github.com/drbenvincent/mixtape-causalpy"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -2,6 +2,8 @@
 
 Work practices for AI assistants (and humans) contributing to this repo.
 
+**Edition:** first edition only (2021). Ground truth is https://mixtape-1ed.netlify.app/. https://mixtape.scunning.com/ is now *Causal Inference: The Remix* and is not a source for this repo. See [issue #4](https://github.com/drbenvincent/mixtape-causalpy/issues/4).
+
 ## Before Starting Work
 
 - [ ] Read `REPO_PLAN.md` to understand what's done and what's next
@@ -28,7 +30,7 @@ Work practices for AI assistants (and humans) contributing to this repo.
 
 - One `.qmd` per Mixtape chapter (e.g., `notebooks/06_regression_discontinuity.qmd`). Do not add `.ipynb` sources
 - Use short references in tables: `06_rd`, `07_iv`, `09_did`, `10_sc`
-- Include a link to the corresponding Mixtape chapter at the top
+- Include a link to the corresponding first-edition chapter at the top (`https://mixtape-1ed.netlify.app/`). Future chapters paraphrase and link to `mixtape-1ed.netlify.app`; never paste book paragraphs or book graphics; credit adapted data-generating processes via `NOTICE`.
 - Note any differences from the book's results (Bayesian vs OLS, etc.)
 - The reader surface is the Quarto website (`quarto preview` / GitHub Pages), not JupyterLab
 
@@ -53,8 +55,8 @@ Work practices for AI assistants (and humans) contributing to this repo.
 
 ## Data Loading
 
-- Prefer `causaldata` package when dataset is available there
-- Fall back to direct URL loading from Mixtape repo
+- Fetch datasets at runtime from the Mixtape code repo via `src/mixtape_causalpy/data.py`. Do not vendor them, and do not describe them as MIT or as licensed by that repo.
+- Do not treat `causaldata` as the preferred or permissively licensed source. This loader does not call it. Its `COPYRIGHT` strings are attributions, not a grant.
 - Use caching to avoid repeated downloads
 - Document any data transformations needed
 

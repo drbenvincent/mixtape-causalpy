@@ -5,7 +5,7 @@ jupyter: mixtape-causalpy
 
 ## Causal Inference: The Mixtape → CausalPy
 
-**Mixtape chapter**: [Synthetic Control](https://mixtape.scunning.com/10-synthetic_control)
+**Mixtape chapter**: [Synthetic Control](https://mixtape-1ed.netlify.app/10-synthetic_control.html)
 
 **CausalPy method**: `SyntheticControl`
 
@@ -528,7 +528,7 @@ The key finding replicates the Mixtape: Texas's prison capacity expansion in 199
 
 ## References
 
-- **Mixtape chapter**: [Chapter 10: Synthetic Control](https://mixtape.scunning.com/10-synthetic_control)
+- **Mixtape chapter**: [Chapter 10: Synthetic Control](https://mixtape-1ed.netlify.app/10-synthetic_control.html)
 - **CausalPy documentation**: [https://causalpy.readthedocs.io/](https://causalpy.readthedocs.io/)
 - **Original paper**: Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic Control Methods for Comparative Case Studies. *Journal of the American Statistical Association*, 105(490), 493-505.
 

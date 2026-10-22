@@ -2,11 +2,12 @@ project:
   type: website
   render:
     - index.qmd
+    - attribution.qmd
     - notebooks/*.qmd
 
 website:
   title: "The Mixtape in CausalPy"
-  description: "CausalPy implementations of Causal Inference: The Mixtape"
+  description: "Unofficial CausalPy translations of the code examples from Scott Cunningham, Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher."
   site-url: https://drbenvincent.github.io/mixtape-causalpy/
   repo-url: https://github.com/drbenvincent/mixtape-causalpy
   repo-actions: [source, issue]
@@ -16,10 +17,17 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - text: Mixtape
-        href: https://mixtape.scunning.com
+      - text: Attribution
+        href: attribution.qmd
+      - text: "Mixtape (1st ed.)"
+        href: https://mixtape-1ed.netlify.app/
       - text: CausalPy
         href: https://causalpy.readthedocs.io
+  page-footer:
+    left: "Unofficial. Not affiliated with Scott Cunningham or Yale University Press."
+    right:
+      - text: Attribution
+        href: attribution.qmd
   sidebar:
     style: docked
     search: true
@@ -38,6 +46,8 @@ format:
     toc: true
     code-copy: true
     code-overflow: wrap
+    open-graph: true
+    twitter-card: true
 
 execute:
   freeze: auto

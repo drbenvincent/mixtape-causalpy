@@ -1,10 +1,10 @@
 """
-Mixtape-CausalPy: CausalPy implementations of Causal Inference: The Mixtape examples.
+Mixtape-CausalPy: unofficial CausalPy translations of Causal Inference: The Mixtape (1st ed., 2021) examples.
 
 This package provides data loading utilities for the datasets used in
 Scott Cunningham's "Causal Inference: The Mixtape".
 
-Source: https://mixtape.scunning.com
+Source: https://mixtape-1ed.netlify.app/
 """
 
 from .data import (

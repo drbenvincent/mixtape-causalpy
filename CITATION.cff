@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+message: >-
+  Cite Scott Cunningham's book first, then this repository as the code
+  translation. This software is an unofficial translation. It is not
+  affiliated with the author or the publisher.
+type: software
+title: "The Mixtape in CausalPy"
+abstract: >-
+  Unofficial CausalPy translations of the code examples from Scott Cunningham,
+  Causal Inference: The Mixtape (Yale University Press, 2021).
+authors:
+  - family-names: Vincent
+    given-names: Benjamin
+repository-code: "https://github.com/drbenvincent/mixtape-causalpy"
+url: "https://drbenvincent.github.io/mixtape-causalpy/"
+license: MIT
+version: 0.1.0
+preferred-citation:
+  type: book
+  title: "Causal Inference: The Mixtape"
+  authors:
+    - family-names: Cunningham
+      given-names: Scott
+  year: 2021
+  publisher:
+    name: Yale University Press
+  isbn: "978-0-300-25168-5"
+  url: "https://yalebooks.yale.edu/book/9780300251685/causal-inference/"
+  notes: >-
+    First-edition text: https://mixtape-1ed.netlify.app/.
+    Ebook ISBN 978-0-300-25588-1.
+references:
+  - type: book
+    title: "Causal Inference: The Mixtape"
+    authors:
+      - family-names: Cunningham
+        given-names: Scott
+    year: 2021
+    publisher:
+      name: Yale University Press
+    isbn: "978-0-300-25168-5"
+  - type: software
+    title: "The Mixtape in CausalPy"
+    authors:
+      - family-names: Vincent
+        given-names: Benjamin
+    repository-code: "https://github.com/drbenvincent/mixtape-causalpy"
+    url: "https://drbenvincent.github.io/mixtape-causalpy/"
+    license: MIT
+    notes: "Code translation. Not a software author credit for Cunningham."
