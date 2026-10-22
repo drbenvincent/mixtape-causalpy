@@ -1,0 +1,16 @@
+AGENTS.md
+  h_63db634213747e 26,34-45
+CONTRIBUTING.md
+  h_63db634213747e 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2def1fec870feee9ed3840fe8ab3cc1a59ae12f9",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
