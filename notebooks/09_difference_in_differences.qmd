@@ -5,7 +5,7 @@ jupyter: mixtape-causalpy
 
 ## Causal Inference: The Mixtape → CausalPy
 
-**Mixtape chapter**: [Difference-in-Differences](https://mixtape.scunning.com/09-difference_in_differences)
+**Mixtape chapter**: [Difference-in-Differences](https://mixtape-1ed.netlify.app/09-difference_in_differences.html)
 
 **CausalPy method**: `DifferenceInDifferences`
 
@@ -464,7 +464,7 @@ In this notebook, we demonstrated CausalPy's `DifferenceInDifferences` experimen
 
 ## References
 
-- **Mixtape chapter**: https://mixtape.scunning.com/09-difference_in_differences
+- **Mixtape chapter**: https://mixtape-1ed.netlify.app/09-difference_in_differences.html
 - **CausalPy docs**: https://causalpy.readthedocs.io
 - **Original papers**:
   - Cheng, C., & Hoekstra, M. (2013). "Does Strengthening Self-Defense Law Deter Crime or Escalate Violence?"

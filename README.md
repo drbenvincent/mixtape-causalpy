@@ -1,8 +1,10 @@
 # The Mixtape in CausalPy
 
-This repository re-implements the code examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape.scunning.com) using [CausalPy](https://causalpy.readthedocs.io).
+Unofficial. This repository is not affiliated with, endorsed by, or authorized by Scott Cunningham, Yale University Press, or PyMC Labs. It re-implements the code examples from the **first edition** of Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) (Yale University Press, 2021) using [CausalPy](https://causalpy.readthedocs.io).
 
-Read the chapters at **<https://drbenvincent.github.io/mixtape-causalpy/>**. GitHub shows the `.qmd` source only; the Pages site is the rendered reader surface, including the saved plots.
+It does **not** cover the second edition, [*Causal Inference: The Remix*](https://mixtape.scunning.com/) (2026). There is no public Remix code repository to translate yet. See [issue #4](https://github.com/drbenvincent/mixtape-causalpy/issues/4).
+
+Read the chapters at **<https://drbenvincent.github.io/mixtape-causalpy/>**. GitHub shows the `.qmd` source only; the Pages site is the rendered reader surface, including the saved plots. Site credit is on the [attribution page](attribution.qmd).
 
 ## Purpose
 
@@ -78,22 +80,26 @@ See [REPO_PLAN.md](REPO_PLAN.md) for:
 
 ## References
 
-- **Mixtape book**: https://mixtape.scunning.com
-- **Mixtape code repo**: https://github.com/scunning1975/mixtape
+- **Mixtape (1st ed.)**: https://mixtape-1ed.netlify.app/
+- **Remix (2nd ed., not implemented here)**: https://mixtape.scunning.com/
+- **Mixtape code and data repo**: https://github.com/scunning1975/mixtape
 - **CausalPy docs**: https://causalpy.readthedocs.io
 - **CausalPy GitHub**: https://github.com/pymc-labs/CausalPy
 
 ## License
 
-Code in this repository is MIT licensed. The datasets are sourced from the Mixtape repo and [causaldata](https://github.com/NickCH-K/causaldata) package — see `data/README.md` for provenance.
+Original code and original prose by Benjamin Vincent are MIT licensed. See `LICENSE` for what that grant does not cover. Code and data-generating processes adapted from [scunning1975/mixtape](https://github.com/scunning1975/mixtape) remain under that repository's MIT license; see `NOTICE`. Datasets are fetched at runtime, not committed, and not relicensed here. See `data/README.md`.
 
 ## Citation
 
-If you use this repo, please cite both the Mixtape and CausalPy:
+Cite the book first, then this repository as the code translation. Cite CausalPy by its repository and Apache-2.0 license, not a guessed publication year.
 
 ```
 Cunningham, S. (2021). Causal Inference: The Mixtape. Yale University Press.
 
-CausalPy Developers. (2024). CausalPy: A Python package for causal inference. 
+Vincent, B. The Mixtape in CausalPy.
+https://github.com/drbenvincent/mixtape-causalpy
+
+CausalPy, Apache-2.0.
 https://github.com/pymc-labs/CausalPy
 ```

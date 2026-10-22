@@ -1,0 +1,37 @@
+Upstream code and data-generating processes adapted in this repository
+are from Scott Cunningham's code repository:
+https://github.com/scunning1975/mixtape
+
+The copyright line, permission paragraph, and warranty disclaimer below are
+reproduced without modification from:
+https://github.com/scunning1975/mixtape/blob/master/LICENSE
+
+That MIT grant covers the code-and-data repository (and, in its own words,
+the course materials in that repo). It does not license the Yale University
+Press book. This repository does not add a notice for
+https://github.com/scunning1975/python-mixtape; that is a separate project
+and is not the source of the adapted code here.
+
+----- BEGIN UPSTREAM LICENSE TEXT -----
+* MIT License
+
+Copyright (c) [2020] [Anthony Scott Cunningham]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, and/or distribute copies of the course
+materials, and to permit persons to whom the class materials is furnished to do so, 
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+----- END UPSTREAM LICENSE TEXT -----
