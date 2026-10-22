@@ -24,4 +24,4 @@ The upstream copyright notice, permission paragraph, and warranty disclaimer are
 | `lmb-data.dta` | Lee, Moretti, and Butler (2004), *QJE* 119(3): 807–859. |
 | `castle.dta` | Cheng and Hoekstra (2013), *JHR* 48(3): 821–854. FBI UCR plus law dates. |
 | `abortion.dta` | Donohue and Levitt (2001). Cite the paper. |
-| `texas.dta` | Texas prison synthetic control. Cite the Mixtape code repository (https://github.com/scunning1975/mixtape) and the series source used there (`python/synth_1.py`, `Do/synth_1.do`: black male prison admission rates). Do not invent a public-domain claim. |
+| `texas.dta` | Texas prison synthetic control. Cite the Mixtape code repository (https://github.com/scunning1975/mixtape) and the series source used there (`python/synth_1.py`, `Do/synth_1.do`: black male prisoners (per capita), `bmprison`). Do not invent a public-domain claim. |
