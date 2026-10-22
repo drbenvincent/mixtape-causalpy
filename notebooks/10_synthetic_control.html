@@ -81,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-6ecbe164c74a9c6be78c3e23c108eb30.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-59a22c8f22ecbb293c221a666528f4e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -114,6 +114,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
+<meta property="og:title" content="Chapter 10: Synthetic Control – The Mixtape in CausalPy">
+<meta property="og:description" content="Unofficial CausalPy translations of the code examples from Scott Cunningham, Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher.">
+<meta property="og:image" content="https://drbenvincent.github.io/mixtape-causalpy/notebooks/10_synthetic_control_files/figure-html/cell-7-output-1.png">
+<meta property="og:site_name" content="The Mixtape in CausalPy">
+<meta property="og:image:height" content="1132">
+<meta property="og:image:width" content="2289">
+<meta name="twitter:title" content="Chapter 10: Synthetic Control – The Mixtape in CausalPy">
+<meta name="twitter:description" content="Unofficial CausalPy translations of the code examples from Scott Cunningham, Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher.">
+<meta name="twitter:image" content="https://drbenvincent.github.io/mixtape-causalpy/notebooks/10_synthetic_control_files/figure-html/cell-7-output-1.png">
+<meta name="twitter:image-height" content="1132">
+<meta name="twitter:image-width" content="2289">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-sidebar docked nav-fixed quarto-light">
@@ -138,8 +150,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://mixtape.scunning.com"> 
-<span class="menu-text">Mixtape</span></a>
+    <a class="nav-link" href="../attribution.html"> 
+<span class="menu-text">Attribution</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://mixtape-1ed.netlify.app/"> 
+<span class="menu-text">Mixtape (1st ed.)</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="https://causalpy.readthedocs.io"> 
@@ -292,7 +308,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="causal-inference-the-mixtape-causalpy" class="level2">
 <h2 class="anchored" data-anchor-id="causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</h2>
-<p><strong>Mixtape chapter</strong>: <a href="https://mixtape.scunning.com/10-synthetic_control">Synthetic Control</a></p>
+<p><strong>Mixtape chapter</strong>: <a href="https://mixtape-1ed.netlify.app/10-synthetic_control.html">Synthetic Control</a></p>
 <p><strong>CausalPy method</strong>: <code>SyntheticControl</code></p>
 <hr>
 <section id="overview" class="level3">
@@ -1628,7 +1644,7 @@ With 10 placebos the smallest two-sided p-value this design can return is 0.091.
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <ul>
-<li><strong>Mixtape chapter</strong>: <a href="https://mixtape.scunning.com/10-synthetic_control">Chapter 10: Synthetic Control</a></li>
+<li><strong>Mixtape chapter</strong>: <a href="https://mixtape-1ed.netlify.app/10-synthetic_control.html">Chapter 10: Synthetic Control</a></li>
 <li><strong>CausalPy documentation</strong>: <a href="https://causalpy.readthedocs.io/">https://causalpy.readthedocs.io/</a></li>
 <li><strong>Original paper</strong>: Abadie, A., Diamond, A., &amp; Hainmueller, J. (2010). Synthetic Control Methods for Comparative Case Studies. <em>Journal of the American Statistical Association</em>, 105(490), 493-505.</li>
 </ul>
@@ -2047,8 +2063,27 @@ With 10 placebos the smallest two-sided p-value this design can return is 0.091.
   </div>
 </nav>
 </div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Unofficial. Not affiliated with Scott Cunningham or Yale University Press.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/notebooks/10_synthetic_control.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../attribution.html">
+<p>Attribution</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
 
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/notebooks/10_synthetic_control.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+</body></html>

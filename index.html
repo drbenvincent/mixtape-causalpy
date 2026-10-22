@@ -46,7 +46,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6ecbe164c74a9c6be78c3e23c108eb30.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-59a22c8f22ecbb293c221a666528f4e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -76,6 +76,12 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
+<meta property="og:title" content="The Mixtape in CausalPy">
+<meta property="og:description" content="Unofficial CausalPy translations of the code examples from Scott Cunningham, Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher.">
+<meta property="og:site_name" content="The Mixtape in CausalPy">
+<meta name="twitter:title" content="The Mixtape in CausalPy">
+<meta name="twitter:description" content="Unofficial CausalPy translations of the code examples from Scott Cunningham, Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher.">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-sidebar docked nav-fixed quarto-light">
@@ -100,8 +106,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://mixtape.scunning.com"> 
-<span class="menu-text">Mixtape</span></a>
+    <a class="nav-link" href="./attribution.html"> 
+<span class="menu-text">Attribution</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://mixtape-1ed.netlify.app/"> 
+<span class="menu-text">Mixtape (1st ed.)</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="https://causalpy.readthedocs.io"> 
@@ -233,7 +243,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This site re-implements the applied examples from Scott Cunningham’s <a href="https://mixtape.scunning.com"><em>Causal Inference: The Mixtape</em></a> with <a href="https://causalpy.readthedocs.io">CausalPy</a>. It is a translation of the analyses, not a copy of the book. Follow the chapter links for identification strategy and narrative.</p>
+<p>Unofficial. This site is not affiliated with, endorsed by, or authorized by Scott Cunningham, Baylor University, Yale University Press, or PyMC Labs. It re-implements code examples from the first edition of Scott Cunningham’s <a href="https://mixtape-1ed.netlify.app/"><em>Causal Inference: The Mixtape</em></a> (Yale University Press, 2021) with <a href="https://causalpy.readthedocs.io">CausalPy</a>. It is a translation of the analyses, not a copy of the book. Credit, dataset citations, and the upstream license notice are on the <a href="./attribution.html">attribution page</a>.</p>
+<p>This site does not cover the second edition, <a href="https://mixtape.scunning.com/"><em>Causal Inference: The Remix</em></a>. Identification narrative stays on the first-edition book site.</p>
 <p>A translation by <a href="https://drbenvincent.github.io/">Benjamin T. Vincent</a>.</p>
 <p>Estimates are Bayesian (PyMC) unless a section says otherwise. Numbers will not match the book’s OLS tables exactly. Each chapter records where they differ and why.</p>
 <p>Outputs are frozen in <code>_freeze/</code>. A project render republishes the saved plots and does not re-sample. Re-running a chapter is a local edit, not a CI step.</p>
@@ -687,8 +698,27 @@ ul.task-list li input[type="checkbox"] {
   });
   </script>
 </div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Unofficial. Not affiliated with Scott Cunningham or Yale University Press.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="./attribution.html">
+<p>Attribution</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
 
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/drbenvincent/mixtape-causalpy/blob/main/index.qmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/drbenvincent/mixtape-causalpy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+</body></html>
