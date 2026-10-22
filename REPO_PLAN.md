@@ -66,6 +66,7 @@ mixtape-causalpy/
 ├── README.md                          # Project overview + quick start
 ├── REPO_PLAN.md                       # This file
 ├── _quarto.yml                        # Website project (freeze: auto)
+├── references.bib                     # Shared bibliography for chapter citations
 ├── index.qmd                          # Site home
 ├── pyproject.toml                     # Dependency source
 ├── uv.lock                            # Locked resolve; `uv sync` is the install
@@ -313,7 +314,7 @@ See `src/mixtape_causalpy/data.py` for the implemented data loading utilities.
 
 ## Chapter template
 
-Each chapter is one `.qmd` page. Quarto lifts the H1 into `title:`; keep the Mixtape link, overview, setup, examples, comparison to the book, CausalPy-specific notes, and TODO placeholders.
+Each chapter is one `.qmd` page. Quarto lifts the H1 into `title:`; keep the Mixtape link, overview, setup, examples, comparison to the book, CausalPy-specific notes, and TODO placeholders. Scholarly works go in `references.bib` and are cited in the prose (`@key`). End with a Further reading callout, then a `## References` heading and an empty `::: {#refs}` div. Citeproc fills that div. Do not write the reference list by hand. An explicit `#refs` div does not generate the heading.
 
 ```markdown
 ---
@@ -348,10 +349,18 @@ jupyter: mixtape-causalpy
 - Demonstrate unique CausalPy capabilities
 - Show both PyMC and OLS backends where applicable
 
-### References
-- Link to Mixtape chapter
-- Link to CausalPy documentation
-- Link to original papers
+::: {.callout-note}
+## Further reading
+
+- First edition: [Chapter X: Method Name](https://mixtape-1ed.netlify.app/<1st-ed-slug>)
+- CausalPy: [Method how-to](https://causalpy.readthedocs.io/en/latest/notebooks/<method>.html)
+- Optional papers the page does not cite, as plain text (author, year, title, venue)
+:::
+
+## References
+
+::: {#refs}
+:::
 ```
 
 ### TODO Placeholder Template

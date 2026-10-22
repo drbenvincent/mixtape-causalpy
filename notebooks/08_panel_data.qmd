@@ -18,7 +18,7 @@ Pooled OLS treats every client session as a separate draw. If providers who take
 The within estimator, which is what provider fixed effects estimate, subtracts each provider's mean. That deletes the time-invariant unit effect \(u_i\). A slope is then identified only from within-provider variation. Two conditions have to hold: the idiosyncratic error is strictly exogenous given the unit effect, and the regressor actually moves inside the provider. A covariate that is constant for each provider is wiped, not estimated.
 
 ::: {.callout-important}
-Fixed effects are not a fix for reverse causality, and they are not a fix for a confounder that changes across sessions. The chapter shows those failures with published tables from Cornwell and Trumbull (1994) and Cornwell and Rupert (1997). Those datasets are not in the Mixtape repo. This page cites the tables and does not recreate them.
+Fixed effects are not a fix for reverse causality, and they are not a fix for a confounder that changes across sessions. The chapter shows those failures with published tables from @cornwell1994 and @cornwell1997. Those datasets are not in the Mixtape repo. This page cites the tables and does not recreate them.
 :::
 
 The coded exercise is Cunningham and Kendall's Survey of Adult Service Providers. Each row is one of a provider's recent client sessions, not a calendar year. The outcome is log hourly price (`lnw`). [Table 8.3](https://mixtape-1ed.netlify.app/08-panel_data) reports three columns on the same balanced sample: pooled OLS, provider fixed effects, and OLS on provider-demeaned variables. Columns 2 and 3 are the same point estimates. That equivalence is the result to show. The book does not put session fixed effects in this regression.
@@ -131,7 +131,7 @@ print(raw.select_dtypes(exclude="number").dtypes)
 print(raw["provider_second"].value_counts(dropna=False))
 ```
 
-Cleaning follows the chapter, not a looser `dropna` on the whole frame:
+Cleaning follows the chapter [@cunningham2021], not a looser `dropna` on the whole frame:
 
 1. Drop a row if any Table 8.3 variable is missing.
 2. Keep providers who still have all four sessions.
@@ -393,9 +393,15 @@ Provider fixed effects and the within transformation answer the same point-estim
 
 ---
 
+::: {.callout-note}
+## Further reading
+
+- First edition: [Chapter 8: Panel Data](https://mixtape-1ed.netlify.app/08-panel_data)
+- CausalPy: [Panel fixed effects](https://causalpy.readthedocs.io/en/latest/notebooks/panel-fixed-effects.html)
+- Cunningham and Kendall, Survey of Adult Service Providers. Data file `sasp_panel.dta` in the [Mixtape repo](https://github.com/scunning1975/mixtape). The coded exercise uses this file; it is not a published paper.
+:::
+
 ## References
 
-- **Mixtape chapter (1st ed.)**: [Chapter 8: Panel Data](https://mixtape-1ed.netlify.app/08-panel_data)
-- **Exercise**: Cunningham and Kendall, Survey of Adult Service Providers. Data file `sasp_panel.dta` in the [Mixtape repo](https://github.com/scunning1975/mixtape).
-- **FE is not a cure-all**: Cornwell and Trumbull (1994); Cornwell and Rupert (1997). Cited, not replicated.
-- **CausalPy**: [`PanelRegression`](https://causalpy.readthedocs.io/)
+::: {#refs}
+:::

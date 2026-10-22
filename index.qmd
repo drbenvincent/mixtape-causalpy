@@ -3,6 +3,7 @@ title: "The Mixtape in CausalPy"
 author:
   - name: Benjamin T. Vincent
     url: https://drbenvincent.github.io/
+suppress-bibliography: true
 ---
 
 This site re-implements the applied examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape.scunning.com) with [CausalPy](https://causalpy.readthedocs.io). It is a translation of the analyses, not a copy of the book. Follow the chapter links for identification strategy and narrative.

@@ -33,7 +33,7 @@ The Mixtape examples use **staggered adoption** designs where different units re
 
 For staggered DiD, see:
 - CausalPy PR #621 (staggered DiD support)
-- Recent literature on issues with TWFE in staggered settings (Goodman-Bacon, Callaway & Sant'Anna, Sun & Abraham)
+- Recent literature on issues with TWFE in staggered settings [@goodmanbacon2021; @callaway2021; @sun2021]
 
 In this notebook, we adapt the examples to work with CausalPy's 2×2 framework.
 
@@ -76,7 +76,7 @@ from mixtape_causalpy import load_castle, load_abortion
 
 ## Example 1: Castle Doctrine and Homicide Rates
 
-The Castle Doctrine (also known as "Stand Your Ground" laws) expands the legal right to use deadly force in self-defense. The Mixtape examines whether these laws increased homicide rates.
+The Castle Doctrine (also known as "Stand Your Ground" laws) expands the legal right to use deadly force in self-defense. The Mixtape examines whether these laws increased homicide rates, following @cheng2013.
 
 **Key details:**
 - **Outcome**: Log homicide rate (`l_homicide`)
@@ -246,7 +246,7 @@ The **causal impact** represents the Average Treatment Effect on the Treated (AT
 
 ## Example 2: Abortion Legalization and Gonorrhea Rates
 
-This example examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected health outcomes, using gonorrhea rates as a proxy.
+This example follows @donohue2001, but uses gonorrhea rates as a proxy rather than crime. It examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected that outcome.
 
 **Key details:**
 - **Outcome**: Log gonorrhea rate (`lnr`)
@@ -462,14 +462,15 @@ In this notebook, we demonstrated CausalPy's `DifferenceInDifferences` experimen
 
 ---
 
+::: {.callout-note}
+## Further reading
+
+- First edition: [Chapter 9: Difference-in-Differences](https://mixtape-1ed.netlify.app/09-difference_in_differences)
+- CausalPy: [Difference-in-differences](https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html)
+- [CausalPy PR #621](https://github.com/pymc-labs/CausalPy/pull/621) tracks staggered DiD support. This page does not estimate a staggered design.
+:::
+
 ## References
 
-- **Mixtape chapter**: https://mixtape.scunning.com/09-difference_in_differences
-- **CausalPy docs**: https://causalpy.readthedocs.io
-- **Original papers**:
-  - Cheng, C., & Hoekstra, M. (2013). "Does Strengthening Self-Defense Law Deter Crime or Escalate Violence?"
-  - Donohue, J., & Levitt, S. (2001). "The Impact of Legalized Abortion on Crime"
-- **Modern DiD literature**:
-  - Goodman-Bacon, A. (2021). "Difference-in-Differences with Variation in Treatment Timing"
-  - Callaway, B., & Sant'Anna, P. (2021). "Difference-in-Differences with Multiple Time Periods"
-
+::: {#refs}
+:::
