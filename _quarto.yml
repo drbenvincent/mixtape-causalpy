@@ -23,6 +23,9 @@ website:
         href: https://mixtape-1ed.netlify.app/
       - text: CausalPy
         href: https://causalpy.readthedocs.io
+    right:
+      - text: Benjamin T. Vincent
+        href: https://drbenvincent.github.io/
   page-footer:
     left: "Unofficial. Not affiliated with Scott Cunningham or Yale University Press."
     right:
