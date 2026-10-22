@@ -1,0 +1,10 @@
+{
+    "python.defaultInterpreterPath": "<CONDA_ENV_PATH>/bin/python",
+    "python.terminal.activateEnvironment": false,
+    "quarto.render.env": {
+        "QUARTO_PYTHON": "<CONDA_ENV_PATH>/bin/python"
+    },
+    "terminal.integrated.env.osx": {
+        "QUARTO_PYTHON": "<CONDA_ENV_PATH>/bin/python"
+    }
+}

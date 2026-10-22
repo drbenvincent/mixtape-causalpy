@@ -6,28 +6,31 @@ Work practices for AI assistants (and humans) contributing to this repo.
 
 - [ ] Read `REPO_PLAN.md` to understand what's done and what's next
 - [ ] Check the Implementation Status summary table for current progress
-- [ ] Identify which notebook/files you'll be working on
+- [ ] Identify which chapter page you'll be working on
 
 ## While Working
 
 - [ ] Focus on CausalPy-native examples first (✅ Native status)
 - [ ] For examples marked ⏭️ Skip, add a TODO placeholder instead of implementing
-- [ ] Follow the notebook template in `REPO_PLAN.md`
+- [ ] Follow the chapter template in `REPO_PLAN.md`
 - [ ] Use the data loading utilities in `src/mixtape_causalpy/data.py`
+- [ ] Execute with the `mixtape-causalpy` Jupyter kernel. Set `QUARTO_PYTHON` to that conda env; do not render with WebAssembly or a stray interpreter
 
 ## After Completing Work
 
 - [ ] **Update `REPO_PLAN.md`**: Change status from ⬜ to ✅ for completed files
 - [ ] **Update the summary table**: Increment the Done count, decrement Todo count
-- [ ] Ensure the notebook runs cleanly from top to bottom
+- [ ] If you changed computational source, render that chapter locally and commit the updated `_freeze/`
+- [ ] Do not re-execute MCMC in CI. Project `quarto render` must succeed from the committed freeze
 - [ ] Commit with a descriptive message referencing the Mixtape file(s) covered
 
-## Notebook Conventions
+## Chapter conventions
 
-- One notebook per Mixtape chapter (e.g., `06_regression_discontinuity.ipynb`)
-- Use short notebook references in tables: `06_rd`, `07_iv`, `09_did`, `10_sc`
+- One `.qmd` per Mixtape chapter (e.g., `notebooks/06_regression_discontinuity.qmd`). Do not add `.ipynb` sources
+- Use short references in tables: `06_rd`, `07_iv`, `09_did`, `10_sc`
 - Include a link to the corresponding Mixtape chapter at the top
 - Note any differences from the book's results (Bayesian vs OLS, etc.)
+- The reader surface is the Quarto website (`quarto preview` / GitHub Pages), not JupyterLab
 
 ## Status Symbols
 

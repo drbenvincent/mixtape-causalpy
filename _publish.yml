@@ -1,0 +1,4 @@
+- source: project
+  gh-pages:
+    - id: gh-pages
+      url: https://drbenvincent.github.io/mixtape-causalpy/

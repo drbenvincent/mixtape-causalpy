@@ -1,6 +1,6 @@
 # Mixtape → CausalPy Translation Repo Plan
 
-This document outlines the structure and implementation plan for translating the code examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape.scunning.com) into CausalPy-based Jupyter notebooks.
+This document outlines the structure and implementation plan for translating the code examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape.scunning.com) into a CausalPy Quarto website. Chapters are independent `.qmd` pages, not a numbered book and not Jupyter notebooks.
 
 > **Primary source**: https://mixtape.scunning.com — use this to verify chapter content and ground truth
 > 
@@ -20,9 +20,9 @@ This keeps the repo focused and avoids maintaining parallel "baseline" implement
 
 ## Implementation Status
 
-**Overall progress by notebook:**
+**Overall progress by chapter:**
 
-| Notebook | Total | ✅ Done | ⏭️ Skip | ⬜ Todo |
+| Chapter | Total | ✅ Done | ⏭️ Skip | ⬜ Todo |
 |----------|-------|---------|---------|---------|
 | `05_matching` | 10 | 5 | 5 | 0 |
 | `06_rd` | 14 | 8 | 6 | 0 |
@@ -59,23 +59,28 @@ The original Mixtape repo (`https://github.com/scunning1975/mixtape`) contains:
 
 ---
 
-## Proposed Repo Structure
+## Repo structure
 
 ```
 mixtape-causalpy/
 ├── README.md                          # Project overview + quick start
 ├── REPO_PLAN.md                       # This file
-├── requirements.txt                   # Pinned dependencies
-├── pyproject.toml                     # Optional: modern packaging
+├── _quarto.yml                        # Website project (freeze: auto)
+├── index.qmd                          # Site home
+├── requirements.txt
+├── pyproject.toml
 │
 ├── notebooks/
-│   ├── 00_data_utilities.ipynb        # Data loading + inspection utilities
-│   ├── 05_matching.ipynb              # Matching & Subclassification
-│   ├── 06_regression_discontinuity.ipynb
-│   ├── 07_instrumental_variables.ipynb
-│   ├── 08_panel_data.ipynb
-│   ├── 09_difference_in_differences.ipynb
-│   └── 10_synthetic_control.ipynb
+│   ├── 00_data_utilities.qmd          # Not started. New chapters are .qmd
+│   ├── 05_matching.qmd
+│   ├── 06_regression_discontinuity.qmd
+│   ├── 07_instrumental_variables.qmd
+│   ├── 08_panel_data.qmd              # Not started
+│   ├── 09_difference_in_differences.qmd
+│   └── 10_synthetic_control.qmd
+│
+├── _freeze/                           # Committed execution results. Do not re-sample in CI
+├── .github/workflows/publish.yml      # quarto-dev/quarto-actions → GitHub Pages
 │
 ├── data/
 │   ├── README.md                      # Data provenance + licensing
@@ -87,11 +92,13 @@ mixtape-causalpy/
         └── data.py                    # Data loading utilities
 ```
 
+Reader URL: https://drbenvincent.github.io/mixtape-causalpy/ . `_site/` and `/.quarto/` are gitignored. One source format: `.qmd`. No paired `.ipynb`.
+
 ---
 
 ## Mixtape Python Examples → Chapter Mapping
 
-Below is a complete catalog of the Python files in the Mixtape repo, mapped to our notebooks with implementation status.
+Below is a complete catalog of the Python files in the Mixtape repo, mapped to chapter pages. Short names (`05_matching`, `06_rd`, `07_iv`, `08_panel`, `09_did`, `10_sc`) are the table refs; source files are `notebooks/<chapter>.qmd`.
 
 ### CausalPy Status Legend
 
@@ -152,7 +159,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 | `teffects_nn.py` | Nearest neighbor matching | `05_matching` | ❌ Missing | ⏭️ |
 | `cem.py` | Coarsened exact matching | `05_matching` | ❌ Missing | ⏭️ |
 
-**Notebook plan**: `05_matching.ipynb`
+**Page**: `notebooks/05_matching.qmd`
 - Demonstrate CausalPy's `InversePropensityWeighting` with NSW data
 - Include balance diagnostics and overlap plots
 - **TODO placeholder** for: NN matching, subclassification, CEM (not yet in CausalPy)
@@ -178,7 +185,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 | `rdd_simulate3.py` | RD simulation - nonlinear | `06_rd` | 📖 Conceptual | ⏭️ |
 | `rdd_simulate4.py` | RD simulation - no discontinuity | `06_rd` | 📖 Conceptual | ⏭️ |
 
-**Notebook plan**: `06_regression_discontinuity.ipynb`
+**Page**: `notebooks/06_regression_discontinuity.qmd`
 - Main example: Lee-Moretti-Butler close elections using `RegressionDiscontinuity`
 - Show sharp RD estimation with bandwidth sensitivity
 - Demonstrate diagnostic plots (binned scatter, bandwidth sensitivity)
@@ -193,7 +200,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 |--------------|-------------|----------|----------|--------|
 | `card.py` | Card (1995) returns to schooling | `07_iv` | ✅ Native | ✅ |
 
-**Notebook plan**: `07_instrumental_variables.ipynb`
+**Page**: `notebooks/07_instrumental_variables.qmd`
 - Card's proximity to college as instrument for education
 - Use CausalPy's `InstrumentalVariable` experiment
 - Show first-stage diagnostics, compare OLS vs 2SLS
@@ -212,11 +219,11 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 | `cluster3.py` | Clustering variations | `08_panel` | ⏭️ Skip | ⏭️ |
 | `cluster4.py` | Clustering variations | `08_panel` | ⏭️ Skip | ⏭️ |
 
-**Notebook plan**: `08_panel_data.ipynb` — **SKIP (placeholder only)**
+**Page**: `notebooks/08_panel_data.qmd` — **SKIP (placeholder only, not created yet)**
 - ⏭️ CausalPy does not have a dedicated panel FE experiment
-- Create placeholder notebook with TODO template
+- Create a placeholder `.qmd` with the TODO template when that work starts
 - Reference: CausalPy panel workhorse proposal in issue tracker
-- Transition note: DiD notebook covers the TWFE-adjacent use case
+- Transition note: the DiD page covers the TWFE-adjacent use case
 
 ---
 
@@ -234,7 +241,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 | `castle_4.py` | Castle doctrine - extensions | `09_did` | ⚠️ Partial | ⏭️ |
 | `castle_5.py` | Castle doctrine - placebo | `09_did` | ❌ Missing | ⏭️ |
 
-**Notebook plan**: `09_difference_in_differences.ipynb`
+**Page**: `notebooks/09_difference_in_differences.qmd`
 - Main examples: Castle doctrine + abortion legalization
 - Use CausalPy's `DifferenceInDifferences` experiment
 - Show parallel trends checks, event study plots
@@ -251,7 +258,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to o
 | `synth_2.py` | Texas SC - weights | `10_sc` | ✅ Native | ✅ |
 | `synth_3_7.R` | Texas SC - placebo-in-space tests | `10_sc` | ✅ Native | ✅ |
 
-**Notebook plan**: `10_synthetic_control.ipynb`
+**Page**: `notebooks/10_synthetic_control.qmd`
 - Texas prison reform as main example
 - Use CausalPy's `SyntheticControl` experiment
 - Show donor weights, pre-treatment fit
@@ -268,21 +275,21 @@ Some Mixtape examples require CausalPy features that don't exist yet. This secti
 
 These features are being actively developed in CausalPy:
 
-| Feature | CausalPy PR | Notebook to Update |
-|---------|-------------|-------------------|
-| Staggered DiD | [PR #621](https://github.com/pymc-labs/CausalPy/pull/621) | `09_difference_in_differences.ipynb` |
-| Event Study | [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) | `09_difference_in_differences.ipynb` |
-| Donut RD | [PR #610](https://github.com/pymc-labs/CausalPy/pull/610) | `06_regression_discontinuity.ipynb` |
+| Feature | CausalPy PR | Page to update |
+|---------|-------------|----------------|
+| Staggered DiD | [PR #621](https://github.com/pymc-labs/CausalPy/pull/621) | `notebooks/09_difference_in_differences.qmd` |
+| Event Study | [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) | `notebooks/09_difference_in_differences.qmd` |
+| Donut RD | [PR #610](https://github.com/pymc-labs/CausalPy/pull/610) | `notebooks/06_regression_discontinuity.qmd` |
 
 ### Feature Proposals (Not Yet Started)
 
 These features have been proposed but don't have open PRs yet. See `proposals/` for detailed writeups:
 
-| Feature | Proposal | Notebook to Update |
-|---------|----------|-------------------|
-| Matching (NN, CEM) | [`proposal_matching.md`](proposals/proposal_matching.md) | `05_matching.ipynb` |
-| Panel Fixed Effects | [`proposal_panel_fe.md`](proposals/proposal_panel_fe.md) | `08_panel_data.ipynb` |
-| Triple Differences | [`proposal_triple_diff.md`](proposals/proposal_triple_diff.md) | `09_difference_in_differences.ipynb` |
+| Feature | Proposal | Page to update |
+|---------|----------|----------------|
+| Matching (NN, CEM) | [`proposal_matching.md`](proposals/proposal_matching.md) | `notebooks/05_matching.qmd` |
+| Panel Fixed Effects | [`proposal_panel_fe.md`](proposals/proposal_panel_fe.md) | `notebooks/08_panel_data.qmd` |
+| Triple Differences | [`proposal_triple_diff.md`](proposals/proposal_triple_diff.md) | `notebooks/09_difference_in_differences.qmd` |
 
 ---
 
@@ -304,18 +311,22 @@ See `src/mixtape_causalpy/data.py` for the implemented data loading utilities.
 
 ---
 
-## Notebook Template
+## Chapter template
 
-Each notebook should follow this structure:
+Each chapter is one `.qmd` page. Quarto lifts the H1 into `title:`; keep the Mixtape link, overview, setup, examples, comparison to the book, CausalPy-specific notes, and TODO placeholders.
 
 ```markdown
-# Chapter X: [Method Name]
+---
+title: "Chapter X: [Method Name]"
+jupyter: mixtape-causalpy
+---
+
 ## Causal Inference: The Mixtape → CausalPy
 
 ### Overview
 - Brief description of the identification strategy
 - Link to the corresponding Mixtape chapter
-- Summary of what this notebook covers
+- Summary of what this page covers
 
 ### Setup
 - Imports (CausalPy, data utilities)
@@ -350,12 +361,12 @@ For sections/examples we skip due to missing CausalPy support:
 ```markdown
 ## [Example Name] — TODO
 
-> **Not yet implemented**: This example requires [matching / panel FE / etc.] 
+> **Not yet implemented**: This example requires [matching / panel FE / etc.]
 > which CausalPy does not currently support as a first-class experiment.
 
 **Mixtape reference**: [Link to relevant chapter section]
 
-**CausalPy tracking**: 
+**CausalPy tracking**:
 - Issue: [link to GitHub issue if exists]
 - PR: [link to PR if in progress]
 
@@ -368,26 +379,27 @@ For sections/examples we skip due to missing CausalPy support:
 
 Per `mixtape_causalpy_translation_repo.md`, "done" means:
 
-- [x] **Implemented chapters** (RD, IV, DiD, SC) each have a notebook that:
+- [x] **Implemented chapters** (RD, IV, DiD, SC) each have a page that:
   - [x] Loads the chapter dataset
   - [x] Runs a comparable identification strategy in CausalPy
   - [x] Reproduces key result figure(s) in spirit
   - [x] Clearly states differences vs book's implementation
 
-- [x] **Partial chapters** (Matching) have a notebook that:
+- [x] **Partial chapters** (Matching) have a page that:
   - [x] Demonstrates what CausalPy supports (IPSW)
   - [x] Includes TODO placeholders for unsupported methods
   - [x] Links to CausalPy issue tracker for future work
 
-- [ ] **Skipped chapters** (Panel) have a placeholder notebook that:
+- [ ] **Skipped chapters** (Panel) have a placeholder `.qmd` that:
   - [ ] Explains why the chapter is not yet implemented
   - [ ] Links to Mixtape chapter for reference
   - [ ] Links to relevant CausalPy issues/PRs
   - [ ] Can be filled in when CausalPy adds support
 
 - [x] README provides:
-  - [x] Quick start instructions
-  - [x] Chapter → notebook mapping table (with status indicators)
+  - [x] Quick start instructions (`quarto preview`, not JupyterLab)
+  - [x] Chapter → page mapping table (with status indicators)
+  - [x] Link to the GitHub Pages site
   - [x] Link to CausalPy docs
   - [x] Link to Mixtape book
 
@@ -395,17 +407,22 @@ Per `mixtape_causalpy_translation_repo.md`, "done" means:
   - [x] `data/README.md` documents all datasets and provenance
   - [x] Loading works without manual download steps
 
+- [x] Website:
+  - [x] `quarto render` builds from committed `_freeze/` without re-sampling
+  - [x] Publish workflow is `.github/workflows/publish.yml` (`quarto-dev/quarto-actions`)
+
 ---
 
 ## Dependencies
 
-We use Conda for environment management due to PyMC dependencies. See `environment.yml` for the full specification.
+We use Conda for environment management due to PyMC dependencies. See `environment.yml` for the full specification. Quarto itself is installed system-wide; set `QUARTO_PYTHON` to the `mixtape-causalpy` env so it does not pick up another interpreter.
 
 **Key dependencies:**
 - **Python**: 3.13
 - **CausalPy**: Development version from GitHub (`git+https://github.com/pymc-labs/CausalPy.git@main`)
 - **PyMC**: >=5.10
 - **ArviZ**: >=0.17
+- **Jupyter kernel**: `mixtape-causalpy` (execution only; the site does not use WASM)
 
 > **Note**: We use the development version of CausalPy to access bug fixes (e.g., RD bandwidth parameter fix in issue #625) and upcoming features.
 
@@ -414,10 +431,10 @@ We use Conda for environment management due to PyMC dependencies. See `environme
 ## Next Steps
 
 - [x] **Initialize repo structure**: Create folders, requirements.txt, data utilities
-- [x] **Implement Phase 1 notebooks**: RD, IV, DiD, SC (full CausalPy coverage)
-- [x] **Implement Phase 2 notebooks**: Matching (IPSW only, with TODO stubs)
-- [ ] **Create placeholder notebooks**: Panel data chapter with TODO template
-- [ ] **CI setup**: Run notebooks on push to ensure reproducibility
+- [x] **Implement Phase 1 pages**: RD, IV, DiD, SC (full CausalPy coverage)
+- [x] **Implement Phase 2 pages**: Matching (IPSW only, with TODO stubs)
+- [x] **Quarto website**: `.qmd` sources, frozen outputs, GitHub Pages workflow
+- [ ] **Create placeholder page**: Panel data chapter as `.qmd` with the TODO template
 - [ ] **Monitor CausalPy PRs**: When new features land, revisit TODO placeholders
 
 ---
@@ -429,4 +446,6 @@ We use Conda for environment management due to PyMC dependencies. See `environme
 - **CausalPy docs**: https://causalpy.readthedocs.io
 - **CausalPy GitHub**: https://github.com/pymc-labs/CausalPy
 - **causaldata package**: https://github.com/NickCH-K/causaldata
+- **Rendered site**: https://drbenvincent.github.io/mixtape-causalpy/
+- **Quarto**: https://quarto.org
 

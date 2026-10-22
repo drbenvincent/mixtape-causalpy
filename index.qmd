@@ -1,0 +1,22 @@
+---
+title: "The Mixtape in CausalPy"
+---
+
+This site re-implements the applied examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape.scunning.com) with [CausalPy](https://causalpy.readthedocs.io). It is a translation of the analyses, not a copy of the book. Follow the chapter links for identification strategy and narrative.
+
+Estimates are Bayesian (PyMC) unless a section says otherwise. Numbers will not match the book's OLS tables exactly. Each chapter records where they differ and why.
+
+Outputs are frozen in `_freeze/`. A project render republishes the saved plots and does not re-sample. Re-running a chapter is a local edit, not a CI step.
+
+## Chapters
+
+| Chapter | Page | CausalPy |
+|---------|------|----------|
+| 5. Matching and subclassification | [Matching](notebooks/05_matching.qmd) | Inverse propensity weighting; other matching methods are TODO |
+| 6. Regression discontinuity | [Regression discontinuity](notebooks/06_regression_discontinuity.qmd) | `RegressionDiscontinuity` |
+| 7. Instrumental variables | [Instrumental variables](notebooks/07_instrumental_variables.qmd) | `InstrumentalVariable` |
+| 8. Panel data | Not started | No panel fixed-effects experiment yet |
+| 9. Difference-in-differences | [Difference-in-differences](notebooks/09_difference_in_differences.qmd) | `DifferenceInDifferences` |
+| 10. Synthetic control | [Synthetic control](notebooks/10_synthetic_control.qmd) | `SyntheticControl` |
+
+Source and setup: [drbenvincent/mixtape-causalpy](https://github.com/drbenvincent/mixtape-causalpy).
