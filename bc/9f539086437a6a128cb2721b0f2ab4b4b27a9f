@@ -1,0 +1,64 @@
+.nojekyll
+  h_63db634213747e 1
+index.html
+  h_63db634213747e 1-671
+notebooks/05_matching.html
+  h_63db634213747e 1-1433
+notebooks/06_regression_discontinuity.html
+  h_63db634213747e 1-1540
+notebooks/07_instrumental_variables.html
+  h_63db634213747e 1-1362
+notebooks/09_difference_in_differences.html
+  h_63db634213747e 1-1373
+notebooks/10_synthetic_control.html
+  h_63db634213747e 1-1997
+robots.txt
+  h_63db634213747e 1
+search.json
+  h_63db634213747e 1-724
+site_libs/bootstrap/bootstrap-0441d281c0042f78ca5e6da214781463.min.css
+  h_63db634213747e 1-12
+site_libs/bootstrap/bootstrap-icons.css
+  h_63db634213747e 1-2106
+site_libs/bootstrap/bootstrap.min.js
+  h_63db634213747e 1-7
+site_libs/clipboard/clipboard.min.js
+  h_63db634213747e 1-7
+site_libs/quarto-html/anchor.min.js
+  h_63db634213747e 1-9
+site_libs/quarto-html/popper.min.js
+  h_63db634213747e 1-6
+site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css
+  h_63db634213747e 1-236
+site_libs/quarto-html/quarto.js
+  h_63db634213747e 1-845
+site_libs/quarto-html/tabsets/tabsets.js
+  h_63db634213747e 1-95
+site_libs/quarto-html/tippy.css
+  h_63db634213747e 1
+site_libs/quarto-html/tippy.umd.min.js
+  h_63db634213747e 1-2
+site_libs/quarto-nav/headroom.min.js
+  h_63db634213747e 1-7
+site_libs/quarto-nav/quarto-nav.js
+  h_63db634213747e 1-325
+site_libs/quarto-search/autocomplete.umd.js
+  h_63db634213747e 1-3
+site_libs/quarto-search/fuse.min.js
+  h_63db634213747e 1-9
+site_libs/quarto-search/quarto-search.js
+  h_63db634213747e 1-1457
+sitemap.xml
+  h_63db634213747e 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bc9f539086437a6a128cb2721b0f2ab4b4b27a9f",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
