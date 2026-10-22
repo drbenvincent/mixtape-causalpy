@@ -1,0 +1,16 @@
+_quarto.yml
+  h_63db634213747e 26-28
+index.qmd
+  h_63db634213747e 3-5,12-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7d26654fa9847bd952d3d47e7ba8fb06687097eb",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
