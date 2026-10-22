@@ -1,0 +1,16 @@
+.github/workflows/publish.yml
+  h_63db634213747e 20-55
+REPO_PLAN.md
+  h_63db634213747e 425
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e71e8f81d0a1dce3e23f46ea813ddfba8007b70",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
