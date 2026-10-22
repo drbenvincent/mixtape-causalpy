@@ -1,0 +1,40 @@
+AGENTS.md
+  h_63db634213747e 28,36-47
+CONTRIBUTING.md
+  h_63db634213747e 1-13
+README.md
+  h_63db634213747e 52,67,70
+REPO_PLAN.md
+  h_63db634213747e 15-16,31-32,81,205,211,220-228,293
+_freeze/notebooks/08_panel_data/execute-results/html.json
+  h_63db634213747e 1-16
+_quarto.yml
+  h_63db634213747e 43
+attribution.qmd
+  h_63db634213747e 28
+data/README.md
+  h_63db634213747e 35,55
+index.qmd
+  h_63db634213747e 25
+notebooks/08_panel_data.qmd
+  h_63db634213747e 1-401
+proposals/README.md
+  h_63db634213747e 10
+proposals/proposal_panel_fe.md
+  h_63db634213747e 3-4
+src/mixtape_causalpy/__init__.py
+  h_63db634213747e 19,31
+src/mixtape_causalpy/data.py
+  h_63db634213747e 117-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8ceae780d341803a8b7caefd890c9f88929d3b63",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
