@@ -204,6 +204,7 @@ sample_kwargs = {
     "chains": 2,
     "cores": 1,  # Single core avoids multiprocessing issues on macOS
     "target_accept": 0.95,
+    "random_seed": 42,
 }
 
 iv_result = InstrumentalVariable(
@@ -212,20 +213,24 @@ iv_result = InstrumentalVariable(
     instruments_formula=instruments_formula,
     formula=formula,
     model=InstrumentalVariableRegression(sample_kwargs=sample_kwargs),
-)
+).fit()
 ```
 
 ```{python}
 # View the posterior summary
 print("Bayesian IV Results:")
-az.summary(iv_result.model.idata, var_names=["beta_t", "beta_z"])[
-    ["mean", "sd", "hdi_3%", "hdi_97%", "r_hat"]
-]
+summary = az.summary(
+    iv_result.idata,
+    var_names=["beta_t", "beta_z"],
+    ci_kind="hdi",
+    ci_prob=0.94,
+)
+summary
 ```
 
 ```{python}
 # Extract the treatment effect (coefficient on educ in second stage)
-beta_z = iv_result.model.idata.posterior["beta_z"]
+beta_z = iv_result.idata["posterior"]["beta_z"]
 
 # Get the education coefficient (should be second element after intercept)
 educ_coef = beta_z.sel(covariates="educ").values.flatten()
@@ -243,7 +248,7 @@ print(
 
 ```{python}
 # Trace plots for diagnostics
-az.plot_trace(iv_result.model.idata, var_names=["beta_z", "beta_t"])
+az.plot_trace(iv_result.idata, var_names=["beta_z", "beta_t"])
 plt.tight_layout()
 plt.show()
 ```
@@ -300,6 +305,9 @@ The Mixtape's IV analysis of the Card data shows:
 
 1. **OLS estimate**: ~7-8% return per year of schooling
 2. **IV estimate**: Often higher, suggesting ability bias may actually *downward* bias OLS (or measurement error attenuates it)
+
+### This run
+OLS, with the notebook's covariates: 0.0712, 95% CI [0.0643, 0.0780]. Bayesian IV, instrument `nearc4`, second stage `lwage ~ 1 + educ` only, `random_seed=42`: mean 0.1826, 94% HDI [0.1438, 0.2260], r-hat 1.00. The IV estimate is higher than OLS in this specification. It is not the book's point estimate. The second stage omits the covariates in the Mixtape formula.
 
 ### Differences from Book's Implementation
 
