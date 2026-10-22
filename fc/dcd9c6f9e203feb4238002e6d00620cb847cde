@@ -1,0 +1,52 @@
+.github/workflows/publish.yml
+  h_63db634213747e 1-25
+.gitignore
+  h_63db634213747e 185,187,208-218
+.vscode/settings.json.example
+  h_63db634213747e 1-10
+AGENTS.md
+  h_63db634213747e 9,15,17,23-24,27,29-30,33
+README.md
+  h_63db634213747e 5-6,18,30,32-34,36-38,41-43,54-63,65
+REPO_PLAN.md
+  h_63db634213747e 3,23,25,62,68-71,74-83,95-96,101,162,188,203,222,224,226,244,261,278-282,288-292,314,316,319-323,329,364,369,382,388,393,400-402,410-413,418,425,434-437,449-450
+_freeze/notebooks/05_matching/execute-results/html.json
+  h_63db634213747e 1-12
+_freeze/notebooks/06_regression_discontinuity/execute-results/html.json
+  h_63db634213747e 1-12
+_freeze/notebooks/07_instrumental_variables/execute-results/html.json
+  h_63db634213747e 1-12
+_freeze/notebooks/09_difference_in_differences/execute-results/html.json
+  h_63db634213747e 1-12
+_freeze/notebooks/10_synthetic_control/execute-results/html.json
+  h_63db634213747e 1-12
+_freeze/site_libs/clipboard/clipboard.min.js
+  h_63db634213747e 1-7
+_publish.yml
+  h_63db634213747e 1-4
+_quarto.yml
+  h_63db634213747e 1-45
+index.qmd
+  h_63db634213747e 1-22
+notebooks/05_matching.qmd
+  h_63db634213747e 1-483
+notebooks/06_regression_discontinuity.qmd
+  h_63db634213747e 1-495
+notebooks/07_instrumental_variables.qmd
+  h_63db634213747e 1-339
+notebooks/09_difference_in_differences.qmd
+  h_63db634213747e 1-471
+notebooks/10_synthetic_control.qmd
+  h_63db634213747e 1-534
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fcdcd9c6f9e203feb4238002e6d00620cb847cde",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
