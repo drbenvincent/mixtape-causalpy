@@ -24,7 +24,7 @@ jobs:
           python3 - <<'PY'
           import json, shutil, subprocess
           from pathlib import Path
-          out = subprocess.check_output(["jupyter", "--paths", "--json"], text=True)
+          out = subprocess.check_output(["python3", "-m", "jupyter", "--paths", "--json"], text=True)
           data_paths = [Path(p) for p in json.loads(out)["data"]]
           src = next(
               (p / "kernels" / "python3" / "kernel.json" for p in data_paths if (p / "kernels" / "python3" / "kernel.json").is_file()),
