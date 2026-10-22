@@ -21,13 +21,23 @@ jobs:
       # execution. The name only has to exist; committed `_freeze/` is what renders.
       - name: Register freeze kernel name
         run: |
-          python3 - <<'PY'
-          import json, shutil, subprocess
+          set -euo pipefail
+          py=$(quarto check jupyter | sed -n 's/^[[:space:]]*Path: //p' | head -1)
+          test -n "$py"
+          test -x "$py"
+          echo "quarto python: $py"
+          QUARTO_PY="$py" "$py" - <<'PY'
+          import json, os, shutil, subprocess
           from pathlib import Path
-          out = subprocess.check_output(["python3", "-m", "jupyter", "--paths", "--json"], text=True)
+          py = os.environ["QUARTO_PY"]
+          out = subprocess.check_output([py, "-m", "jupyter", "--paths", "--json"], text=True)
           data_paths = [Path(p) for p in json.loads(out)["data"]]
           src = next(
-              (p / "kernels" / "python3" / "kernel.json" for p in data_paths if (p / "kernels" / "python3" / "kernel.json").is_file()),
+              (
+                  p / "kernels" / "python3" / "kernel.json"
+                  for p in data_paths
+                  if (p / "kernels" / "python3" / "kernel.json").is_file()
+              ),
               None,
           )
           dest_parent = None
@@ -46,7 +56,7 @@ jobs:
               shutil.copy(src, dest / "kernel.json")
           else:
               (dest / "kernel.json").write_text(json.dumps({
-                  "argv": ["python3", "-m", "ipykernel_launcher", "-f", "{connection_file}"],
+                  "argv": [py, "-m", "ipykernel_launcher", "-f", "{connection_file}"],
                   "display_name": "Mixtape CausalPy",
                   "language": "python",
               }))
