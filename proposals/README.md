@@ -7,7 +7,7 @@ This directory contains feature proposals for CausalPy, identified during the Mi
 | Proposal | CausalPy Feature | Mixtape Chapter | Status |
 |----------|------------------|-----------------|--------|
 | [Matching Methods](proposal_matching.md) | `cp.Matching` | Ch 5 | 📝 Proposed |
-| [Panel Fixed Effects](proposal_panel_fe.md) | `cp.PanelRegression` | Ch 8 | 📝 Proposed |
+| [Panel Fixed Effects](proposal_panel_fe.md) | `cp.PanelRegression` | Ch 8 | Superseded — shipped |
 | [Triple Differences](proposal_triple_diff.md) | `cp.TripleDifferences` | Ch 9 | 📝 Proposed |
 
 ## Already In Progress

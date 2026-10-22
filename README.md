@@ -49,7 +49,7 @@ uv run python -c "import causalpy, pymc; print('causalpy', causalpy.__version__)
 | Ch 5: Matching & Subclassification | [`05_matching.qmd`](notebooks/05_matching.qmd) | ✅ Done |
 | Ch 6: Regression Discontinuity | [`06_regression_discontinuity.qmd`](notebooks/06_regression_discontinuity.qmd) | ✅ Done |
 | Ch 7: Instrumental Variables | [`07_instrumental_variables.qmd`](notebooks/07_instrumental_variables.qmd) | ✅ Done |
-| Ch 8: Panel Data | `08_panel_data.qmd` | ⏭️ TODO |
+| Ch 8: Panel Data | [`08_panel_data.qmd`](notebooks/08_panel_data.qmd) | ✅ Done |
 | Ch 9: Difference-in-Differences | [`09_difference_in_differences.qmd`](notebooks/09_difference_in_differences.qmd) | ✅ Done |
 | Ch 10: Synthetic Control | [`10_synthetic_control.qmd`](notebooks/10_synthetic_control.qmd) | ✅ Done |
 
@@ -64,9 +64,10 @@ CausalPy provides direct support for:
 - ✅ Instrumental Variables (`InstrumentalVariable`)
 - ✅ Difference-in-Differences (`DifferenceInDifferences`)
 - ✅ Synthetic Control (`SyntheticControl`)
+- ✅ Panel fixed effects (`PanelRegression`)
 - ⚠️ Inverse Propensity Weighting (`InversePropensityWeighting`) — partial matching support
 
-For methods not yet in CausalPy (NN matching, panel FE, etc.), we include TODO placeholders linking to CausalPy issues. When CausalPy adds support, we can make targeted PRs to fill in those sections.
+For methods not yet in CausalPy (NN matching, and so on), we include TODO placeholders linking to CausalPy issues. When CausalPy adds support, we can make targeted PRs to fill in those sections.
 
 ## Project Planning
 

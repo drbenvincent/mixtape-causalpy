@@ -25,6 +25,7 @@ Work practices for AI assistants (and humans) contributing to this repo.
 - [ ] If you changed computational source, render that chapter locally and commit the updated `_freeze/`
 - [ ] Do not re-execute MCMC in CI. Project `quarto render` must succeed from the committed freeze
 - [ ] Commit with a descriptive message referencing the Mixtape file(s) covered
+- [ ] The live site updates only after this lands on `main`. See below.
 
 ## Chapter conventions
 
@@ -32,7 +33,18 @@ Work practices for AI assistants (and humans) contributing to this repo.
 - Use short references in tables: `06_rd`, `07_iv`, `09_did`, `10_sc`
 - Include a link to the corresponding first-edition chapter at the top (`https://mixtape-1ed.netlify.app/`). Future chapters paraphrase and link to `mixtape-1ed.netlify.app`; never paste book paragraphs or book graphics; credit adapted data-generating processes via `NOTICE`.
 - Note any differences from the book's results (Bayesian vs OLS, etc.)
-- The reader surface is the Quarto website (`quarto preview` / GitHub Pages), not JupyterLab
+- The reader surface is the GitHub Pages site, not JupyterLab. `quarto preview` is local only
+
+## Live site
+
+Reader URL: https://drbenvincent.github.io/mixtape-causalpy/. Merging to `main` is what updates it. An open PR does not.
+
+`Quarto Publish` (`.github/workflows/publish.yml`) runs on that push, and from Actions → Run workflow. It renders the committed `_freeze/` and deploys `gh-pages`. It does not re-sample.
+
+- Do not push `gh-pages`, and do not run `quarto publish` locally.
+- If computations changed, the merge must include the updated `_freeze/`.
+
+Steps: `CONTRIBUTING.md`.
 
 ## Status Symbols
 

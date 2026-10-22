@@ -12,8 +12,8 @@ This document outlines the structure and implementation plan for translating the
 
 **We implement what CausalPy supports, and skip the rest.**
 
-- ✅ **Implement**: Examples where CausalPy has direct experiment APIs (RD, IV, DiD, SC, IPSW)
-- ⏭️ **Skip with TODO**: Examples requiring methods CausalPy doesn't yet support (matching, panel FE, etc.)
+- ✅ **Implement**: Examples where CausalPy has direct experiment APIs (RD, IV, DiD, SC, IPSW, panel FE)
+- ⏭️ **Skip with TODO**: Examples requiring methods CausalPy doesn't yet support (matching, and so on)
 - 📝 **Placeholder strategy**: Skipped sections include a `TODO` stub linking to relevant CausalPy issues/PRs, so we can return later when functionality lands
 
 This keeps the repo focused and avoids maintaining parallel "baseline" implementations that would drift from CausalPy's direction. When CausalPy gains new capabilities, we can make targeted PRs to fill in the placeholders.
@@ -28,8 +28,8 @@ This keeps the repo focused and avoids maintaining parallel "baseline" implement
 |----------|-------|---------|---------|---------|
 | `05_matching` | 10 | 5 | 5 | 0 |
 | `06_rd` | 14 | 8 | 6 | 0 |
-| `07_iv` | 1 | 1 | 0 | 0 |
-| `08_panel` | 6 | 0 | 6 | 0 |
+| `07_iv` | 2 | 1 | 0 | 1 |
+| `08_panel` | 1 | 1 | 0 | 0 |
 | `09_did` | 9 | 3 | 6 | 0 |
 | `10_sc` | 3 | 3 | 0 | 0 |
 | `00_data` | 11 | 0 | 11 | 0 |
@@ -78,7 +78,7 @@ mixtape-causalpy/
 │   ├── 05_matching.qmd
 │   ├── 06_regression_discontinuity.qmd
 │   ├── 07_instrumental_variables.qmd
-│   ├── 08_panel_data.qmd              # Not started
+│   ├── 08_panel_data.qmd
 │   ├── 09_difference_in_differences.qmd
 │   └── 10_synthetic_control.qmd
 │
@@ -202,11 +202,13 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
 | `card.py` | Card (1995) returns to schooling | `07_iv` | ✅ Native | ✅ |
+| `bail.py` | Stevenson judge-leniency design (OLS, 2SLS, JIVE). Not a panel-FE exercise and not this notebook. JIVE is not a CausalPy estimator. Not implemented. | `07_iv` | ⚠️ Partial | ⬜ |
 
 **Page**: `notebooks/07_instrumental_variables.qmd`
 - Card's proximity to college as instrument for education
 - Use CausalPy's `InstrumentalVariable` experiment
 - Show first-stage diagnostics, compare OLS vs 2SLS
+- `bail.py` is Chapter 7, not Chapter 8. Not implemented on this page.
 - Reference: fuzzy RD (issue #221) for connection to RD chapter
 
 ---
@@ -215,18 +217,15 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `sasp.py` | Sex worker panel data - FE estimation | `08_panel` | ⏭️ Skip | ⏭️ |
-| `bail.py` | Bail judge FE | `08_panel` | ⏭️ Skip | ⏭️ |
-| `cluster1.py` | Clustering standard errors | `08_panel` | ⏭️ Skip | ⏭️ |
-| `cluster2.py` | Clustering variations | `08_panel` | ⏭️ Skip | ⏭️ |
-| `cluster3.py` | Clustering variations | `08_panel` | ⏭️ Skip | ⏭️ |
-| `cluster4.py` | Clustering variations | `08_panel` | ⏭️ Skip | ⏭️ |
+| `sasp.py` | Sex worker panel data - FE estimation | `08_panel` | ✅ Native | ✅ |
 
-**Page**: `notebooks/08_panel_data.qmd` — **SKIP (placeholder only, not created yet)**
-- ⏭️ CausalPy does not have a dedicated panel FE experiment
-- Create a placeholder `.qmd` with the TODO template when that work starts
-- Reference: CausalPy panel workhorse proposal in issue tracker
-- Transition note: the DiD page covers the TWFE-adjacent use case
+**Page**: [`notebooks/08_panel_data.qmd`](notebooks/08_panel_data.qmd) — pooled OLS, provider fixed effects, and the within estimator via `cp.PanelRegression`.
+
+Not this page, and not waiting on panel FE:
+
+| Mixtape file | Why it is not Chapter 8 | Status |
+|--------------|-------------------------|--------|
+| `cluster1.py`–`cluster4.py` | Monte Carlo of cluster-robust versus iid standard errors. Not in the remix chapter, and not a CausalPy method. Not implemented. | ⬜ |
 
 ---
 
@@ -291,7 +290,7 @@ These features have been proposed but don't have open PRs yet. See `proposals/` 
 | Feature | Proposal | Page to update |
 |---------|----------|----------------|
 | Matching (NN, CEM) | [`proposal_matching.md`](proposals/proposal_matching.md) | `notebooks/05_matching.qmd` |
-| Panel Fixed Effects | [`proposal_panel_fe.md`](proposals/proposal_panel_fe.md) | `notebooks/08_panel_data.qmd` |
+| Panel Fixed Effects | [`proposal_panel_fe.md`](proposals/proposal_panel_fe.md) — superseded; shipped as `cp.PanelRegression` | `notebooks/08_panel_data.qmd` |
 | Triple Differences | [`proposal_triple_diff.md`](proposals/proposal_triple_diff.md) | `notebooks/09_difference_in_differences.qmd` |
 
 ---

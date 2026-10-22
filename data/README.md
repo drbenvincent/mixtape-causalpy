@@ -32,6 +32,7 @@ To clear the cache, simply delete this directory.
 | NSW | `nsw_mixtape.dta` | Ch 5: Matching | National Supported Work experimental data |
 | Abortion | `abortion.dta` | Ch 9: DiD | Abortion legalization effects |
 | CPS | `cps_mixtape.dta` | Ch 5: Matching | CPS control group for matching |
+| SASP | `sasp_panel.dta` | Ch 8: Panel | Cunningham & Kendall sex-worker survey; panel of recent client sessions. Provenance: Mixtape repo (`scunning1975/mixtape`). |
 
 ## Original sources
 
@@ -51,6 +52,7 @@ Files are not committed to this repository. They are fetched at runtime from Sco
 | `castle.dta` | Cheng and Hoekstra (2013), *JHR* 48(3): 821–854. FBI UCR plus law dates. |
 | `abortion.dta` | Donohue and Levitt (2001). Cite the paper. |
 | `texas.dta` | Texas prison synthetic control. Cite the Mixtape code repository and the series source used there (`python/synth_1.py`, `Do/synth_1.do`: black male prisoners (per capita), `bmprison`). Do not invent a public-domain claim. |
+| `sasp_panel.dta` | Cunningham and Kendall, Survey of Adult Service Providers. Panel of recent client sessions. Fetched from the Mixtape code repository. Not relicensed here. |
 
 ## Alternative: causaldata package
 

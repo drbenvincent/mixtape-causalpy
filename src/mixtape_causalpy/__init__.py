@@ -16,6 +16,7 @@ from .data import (
     load_nsw,
     load_abortion,
     load_cps,
+    load_sasp,
 )
 
 __all__ = [
@@ -27,5 +28,6 @@ __all__ = [
     "load_nsw",
     "load_abortion",
     "load_cps",
+    "load_sasp",
 ]
 
