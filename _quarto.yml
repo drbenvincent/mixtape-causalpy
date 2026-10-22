@@ -29,6 +29,7 @@ website:
           - notebooks/05_matching.qmd
           - notebooks/06_regression_discontinuity.qmd
           - notebooks/07_instrumental_variables.qmd
+          - notebooks/08_panel_data.qmd
           - notebooks/09_difference_in_differences.qmd
           - notebooks/10_synthetic_control.qmd
 

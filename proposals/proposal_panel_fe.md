@@ -1,5 +1,7 @@
 # Feature Proposal: Panel Fixed Effects
 
+> **Superseded:** shipped as `cp.PanelRegression` (`fe_method="demeaned"`, not `"within"`). See [issue #3](https://github.com/drbenvincent/mixtape-causalpy/issues/3). Do not refile this against CausalPy.
+
 ## Summary
 
 Add a `PanelRegression` experiment wrapper that enables panel-aware visualization and diagnostics, with support for both dummy variable and within-transformation approaches to fixed effects.
