@@ -5,7 +5,7 @@ jupyter: mixtape-causalpy
 
 ## Causal Inference: The Mixtape → CausalPy
 
-**Mixtape chapter**: [Matching and Subclassification](https://mixtape.scunning.com/05-matching_and_subclassification)
+**Mixtape chapter**: [Matching and Subclassification](https://mixtape-1ed.netlify.app/05-matching_and_subclassification)
 
 **CausalPy method**: `InversePropensityWeighting`
 

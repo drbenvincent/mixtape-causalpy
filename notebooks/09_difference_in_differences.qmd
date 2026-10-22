@@ -5,7 +5,7 @@ jupyter: mixtape-causalpy
 
 ## Causal Inference: The Mixtape → CausalPy
 
-**Mixtape chapter**: [Difference-in-Differences](https://mixtape.scunning.com/09-difference_in_differences)
+**Mixtape chapter**: [Difference-in-Differences](https://mixtape-1ed.netlify.app/09-difference_in_differences.html)
 
 **CausalPy method**: `DifferenceInDifferences`
 
@@ -465,7 +465,7 @@ In this notebook, we demonstrated CausalPy's `DifferenceInDifferences` experimen
 ::: {.callout-note}
 ## Further reading
 
-- First edition: [Chapter 9: Difference-in-Differences](https://mixtape-1ed.netlify.app/09-difference_in_differences)
+- First edition: [Chapter 9: Difference-in-Differences](https://mixtape-1ed.netlify.app/09-difference_in_differences.html)
 - CausalPy: [Difference-in-differences](https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html)
 - [CausalPy PR #621](https://github.com/pymc-labs/CausalPy/pull/621) tracks staggered DiD support. This page does not estimate a staggered design.
 :::

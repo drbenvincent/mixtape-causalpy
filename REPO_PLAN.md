@@ -1,9 +1,11 @@
 # Mixtape → CausalPy Translation Repo Plan
 
-This document outlines the structure and implementation plan for translating the code examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape.scunning.com) into a CausalPy Quarto website. Chapters are independent `.qmd` pages, not a numbered book and not Jupyter notebooks.
+**Edition: first edition only (2021).** This plan does not cover *Causal Inference: The Remix*. See [issue #4](https://github.com/drbenvincent/mixtape-causalpy/issues/4). `https://mixtape.scunning.com` is now the Remix and is not ground truth here.
 
-> **Primary source**: https://mixtape.scunning.com — use this to verify chapter content and ground truth
-> 
+This document outlines the structure and implementation plan for translating the code examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) into a CausalPy Quarto website. Chapters are independent `.qmd` pages, not a numbered book and not Jupyter notebooks.
+
+> **Primary source**: https://mixtape-1ed.netlify.app/ — first edition. Use this to verify chapter content and ground truth.
+>
 > **Code & data repo**: https://github.com/scunning1975/mixtape (cloned locally at `/Users/benjamv/git/mixtape`)
 
 ## Scope: CausalPy-First Approach
@@ -296,17 +298,9 @@ These features have been proposed but don't have open PRs yet. See `proposals/` 
 
 ## Data Strategy
 
-### Primary sources (in order of preference)
+Datasets are fetched at runtime from the Mixtape code repository (`https://github.com/scunning1975/mixtape/raw/master/`) and cached in `~/.cache/mixtape-causalpy/`. They are not committed and not relicensed here. Cunningham's MIT grant does not license third-party data. See `data/README.md` and `NOTICE`.
 
-1. **`causaldata` package**: Many Mixtape datasets are available via `pip install causaldata`
-   - Preferred for: NSW, Castle, Card, others
-   - Advantages: Clean, documented, permissively licensed
-
-2. **Mixtape GitHub repo**: Direct download from `https://github.com/scunning1975/mixtape/raw/master/`
-   - Fallback for datasets not in `causaldata`
-   - Use URL-based loading (no vendoring of .dta files)
-
-3. **Local caching**: Download once, cache in `~/.cache/mixtape-causalpy/`
+`causaldata` is not the preferred source. The loader does not call it. Per-dataset `COPYRIGHT` strings in that project are attributions, not a grant. Do not describe the files as permissively licensed.
 
 See `src/mixtape_causalpy/data.py` for the implemented data loading utilities.
 
@@ -458,8 +452,9 @@ uv run python -c "import causalpy, pymc; print('causalpy', causalpy.__version__)
 
 ## References
 
-- **Mixtape book**: https://mixtape.scunning.com
-- **Mixtape repo**: https://github.com/scunning1975/mixtape
+- **Mixtape book (1st ed.)**: https://mixtape-1ed.netlify.app/
+- **Remix (2nd ed., not this plan)**: https://mixtape.scunning.com/
+- **Mixtape code and data repo**: https://github.com/scunning1975/mixtape
 - **CausalPy docs**: https://causalpy.readthedocs.io
 - **CausalPy GitHub**: https://github.com/pymc-labs/CausalPy
 - **causaldata package**: https://github.com/NickCH-K/causaldata

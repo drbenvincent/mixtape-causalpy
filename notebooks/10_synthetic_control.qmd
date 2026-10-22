@@ -5,7 +5,7 @@ jupyter: mixtape-causalpy
 
 ## Causal Inference: The Mixtape → CausalPy
 
-**Mixtape chapter**: [Synthetic Control](https://mixtape.scunning.com/10-synthetic_control)
+**Mixtape chapter**: [Synthetic Control](https://mixtape-1ed.netlify.app/10-synthetic_control.html)
 
 **CausalPy method**: `SyntheticControl`
 
@@ -540,7 +540,7 @@ Texas's post-1993 incarceration rate is higher than the synthetic control, and t
 ::: {.callout-note}
 ## Further reading
 
-- First edition: [Chapter 10: Synthetic Control](https://mixtape-1ed.netlify.app/10-synthetic_control)
+- First edition: [Chapter 10: Synthetic Control](https://mixtape-1ed.netlify.app/10-synthetic_control.html)
 - CausalPy: [Synthetic control](https://causalpy.readthedocs.io/en/latest/notebooks/synthetic-control-pymc.html)
 :::
 
