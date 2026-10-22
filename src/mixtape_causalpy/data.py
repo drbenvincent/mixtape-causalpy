@@ -114,3 +114,14 @@ def load_cps() -> pd.DataFrame:
     Used in Chapter 5: Matching and Subclassification.
     """
     return load_mixtape_data("cps_mixtape.dta")
+
+
+def load_sasp() -> pd.DataFrame:
+    """
+    Survey of Adult Service Providers panel (Cunningham & Kendall).
+
+    Used in Chapter 8: Panel Data. Raw `sasp_panel.dta` from the Mixtape
+    repo; the chapter page does the listwise deletion, balancing, and
+    `provider_second` recode.
+    """
+    return load_mixtape_data("sasp_panel.dta")

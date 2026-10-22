@@ -20,7 +20,7 @@ Outputs are frozen in `_freeze/`. A project render republishes the saved plots a
 | 5. Matching and subclassification | [Matching](notebooks/05_matching.qmd) | Inverse propensity weighting; other matching methods are TODO |
 | 6. Regression discontinuity | [Regression discontinuity](notebooks/06_regression_discontinuity.qmd) | `RegressionDiscontinuity` |
 | 7. Instrumental variables | [Instrumental variables](notebooks/07_instrumental_variables.qmd) | `InstrumentalVariable` |
-| 8. Panel data | Not started | No panel fixed-effects experiment yet |
+| 8. Panel data | [Panel data](notebooks/08_panel_data.qmd) | `PanelRegression` |
 | 9. Difference-in-differences | [Difference-in-differences](notebooks/09_difference_in_differences.qmd) | `DifferenceInDifferences` |
 | 10. Synthetic control | [Synthetic control](notebooks/10_synthetic_control.qmd) | `SyntheticControl` |
 

@@ -32,6 +32,7 @@ To clear the cache, simply delete this directory.
 | NSW | `nsw_mixtape.dta` | Ch 5: Matching | National Supported Work experimental data |
 | Abortion | `abortion.dta` | Ch 9: DiD | Abortion legalization effects |
 | CPS | `cps_mixtape.dta` | Ch 5: Matching | CPS control group for matching |
+| SASP | `sasp_panel.dta` | Ch 8: Panel | Cunningham & Kendall sex-worker survey; panel of recent client sessions. Provenance: Mixtape repo (`scunning1975/mixtape`). |
 
 ## Original Sources
 
