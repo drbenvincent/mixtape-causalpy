@@ -460,7 +460,7 @@
     "href": "index.html",
     "title": "The Mixtape in CausalPy",
     "section": "",
-    "text": "This site re-implements the applied examples from Scott Cunningham’s Causal Inference: The Mixtape with CausalPy. It is a translation of the analyses, not a copy of the book. Follow the chapter links for identification strategy and narrative.\nEstimates are Bayesian (PyMC) unless a section says otherwise. Numbers will not match the book’s OLS tables exactly. Each chapter records where they differ and why.\nOutputs are frozen in _freeze/. A project render republishes the saved plots and does not re-sample. Re-running a chapter is a local edit, not a CI step."
+    "text": "This site re-implements the applied examples from Scott Cunningham’s Causal Inference: The Mixtape with CausalPy. It is a translation of the analyses, not a copy of the book. Follow the chapter links for identification strategy and narrative.\nA translation by Benjamin T. Vincent.\nEstimates are Bayesian (PyMC) unless a section says otherwise. Numbers will not match the book’s OLS tables exactly. Each chapter records where they differ and why.\nOutputs are frozen in _freeze/. A project render republishes the saved plots and does not re-sample. Re-running a chapter is a local edit, not a CI step."
   },
   {
     "objectID": "index.html#chapters",
