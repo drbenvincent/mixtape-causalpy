@@ -370,7 +370,7 @@ Important
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="fe75571f" class="cell" data-execution_count="1">
+<div id="1d5e314c" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -391,7 +391,7 @@ Important
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The outcome is <code>lnw</code>. The regressors are the full Table 8.3 list, not a shortened covariate set. Provider characteristics before <code>age_cl</code> do not vary across a provider’s sessions. Client and session characteristics from <code>age_cl</code> onward do.</p>
-<div id="3bfdf906" class="cell" data-execution_count="2">
+<div id="dac91f71" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>TIME_INVARIANT <span class="op">=</span> [</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"age"</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"asq"</span>,</span>
@@ -451,7 +451,7 @@ Important
 <section id="load-and-clean" class="level2">
 <h2 class="anchored" data-anchor-id="load-and-clean">Load and clean</h2>
 <p><code>provider_second</code> is not numeric in the Stata file. <code>pd.read_stata</code> brings it in as a labelled category (<code>"1. No"</code>, <code>"2. Yes"</code>). Check that before fitting. The other regressors are numeric.</p>
-<div id="dc835e34" class="cell" data-execution_count="3">
+<div id="bdd31bc5" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>raw <span class="op">=</span> load_sasp()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Raw shape: </span><span class="sc">{</span>raw<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Non-numeric columns:"</span>)</span>
@@ -476,7 +476,7 @@ Name: count, dtype: int64</code></pre>
 <li>Recode <code>provider_second</code> to 1/0, matching <code>sasp.py</code> (<code>"2. Yes"</code> → 1).</li>
 </ol>
 <p>The cleaned frame has to be 1,028 rows. A different sample is not comparable to Table 8.3.</p>
-<div id="01a2ab45" class="cell" data-execution_count="4">
+<div id="33f9e567" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>missing <span class="op">=</span> [column <span class="cf">for</span> column <span class="kw">in</span> [<span class="st">"id"</span>, <span class="st">"session"</span>, <span class="op">*</span>FORMULA_VARS] <span class="cf">if</span> column <span class="kw">not</span> <span class="kw">in</span> raw.columns]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> missing:</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="ss">f"sasp_panel.dta is missing </span><span class="sc">{</span>missing<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -515,7 +515,7 @@ Name: provider_second, dtype: int64</code></pre>
 <section id="what-fixed-effects-can-see" class="level2">
 <h2 class="anchored" data-anchor-id="what-fixed-effects-can-see">What fixed effects can see</h2>
 <p>Subtract the provider mean and the time-invariant columns are identically zero. That is the within transformation, not a coefficient the dummy regression should be asked to invent.</p>
-<div id="3a4f5082" class="cell" data-execution_count="5">
+<div id="e7c6a88f" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>within_sd <span class="op">=</span> sasp.groupby(<span class="st">"id"</span>)[REGRESSORS].std().<span class="bu">max</span>().rename(<span class="st">"max within-unit SD"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(within_sd.loc[TIME_INVARIANT].to_frame())</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(within_sd.loc[TIME_VARYING].to_frame())</span>
@@ -558,7 +558,7 @@ massage_cl                 0.577350</code></pre>
 <p>Same sklearn backend for all three columns, so a difference is the estimator, not the optimizer. <code>PanelRegression</code> requires <code>unit_fe_variable</code>, so pooled OLS cannot be that class. It is <code>LinearRegression</code> on the formula design matrix, with <code>fit_intercept=False</code> because patsy already built the intercept column. CausalPy does the same internally.</p>
 <p><code>time_fe_variable</code> stays unset. On the demeaned path that argument is not a label: setting it also demeans by that column, which would be two-way FE. The book is one-way provider FE. Session is the within-unit index, not a second fixed effect.</p>
 <p>The demeaned formula keeps only the time-varying regressors. After demeaning, the provider characteristics are zero columns and the design is singular. Leaving them out is the result, not a shorter model.</p>
-<div id="40a6ee45" class="cell" data-execution_count="6">
+<div id="c96e72ea" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pooled_formula <span class="op">=</span> <span class="st">"lnw ~ "</span> <span class="op">+</span> <span class="st">" + "</span>.join(REGRESSORS)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dummy_formula <span class="op">=</span> <span class="st">"lnw ~ C(id) + "</span> <span class="op">+</span> <span class="st">" + "</span>.join(REGRESSORS)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>demeaned_formula <span class="op">=</span> <span class="st">"lnw ~ "</span> <span class="op">+</span> <span class="st">" + "</span>.join(TIME_VARYING)</span>
@@ -721,7 +721,7 @@ massage_cl                 0.577350</code></pre>
 </div>
 </div>
 <p>Dummy FE and demeaned FE match each other, not merely the printed table. The design for the dummy fit is rank-deficient by the twelve time-invariant covariates: those columns lie in the span of the provider dummies. Sklearn’s least squares does not drop them, and the min-norm numbers on age, BMI, race, schooling, and marital status are not identified. They are not the book’s <code>0.000</code>. The within transformation is the result that matches the book: those columns have within-unit SD 0, so the demeaned formula omits them. Do not “solve” that by adding session FE or by dropping a different set of regressors than the book does.</p>
-<div id="3a390367" class="cell" data-execution_count="7">
+<div id="7e164b61" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>X_dummy <span class="op">=</span> np.asarray(fe.design[<span class="st">"X"</span>])</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>dummy_rank <span class="op">=</span> np.linalg.matrix_rank(X_dummy)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dummy design: </span><span class="sc">{</span>X_dummy<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columns, rank </span><span class="sc">{</span>dummy_rank<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -758,40 +758,35 @@ Figure&nbsp;1: Provider intercepts from the OLS dummy-variable fit. The demeaned
 <section id="bayesian-within-estimator" class="level2">
 <h2 class="anchored" data-anchor-id="bayesian-within-estimator">Bayesian within estimator</h2>
 <p>This is the CausalPy result. <code>fe_method="demeaned"</code>, time-varying formula only, <code>time_fe_variable</code> left unset, then <code>.fit()</code>. The dummy specification is not sampled — about 257 provider effects. The prior is the model’s default. It is not tuned to the published numbers.</p>
-<div id="b9b3891c" class="cell" data-execution_count="9">
+<div id="a34d93f7" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tune"</span>: <span class="dv">1000</span>,</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"draws"</span>: <span class="dv">1000</span>,</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"chains"</span>: <span class="dv">2</span>,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cores"</span>: <span class="dv">1</span>,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressbar"</span>: <span class="va">False</span>,</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>bayes <span class="op">=</span> cp.PanelRegression(</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    sasp,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    demeaned_formula,</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    unit_fe_variable<span class="op">=</span><span class="st">"id"</span>,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    time_fe_variable<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    fe_method<span class="op">=</span><span class="st">"demeaned"</span>,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>).fit()</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> bayes.time_fe_variable <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">or</span> bayes.fe_method <span class="op">!=</span> <span class="st">"demeaned"</span>:</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">"Bayesian fit must be one-way demeaned provider FE"</span>)</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>bayes_means <span class="op">=</span> coefficient_means(bayes)</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">abs</span>(bayes_means[<span class="st">"unsafe"</span>] <span class="op">-</span> within_slopes[<span class="st">"unsafe"</span>]) <span class="op">&gt;</span> <span class="fl">0.01</span>:</span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">"Bayesian unsafe mean is not sitting on the OLS within estimate"</span>)</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>bayes.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressbar"</span>: <span class="va">False</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>bayes <span class="op">=</span> cp.PanelRegression(</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    sasp,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    demeaned_formula,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    unit_fe_variable<span class="op">=</span><span class="st">"id"</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    time_fe_variable<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    fe_method<span class="op">=</span><span class="st">"demeaned"</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> bayes.time_fe_variable <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">or</span> bayes.fe_method <span class="op">!=</span> <span class="st">"demeaned"</span>:</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">"Bayesian fit must be one-way demeaned provider FE"</span>)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>bayes_means <span class="op">=</span> coefficient_means(bayes)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">abs</span>(bayes_means[<span class="st">"unsafe"</span>] <span class="op">-</span> within_slopes[<span class="st">"unsafe"</span>]) <span class="op">&gt;</span> <span class="fl">0.01</span>:</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">"Bayesian unsafe mean is not sitting on the OLS within estimate"</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>bayes.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 20 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
+<pre><code>NUTS[nutpie]: [beta, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]</code></pre>
 </div>
@@ -806,23 +801,23 @@ Observations: 1028
 
 Model Coefficients:
 Model coefficients:
-  Intercept        -0.00015, 94% HDI [-0.012, 0.011]
-  age_cl           0.0023, 94% HDI [-0.0074, 0.011]
-  unsafe           0.05, 94% HDI [-0.0085, 0.11]
+  Intercept        0.00016, 94% HDI [-0.012, 0.011]
+  age_cl           0.0029, 94% HDI [-0.0059, 0.012]
+  unsafe           0.051, 94% HDI [-0.0099, 0.11]
   llength          -0.43, 94% HDI [-0.46, -0.41]
-  reg              -0.038, 94% HDI [-0.07, -0.0031]
-  asq_cl           -1.5e-05, 94% HDI [-0.00011, 8.4e-05]
-  appearance_cl    0.0056, 94% HDI [-0.0026, 0.015]
-  provider_second  0.11, 94% HDI [0.037, 0.19]
-  asian_cl         -0.011, 94% HDI [-0.067, 0.056]
-  black_cl         0.027, 94% HDI [-0.036, 0.092]
-  hispanic_cl      -0.062, 94% HDI [-0.14, 0.018]
-  othrace_cl       0.14, 94% HDI [0.047, 0.23]
-  hot              0.052, 94% HDI [0.0096, 0.089]
-  massage_cl       -0.0014, 94% HDI [-0.044, 0.039]</code></pre>
+  reg              -0.038, 94% HDI [-0.072, -0.0013]
+  asq_cl           -2.1e-05, 94% HDI [-0.00011, 7.6e-05]
+  appearance_cl    0.0056, 94% HDI [-0.0029, 0.013]
+  provider_second  0.11, 94% HDI [0.039, 0.18]
+  asian_cl         -0.011, 94% HDI [-0.073, 0.052]
+  black_cl         0.026, 94% HDI [-0.041, 0.09]
+  hispanic_cl      -0.063, 94% HDI [-0.14, 0.012]
+  othrace_cl       0.14, 94% HDI [0.057, 0.23]
+  hot              0.052, 94% HDI [0.013, 0.093]
+  massage_cl       -0.00059, 94% HDI [-0.04, 0.043]</code></pre>
 </div>
 </div>
-<div id="cbd6f5e6" class="cell" data-execution_count="10">
+<div id="fd89046a" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bayes_comparison <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"OLS within"</span>: pd.Series({term: within_slopes[term] <span class="cf">for</span> term <span class="kw">in</span> BOOK}),</span>
@@ -850,14 +845,14 @@ Model coefficients:
 <tr class="odd">
 <th data-quarto-table-cell-role="th">unsafe</th>
 <td>0.051</td>
-<td>0.050</td>
-<td>-0.001</td>
+<td>0.051</td>
+<td>0.000</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">llength</th>
 <td>-0.435</td>
-<td>-0.434</td>
-<td>0.000</td>
+<td>-0.435</td>
+<td>-0.000</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">reg</th>
@@ -875,13 +870,13 @@ Model coefficients:
 <th data-quarto-table-cell-role="th">provider_second</th>
 <td>0.113</td>
 <td>0.113</td>
-<td>-0.000</td>
+<td>-0.001</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">othrace_cl</th>
 <td>0.142</td>
-<td>0.142</td>
-<td>-0.000</td>
+<td>0.141</td>
+<td>-0.001</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">hot</th>
@@ -893,7 +888,7 @@ Model coefficients:
 <th data-quarto-table-cell-role="th">massage_cl</th>
 <td>-0.001</td>
 <td>-0.001</td>
-<td>-0.000</td>
+<td>0.000</td>
 </tr>
 </tbody>
 </table>

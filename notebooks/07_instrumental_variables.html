@@ -370,7 +370,7 @@ div.csl-indent {
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="f958ab2d" class="cell" data-execution_count="1">
+<div id="70e77b80" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -406,7 +406,7 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="the-endogeneity-problem">The Endogeneity Problem</h3>
 <p>Estimating returns to schooling via OLS is problematic because education is <strong>endogenous</strong> — it’s correlated with unobserved ability, motivation, and family background. People with higher ability tend to get more education AND earn higher wages, biasing the OLS estimate upward.</p>
 <p>Card’s insight: proximity to a college affects education (reduces cost of attending) but shouldn’t directly affect wages conditional on education.</p>
-<div id="2acee28d" class="cell" data-execution_count="2">
+<div id="0d3c96ee" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_card()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset shape: </span><span class="sc">{</span>df<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -573,7 +573,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<div id="009a1e99" class="cell" data-execution_count="3">
+<div id="826a936f" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Key variables for IV</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>key_vars <span class="op">=</span> [<span class="st">"lwage"</span>, <span class="st">"educ"</span>, <span class="st">"nearc4"</span>, <span class="st">"exper"</span>, <span class="st">"black"</span>, <span class="st">"south"</span>, <span class="st">"married"</span>, <span class="st">"smsa"</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Key variables:"</span>)</span>
@@ -601,7 +601,7 @@ min       0.000000     1.000000     0.000000
 max       1.000000     6.000000     1.000000  </code></pre>
 </div>
 </div>
-<div id="66813d57" class="cell" data-execution_count="4">
+<div id="c8832ea8" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the instrument: does nearc4 predict education?</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Education by proximity to college:"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.groupby(<span class="st">"nearc4"</span>)[<span class="st">"educ"</span>].agg([<span class="st">"mean"</span>, <span class="st">"std"</span>, <span class="st">"count"</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -619,7 +619,7 @@ nearc4
 <section id="visualize-the-first-stage" class="level2">
 <h2 class="anchored" data-anchor-id="visualize-the-first-stage">Visualize the First Stage</h2>
 <p>A key assumption for IV is <strong>relevance</strong>: the instrument must be correlated with the endogenous variable. Let’s visualize this relationship.</p>
-<div id="9cf03947" class="cell" data-execution_count="5">
+<div id="a56ddc3e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">5</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Education distribution by nearc4</span></span>
@@ -674,7 +674,7 @@ nearc4
 <section id="ols-baseline-biased" class="level2">
 <h2 class="anchored" data-anchor-id="ols-baseline-biased">OLS Baseline (Biased)</h2>
 <p>First, let’s estimate the returns to schooling using OLS. This estimate is likely biased due to ability confounding.</p>
-<div id="bb0b5442" class="cell" data-execution_count="6">
+<div id="ee2f2c72" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># OLS regression (as in card.py)</span></span>
@@ -703,7 +703,7 @@ Interpretation: Each additional year of education is associated with a 7.1% incr
 <p>Now we use CausalPy’s <code>InstrumentalVariable</code> experiment to estimate the causal effect of education on wages, using <code>nearc4</code> as an instrument.</p>
 <p>CausalPy implements IV as a Bayesian model that jointly estimates: 1. <strong>First stage</strong>: <code>educ ~ nearc4</code> (instrument → treatment) 2. <strong>Second stage</strong>: <code>lwage ~ educ</code> (treatment → outcome)</p>
 <p>This is modeled as a multivariate normal to capture the correlation between the treatment and outcome.</p>
-<div id="3f1beb89" class="cell" data-execution_count="7">
+<div id="b9536eb3" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for CausalPy</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy requires separate dataframes for instruments and outcome</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -729,48 +729,40 @@ Instruments data shape: (3010, 2)
 Outcome data shape: (3010, 2)</code></pre>
 </div>
 </div>
-<div id="f1fee263" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the Bayesian IV model</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: cores=1 required for Jupyter notebooks on macOS</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tune"</span>: <span class="dv">1000</span>,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"draws"</span>: <span class="dv">1000</span>,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"chains"</span>: <span class="dv">2</span>,</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cores"</span>: <span class="dv">1</span>,  <span class="co"># Single core avoids multiprocessing issues on macOS</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>iv_result <span class="op">=</span> InstrumentalVariable(</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    instruments_data<span class="op">=</span>instruments_data,</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    instruments_formula<span class="op">=</span>instruments_formula,</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span>formula,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>InstrumentalVariableRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="cd8d167c" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the Bayesian IV model. Seed only. nutpie is the declared sampler.</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tune"</span>: <span class="dv">1000</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"draws"</span>: <span class="dv">1000</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"chains"</span>: <span class="dv">2</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>iv_result <span class="op">=</span> InstrumentalVariable(</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    instruments_data<span class="op">=</span>instruments_data,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    instruments_formula<span class="op">=</span>instruments_formula,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span>formula,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>InstrumentalVariableRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
-NUTS: [beta_t, beta_z, chol_cov]</code></pre>
+<pre><code>NUTS[nutpie]: [beta_t, beta_z, chol_cov]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 48 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics</code></pre>
 </div>
-</div>
-<div id="c6a36328" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the posterior summary</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Bayesian IV Results:"</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> az.summary(</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    iv_result.idata,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    var_names<span class="op">=</span>[<span class="st">"beta_t"</span>, <span class="st">"beta_z"</span>],</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    ci_kind<span class="op">=</span><span class="st">"hdi"</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    ci_prob<span class="op">=</span><span class="fl">0.94</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="756a4990" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the posterior summary</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Bayesian IV Results:"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> az.summary(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    iv_result.idata,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    var_names<span class="op">=</span>[<span class="st">"beta_t"</span>, <span class="st">"beta_z"</span>],</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    ci_kind<span class="op">=</span><span class="st">"hdi"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    ci_prob<span class="op">=</span><span class="fl">0.94</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Bayesian IV Results:</code></pre>
 </div>
@@ -793,87 +785,87 @@ We recommend running at least 4 chains for robust computation of convergence dia
 <tbody>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">beta_t[Intercept]</th>
-<td>12.692</td>
-<td>0.079</td>
+<td>12.69</td>
+<td>0.083</td>
 <td>13</td>
 <td>13</td>
-<td>427</td>
-<td>593</td>
-<td>1.00</td>
-<td>0.0038</td>
+<td>412</td>
+<td>461</td>
+<td>1.01</td>
+<td>0.0041</td>
 <td>0.0028</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">beta_t[nearc4]</th>
-<td>0.842</td>
-<td>0.093</td>
-<td>0.67</td>
+<td>0.84</td>
+<td>0.099</td>
+<td>0.65</td>
 <td>1</td>
-<td>384</td>
-<td>505</td>
-<td>1.00</td>
-<td>0.0047</td>
-<td>0.0031</td>
+<td>322</td>
+<td>444</td>
+<td>1.01</td>
+<td>0.0055</td>
+<td>0.0037</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">beta_z[Intercept]</th>
 <td>3.84</td>
-<td>0.3</td>
+<td>0.33</td>
 <td>3.2</td>
-<td>4.3</td>
-<td>339</td>
-<td>389</td>
-<td>1.00</td>
-<td>0.016</td>
-<td>0.012</td>
+<td>4.4</td>
+<td>136</td>
+<td>172</td>
+<td>1.01</td>
+<td>0.029</td>
+<td>0.017</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">beta_z[educ]</th>
-<td>0.183</td>
-<td>0.023</td>
+<td>0.182</td>
+<td>0.025</td>
 <td>0.14</td>
 <td>0.23</td>
-<td>340</td>
-<td>390</td>
-<td>1.00</td>
-<td>0.0012</td>
-<td>0.00089</td>
+<td>136</td>
+<td>180</td>
+<td>1.01</td>
+<td>0.0022</td>
+<td>0.0013</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="20328dae" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the treatment effect (coefficient on educ in second stage)</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>beta_z <span class="op">=</span> iv_result.idata[<span class="st">"posterior"</span>][<span class="st">"beta_z"</span>]</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the education coefficient (should be second element after intercept)</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>educ_coef <span class="op">=</span> beta_z.sel(covariates<span class="op">=</span><span class="st">"educ"</span>).values.flatten()</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">2SLS (Bayesian) Returns to Schooling:"</span>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Mean: </span><span class="sc">{</span>np<span class="sc">.</span>mean(educ_coef)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Std:  </span><span class="sc">{</span>np<span class="sc">.</span>std(educ_coef)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  94% HDI: [</span><span class="sc">{</span>np<span class="sc">.</span>percentile(educ_coef, <span class="dv">3</span>)<span class="sc">:.4f}</span><span class="ss">, </span><span class="sc">{</span>np<span class="sc">.</span>percentile(educ_coef, <span class="dv">97</span>)<span class="sc">:.4f}</span><span class="ss">]"</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="ch">\n</span><span class="ss">Interpretation: Each additional year of education causes a </span><span class="sc">{</span>np<span class="sc">.</span>mean(educ_coef) <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">% increase in wages."</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6af049f4" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the treatment effect (coefficient on educ in second stage)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>beta_z <span class="op">=</span> iv_result.idata[<span class="st">"posterior"</span>][<span class="st">"beta_z"</span>]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the education coefficient (should be second element after intercept)</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>educ_coef <span class="op">=</span> beta_z.sel(covariates<span class="op">=</span><span class="st">"educ"</span>).values.flatten()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">2SLS (Bayesian) Returns to Schooling:"</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Mean: </span><span class="sc">{</span>np<span class="sc">.</span>mean(educ_coef)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Std:  </span><span class="sc">{</span>np<span class="sc">.</span>std(educ_coef)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  94% HDI: [</span><span class="sc">{</span>np<span class="sc">.</span>percentile(educ_coef, <span class="dv">3</span>)<span class="sc">:.4f}</span><span class="ss">, </span><span class="sc">{</span>np<span class="sc">.</span>percentile(educ_coef, <span class="dv">97</span>)<span class="sc">:.4f}</span><span class="ss">]"</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="ch">\n</span><span class="ss">Interpretation: Each additional year of education causes a </span><span class="sc">{</span>np<span class="sc">.</span>mean(educ_coef) <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">% increase in wages."</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 2SLS (Bayesian) Returns to Schooling:
-  Mean: 0.1826
-  Std:  0.0226
-  94% HDI: [0.1438, 0.2260]
+  Mean: 0.1823
+  Std:  0.0250
+  94% HDI: [0.1402, 0.2315]
 
-Interpretation: Each additional year of education causes a 18.3% increase in wages.</code></pre>
+Interpretation: Each additional year of education causes a 18.2% increase in wages.</code></pre>
 </div>
 </div>
-<div id="4565a50d" class="cell" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace plots for diagnostics</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>az.plot_trace(iv_result.idata, var_names<span class="op">=</span>[<span class="st">"beta_z"</span>, <span class="st">"beta_t"</span>])</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="1651097e" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace plots for diagnostics</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>az.plot_trace(iv_result.idata, var_names<span class="op">=</span>[<span class="st">"beta_z"</span>, <span class="st">"beta_t"</span>])</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -886,44 +878,44 @@ Interpretation: Each additional year of education causes a 18.3% increase in wag
 <section id="comparing-ols-vs-iv-estimates" class="level2">
 <h2 class="anchored" data-anchor-id="comparing-ols-vs-iv-estimates">Comparing OLS vs IV Estimates</h2>
 <p>Let’s visualize the difference between the naive OLS estimate and the IV estimate.</p>
-<div id="be54b239" class="cell" data-execution_count="12">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior distribution of IV estimate</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>ax.hist(</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    educ_coef,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    bins<span class="op">=</span><span class="dv">50</span>,</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    density<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.7</span>,</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"C0"</span>,</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Bayesian IV Posterior"</span>,</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Add OLS estimate as vertical line</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>ax.axvline(</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    ols_result.params[<span class="st">"educ"</span>],</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"red"</span>,</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    linestyle<span class="op">=</span><span class="st">"--"</span>,</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="ss">f"OLS estimate: </span><span class="sc">{</span>ols_result<span class="sc">.</span>params[<span class="st">'educ'</span>]<span class="sc">:.4f}</span><span class="ss">"</span>,</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Add IV mean</span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>ax.axvline(</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    np.mean(educ_coef),</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"C0"</span>,</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    linestyle<span class="op">=</span><span class="st">"-"</span>,</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="ss">f"IV mean: </span><span class="sc">{</span>np<span class="sc">.</span>mean(educ_coef)<span class="sc">:.4f}</span><span class="ss">"</span>,</span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Returns to Schooling (coefficient on education)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Density"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"OLS vs Instrumental Variables: Returns to Schooling"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="1b576c22" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot posterior distribution of IV estimate</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>ax.hist(</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    educ_coef,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    bins<span class="op">=</span><span class="dv">50</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    density<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.7</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"C0"</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Bayesian IV Posterior"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Add OLS estimate as vertical line</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>ax.axvline(</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    ols_result.params[<span class="st">"educ"</span>],</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"red"</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    linestyle<span class="op">=</span><span class="st">"--"</span>,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="ss">f"OLS estimate: </span><span class="sc">{</span>ols_result<span class="sc">.</span>params[<span class="st">'educ'</span>]<span class="sc">:.4f}</span><span class="ss">"</span>,</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Add IV mean</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>ax.axvline(</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    np.mean(educ_coef),</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"C0"</span>,</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    linestyle<span class="op">=</span><span class="st">"-"</span>,</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="ss">f"IV mean: </span><span class="sc">{</span>np<span class="sc">.</span>mean(educ_coef)<span class="sc">:.4f}</span><span class="ss">"</span>,</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Returns to Schooling (coefficient on education)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Density"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"OLS vs Instrumental Variables: Returns to Schooling"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

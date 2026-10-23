@@ -401,7 +401,7 @@ div.csl-indent {
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="4a0e9687" class="cell" data-execution_count="1">
+<div id="246e588a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -431,7 +431,7 @@ div.csl-indent {
 <h2 class="anchored" data-anchor-id="part-1-rd-concepts-via-simulation">Part 1: RD Concepts via Simulation</h2>
 <p>Before diving into real data, let’s build intuition for regression discontinuity using simulated examples (rdd_simulate1-4).</p>
 <p>Data-generating process adapted from <code>python/rdd_simulate1.py</code> in the Mixtape code repository. See <code>NOTICE</code>.</p>
-<div id="16aaccad" class="cell" data-execution_count="2">
+<div id="6dbd365c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rdd_simulate1 &amp; rdd_simulate2: Treatment effect simulations</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sim_dat <span class="op">=</span> pd.DataFrame({<span class="st">"x"</span>: np.random.normal(<span class="dv">50</span>, <span class="dv">25</span>, <span class="dv">1000</span>)})</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sim_dat.loc[sim_dat.x <span class="op">&lt;</span> <span class="dv">0</span>, <span class="st">"x"</span>] <span class="op">=</span> <span class="dv">0</span></span>
@@ -473,7 +473,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<div id="33678a00" class="cell" data-execution_count="3">
+<div id="b45f1e20" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rdd_simulate3: Nonlinear CEF - Linear fit creates FALSE discontinuity</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sim_nonlin <span class="op">=</span> pd.DataFrame({<span class="st">"x"</span>: np.random.normal(<span class="dv">100</span>, <span class="dv">50</span>, <span class="dv">1000</span>)})</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>sim_nonlin.loc[sim_nonlin.x <span class="op">&lt;</span> <span class="dv">0</span>, <span class="st">"x"</span>] <span class="op">=</span> <span class="dv">0</span></span>
@@ -521,7 +521,7 @@ div.csl-indent {
 <section id="part-2-close-elections" class="level2">
 <h2 class="anchored" data-anchor-id="part-2-close-elections">Part 2: Close elections</h2>
 <p>Now we turn to real data from <span class="citation" data-cites="lee2004voters">Lee et al. (<a href="#ref-lee2004voters" role="doc-biblioref">2004</a>)</span>. The key question: Does <em>winning</em> a close election affect voting behavior?</p>
-<div id="6ce5bc48" class="cell" data-execution_count="4">
+<div id="ee040cbe" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and prepare data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> load_lmb()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_clean <span class="op">=</span> df.dropna(subset<span class="op">=</span>[<span class="st">"demvoteshare"</span>, <span class="st">"score"</span>]).copy()</span>
@@ -540,7 +540,7 @@ Treated (above 50%): 8097
 Control (below 50%): 5480</code></pre>
 </div>
 </div>
-<div id="770da3c3" class="cell" data-execution_count="5">
+<div id="9622c769" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_1 &amp; lmb_2: Naive comparisons (NOT RD - just to motivate the method)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>lmb_subset <span class="op">=</span> df_clean[df_clean[<span class="st">"lagdemvoteshare"</span>].between(<span class="fl">0.48</span>, <span class="fl">0.52</span>)].copy()</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -575,7 +575,7 @@ RD solves this by comparing only at the threshold.</code></pre>
 <p>Now we use <strong>CausalPy’s <code>RegressionDiscontinuity</code></strong> for proper RD estimation with Bayesian inference.</p>
 <section id="lmb_3-linear-rd-with-causalpy-same-slopes" class="level3">
 <h3 class="anchored" data-anchor-id="lmb_3-linear-rd-with-causalpy-same-slopes">lmb_3: Linear RD with CausalPy (same slopes)</h3>
-<div id="1dbd562b" class="cell" data-execution_count="6">
+<div id="ce67cf04" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_3: CausalPy RD - Linear specification (same slope on both sides)</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>result_linear <span class="op">=</span> cp.RegressionDiscontinuity(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
@@ -588,16 +588,13 @@ RD solves this by comparing only at the threshold.</code></pre>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>).fit()</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>result_linear.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (4 chains in 4 jobs)
-NUTS: [beta, y_hat_sigma]</code></pre>
+<pre><code>NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 4 seconds.
-Sampling: [y_hat]
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
@@ -615,7 +612,7 @@ Donut hole: 0.0
 Observations used for fit: 13577
 
 Results:
-Discontinuity at threshold = 58.39$CI_{94\%}$[57, 60]
+Discontinuity at threshold = 58.38$CI_{94\%}$[57, 60]
 
 
 Model coefficients:
@@ -624,7 +621,7 @@ Model coefficients:
   demvoteshare_c   -49, 94% HDI [-52, -46]</code></pre>
 </div>
 </div>
-<div id="e8fda9bf" class="cell" data-execution_count="7">
+<div id="5b24eeb7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_4: CausalPy RD - Different slopes (interaction term)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>result_interact <span class="op">=</span> cp.RegressionDiscontinuity(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_clean,</span>
@@ -637,16 +634,13 @@ Model coefficients:
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>).fit()</span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>result_interact.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (4 chains in 4 jobs)
-NUTS: [beta, y_hat_sigma]</code></pre>
+<pre><code>NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 6 seconds.
-Sampling: [y_hat]
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
@@ -670,11 +664,11 @@ Discontinuity at threshold = 55.38$CI_{94\%}$[54, 57]
 Model coefficients:
   Intercept                       17, 94% HDI [16, 18]
   treated[T.True]                 55, 94% HDI [54, 57]
-  demvoteshare_c                  -5.9, 94% HDI [-12, -0.13]
-  demvoteshare_c:treated[T.True]  -55, 94% HDI [-62, -49]</code></pre>
+  demvoteshare_c                  -5.9, 94% HDI [-12, -0.17]
+  demvoteshare_c:treated[T.True]  -55, 94% HDI [-61, -48]</code></pre>
 </div>
 </div>
-<div id="e1725f18" class="cell" data-execution_count="8">
+<div id="de943bc5" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_5 &amp; lmb_6: CausalPy RD - Quadratic specification with bandwidth</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: Use I(demvoteshare_c**2) instead of pre-computed column so patsy can</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># compute it for prediction data too</span></span>
@@ -690,16 +684,13 @@ Model coefficients:
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>).fit()</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>result_quad.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (4 chains in 4 jobs)
-NUTS: [beta, y_hat_sigma]</code></pre>
+<pre><code>NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 1_000 tune and 1_000 draw iterations (4_000 + 4_000 draws total) took 3 seconds.
-Sampling: [y_hat]
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
@@ -717,22 +708,22 @@ Donut hole: 0.0
 Observations used for fit: 2387
 
 Results:
-Discontinuity at threshold = 47.02$CI_{94\%}$[44, 50]
+Discontinuity at threshold = 47.05$CI_{94\%}$[44, 50]
 
 
 Model coefficients:
   Intercept                               17, 94% HDI [16, 19]
   treated[T.True]                         47, 94% HDI [44, 50]
-  demvoteshare_c                          22, 94% HDI [-29, 74]
-  demvoteshare_c:treated[T.True]          -35, 94% HDI [-106, 29]
-  I(demvoteshare_c ** 2)                  -1.4, 94% HDI [-90, 97]
-  I(demvoteshare_c ** 2):treated[T.True]  -1.7, 94% HDI [-92, 93]</code></pre>
+  demvoteshare_c                          21, 94% HDI [-33, 75]
+  demvoteshare_c:treated[T.True]          -34, 94% HDI [-98, 36]
+  I(demvoteshare_c ** 2)                  -0.77, 94% HDI [-102, 86]
+  I(demvoteshare_c ** 2):treated[T.True]  -1.4, 94% HDI [-98, 94]</code></pre>
 </div>
 </div>
 </section>
 <section id="causalpy-rd-plot" class="level3">
 <h3 class="anchored" data-anchor-id="causalpy-rd-plot">CausalPy RD Plot</h3>
-<div id="144023ff" class="cell" data-execution_count="9">
+<div id="72d78bb2" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy built-in RD plot</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: CausalPy plots ALL data points even when bandwidth is specified.</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The model is fitted only on the bandwidth data, but the plot shows full context.</span></span>
@@ -749,7 +740,7 @@ Model coefficients:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="d65ec196" class="cell" data-execution_count="10">
+<div id="e057a6cb" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary of CausalPy RD estimates across specifications</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"CausalPy RD Estimates: Treatment Effect at Threshold"</span>)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
@@ -767,13 +758,13 @@ Model coefficients:
 <div class="cell-output cell-output-stdout">
 <pre><code>CausalPy RD Estimates: Treatment Effect at Threshold
 ============================================================
-Linear         :  58.4 [94% CI: 57.2, 59.6]
-Interaction    :  55.4 [94% CI: 54.1, 56.7]
-Quadratic+BW   :  47.0 [94% CI: 44.3, 49.7]
+Linear         :  58.4 [94% CI: 57.1, 59.6]
+Interaction    :  55.4 [94% CI: 54.1, 56.6]
+Quadratic+BW   :  47.0 [94% CI: 44.1, 49.8]
 </code></pre>
 </div>
 </div>
-<div id="4fa4594d" class="cell" data-execution_count="11">
+<div id="66eb397e" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_9 - Optimal Bandwidth Selection (rdrobust) - Awaiting CausalPy support</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
@@ -789,7 +780,7 @@ Using manual bandwidth sensitivity analysis instead (see below).</code></pre>
 </section>
 <section id="validity-check-mccrary-density-test-lmb_10-placeholder" class="level3">
 <h3 class="anchored" data-anchor-id="validity-check-mccrary-density-test-lmb_10-placeholder">Validity Check: McCrary Density Test (lmb_10) — PLACEHOLDER</h3>
-<div id="137d2819" class="cell" data-execution_count="12">
+<div id="ce0a2524" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: lmb_10 - McCrary Density Test - Awaiting CausalPy support</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># =============================================================================</span></span>
@@ -828,7 +819,7 @@ Visual inspection of running variable density below:</code></pre>
 </section>
 <section id="part-4-rd-visualizations-lmb_7-lmb_8" class="level2">
 <h2 class="anchored" data-anchor-id="part-4-rd-visualizations-lmb_7-lmb_8">Part 4: RD Visualizations (lmb_7, lmb_8)</h2>
-<div id="a9841d94" class="cell" data-execution_count="13">
+<div id="79f2cd59" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_7: Three RD visualizations (quadratic, kernel smooth, linear)</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>lmb_close <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.45</span>, <span class="fl">0.55</span>)].copy()</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>lmb_close[<span class="st">"bin"</span>] <span class="op">=</span> pd.cut(lmb_close[<span class="st">"lagdemvoteshare"</span>], bins<span class="op">=</span><span class="dv">100</span>)</span>
@@ -883,7 +874,7 @@ Visual inspection of running variable density below:</code></pre>
 </div>
 </div>
 </div>
-<div id="a533d9ef" class="cell" data-execution_count="14">
+<div id="96b582cd" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lmb_8: Kernel-smoothed RD plot (full range)</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>df_kernel <span class="op">=</span> df_clean[df_clean[<span class="st">"demvoteshare"</span>].between(<span class="fl">0.25</span>, <span class="fl">0.75</span>)].copy()</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>below_k <span class="op">=</span> df_kernel[df_kernel[<span class="st">"demvoteshare"</span>] <span class="op">&lt;</span> <span class="fl">0.5</span>]</span>
@@ -928,7 +919,7 @@ Visual inspection of running variable density below:</code></pre>
 </section>
 <section id="part-5-bandwidth-sensitivity-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="part-5-bandwidth-sensitivity-analysis">Part 5: Bandwidth Sensitivity Analysis</h2>
-<div id="6020fdf7" class="cell" data-execution_count="15">
+<div id="6948e7da" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CausalPy bandwidth sensitivity analysis</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>bandwidths <span class="op">=</span> [<span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span>]</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>bw_results <span class="op">=</span> []</span>
@@ -940,7 +931,7 @@ Visual inspection of running variable density below:</code></pre>
 <span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>            formula<span class="op">=</span><span class="st">"score ~ 1 + demvoteshare_c + treated"</span>,</span>
 <span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>            running_variable_name<span class="op">=</span><span class="st">"demvoteshare_c"</span>,</span>
 <span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>                sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">False</span>, <span class="st">"cores"</span>: <span class="dv">1</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>                sample_kwargs<span class="op">=</span>{<span class="st">"progressbar"</span>: <span class="va">False</span>, <span class="st">"random_seed"</span>: <span class="dv">42</span>}</span>
 <span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>            ),</span>
 <span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>            treatment_threshold<span class="op">=</span><span class="fl">0.0</span>,</span>
 <span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>            bandwidth<span class="op">=</span>bw,</span>
@@ -989,11 +980,7 @@ Visual inspection of running variable density below:</code></pre>
 <span id="cb32-58"><a href="#cb32-58" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>lo<span class="sc">:.1f}</span><span class="ss"> to </span><span class="sc">{</span>hi<span class="sc">:.1f}</span><span class="ss"> ADA points."</span></span>
 <span id="cb32-59"><a href="#cb32-59" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 1 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
+<pre><code>NUTS[nutpie]: [beta, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
@@ -1001,86 +988,65 @@ Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]</code></pre>
+NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>BW=0.02: n=  945, effect=46.3 ± 1.4</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 2 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
-Sampling: [y_hat]
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]</code></pre>
+NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>BW=0.05: n= 2387, effect=46.8 ± 1.4</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 3 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>BW=0.10: n= 4632, effect=47.3 ± 1.2</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 3 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
-Sampling: [y_hat]
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...
-Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]</code></pre>
+NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>BW=0.15: n= 6788, effect=47.2 ± 1.0</code></pre>
+<pre><code>BW=0.10: n= 4632, effect=47.1 ± 1.2</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
-Sampling: [y_hat]
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]
 Sampling: [y_hat]
-Initializing NUTS using jitter+adapt_diag...</code></pre>
+NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>BW=0.20: n= 8699, effect=47.9 ± 0.9</code></pre>
+<pre><code>BW=0.15: n= 6788, effect=47.3 ± 1.0</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Sequential sampling (2 chains in 1 job)
-NUTS: [beta, y_hat_sigma]
-Sampling 2 chains for 1_000 tune and 1_000 draw iterations (2_000 + 2_000 draws total) took 4 seconds.
-We recommend running at least 4 chains for robust computation of convergence diagnostics
-The rhat statistic is larger than 1.01 for some parameters. This indicates problems during sampling. See https://arxiv.org/abs/1903.08008 for details
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [y_hat]
+Sampling: [beta, y_hat, y_hat_sigma]
+Sampling: [y_hat]
+Sampling: [y_hat]
+NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BW=0.20: n= 8699, effect=47.8 ± 0.9</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
 Sampling: [y_hat]
@@ -1099,7 +1065,7 @@ Sampling: [y_hat]</code></pre>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Local linear effects across bandwidths 0.02–0.25: 46.3 to 47.9 ADA points.</code></pre>
+<pre><code>Local linear effects across bandwidths 0.02–0.25: 46.3 to 47.8 ADA points.</code></pre>
 </div>
 </div>
 <hr>
