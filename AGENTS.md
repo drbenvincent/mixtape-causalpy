@@ -16,7 +16,7 @@ Work practices for AI assistants (and humans) contributing to this repo.
 - [ ] For examples marked ⏭️ Skip, add a TODO placeholder instead of implementing
 - [ ] Follow the chapter template in `REPO_PLAN.md`
 - [ ] Use the data loading utilities in `src/mixtape_causalpy/data.py`
-- [ ] Execute with the `mixtape-causalpy` Jupyter kernel. Set `QUARTO_PYTHON` to the project `.venv` created by `uv sync`; do not render with WebAssembly or a stray interpreter
+- [ ] Execute with the `mixtape-causalpy` Jupyter kernel only after its `kernel.json` `argv` is this checkout's `.venv/bin/python`. Re-register that kernel from `.venv` after `uv sync` or any environment replacement. `QUARTO_PYTHON` does not override a named kernel. Do not render with WebAssembly or a stray interpreter
 
 ## After Completing Work
 
