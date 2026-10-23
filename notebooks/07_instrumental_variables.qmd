@@ -196,13 +196,11 @@ print(f"Outcome data shape: {data.shape}")
 ```
 
 ```{python}
-# Run the Bayesian IV model
-# Note: cores=1 required for Jupyter notebooks on macOS
+# Run the Bayesian IV model. Seed only. nutpie is the declared sampler.
 sample_kwargs = {
     "tune": 1000,
     "draws": 1000,
     "chains": 2,
-    "cores": 1,  # Single core avoids multiprocessing issues on macOS
     "target_accept": 0.95,
     "random_seed": 42,
 }

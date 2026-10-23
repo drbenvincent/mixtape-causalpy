@@ -424,6 +424,7 @@ Per `mixtape_causalpy_translation_repo.md`, "done" means:
 - **Python**: >=3.12 (3.13 pinned for `uv sync`)
 - **CausalPy**: 1.0 line (`>=1.0.0rc1,<2`). Not 0.9.0, and not a GitHub `main` checkout
 - **PyMC**: >=6.0.1,<7
+- **nutpie**: >=0.16.11. Declared so PyMC selects it when `nuts_sampler` is omitted. That avoids the built-in sampler's fork crash on the IV graph. Do not set `cores=1` instead.
 - **PyTensor**: >=3,<4 (pulled by PyMC 6)
 - **ArviZ**: >=1.1,<2
 - **Quarto executor**: `ipykernel`, `nbclient`, `nbformat`, `pyyaml`. `quarto render` imports these from `QUARTO_PYTHON`. They are not used by the analyses.

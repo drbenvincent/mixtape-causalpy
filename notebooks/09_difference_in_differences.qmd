@@ -203,7 +203,6 @@ sample_kwargs = {
     "tune": 1000,
     "draws": 1000,
     "chains": 2,
-    "cores": 1,  # Single core for macOS Jupyter compatibility
     "target_accept": 0.95,
     "progressbar": True,
     "random_seed": 42,
