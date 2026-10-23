@@ -1,0 +1,50 @@
+REPO_PLAN.md
+  h_63db634213747e 29-31,33,157-158,162,168-169,177,183,185-190,194-196,204-205,208-209,234-235,238-242,245-247,274,278
+_freeze/notebooks/05_matching/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/06_regression_discontinuity/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/07_instrumental_variables/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/09_difference_in_differences/execute-results/html.json
+  h_63db634213747e 2,5,10
+_freeze/notebooks/10_synthetic_control/execute-results/html.json
+  h_63db634213747e 2,5
+data/README.md
+  h_63db634213747e 31
+index.qmd
+  h_63db634213747e 23-25,27
+notebooks/05_matching.qmd
+  h_63db634213747e 8,38-39,43-46,59,106-144,429,445,449-450,452-453
+notebooks/06_regression_discontinuity.qmd
+  h_63db634213747e 37-38,41,43-44,153-204,207-209,304-321,343,348,354,359-364,366-371,374-375,378-379,381,383,387,464,474-475,492,548-549,553-557,559,567,576
+notebooks/07_instrumental_variables.qmd
+  h_63db634213747e 36,59,155-158,160,176-179,187-191,200-201,210,229-236,238-239,304,312-313,324-375
+notebooks/09_difference_in_differences.qmd
+  h_63db634213747e 2,10,12,14,16,18,30,40,43,45,47,49,52-55,57-62,64-65,67-69,71-72,74-76,80-86,91,93,95,97,99,102-118,121,123,125,128-134,138,140-141,143,145,147,149-150,152-153,155,157-158,160,162,164-168,170-171,173-174,178,184-186
+notebooks/10_synthetic_control.qmd
+  h_63db634213747e 525-530
+proposals/README.md
+  h_63db634213747e 13,15,17-21
+pyproject.toml
+  h_63db634213747e 29
+references.bib
+  h_63db634213747e 56-66
+src/mixtape_causalpy/__init__.py
+  h_63db634213747e 15,28
+src/mixtape_causalpy/data.py
+  h_63db634213747e 83-93
+uv.lock
+  h_63db634213747e 33-84,448-459,562-589,1133,1152,1176-1244,1328-1359,1433-1514,1826-1875,2836-2853
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d085cd459dbb726d2d287abc785d59cff7302ec",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
