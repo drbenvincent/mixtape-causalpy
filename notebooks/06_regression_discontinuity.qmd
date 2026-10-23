@@ -413,7 +413,7 @@ for bw in bandwidths:
             formula="score ~ 1 + demvoteshare_c + treated",
             running_variable_name="demvoteshare_c",
             model=cp.pymc_models.LinearRegression(
-                sample_kwargs={"progressbar": False, "cores": 1, "random_seed": 42}
+                sample_kwargs={"progressbar": False, "random_seed": 42}
             ),
             treatment_threshold=0.0,
             bandwidth=bw,

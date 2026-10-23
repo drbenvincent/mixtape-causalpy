@@ -37,11 +37,11 @@ Copy `.vscode/settings.json.example` to `.vscode/settings.json` if you use the e
 A bare `pip install causalpy` still resolves to 0.9.0 until 1.0.0 final is the PyPI default. This project pins the 1.0 line (`causalpy>=1.0.0rc1,<2`) and PyMC 6. Confirm the environment `uv sync` created, and confirm the named kernel is that interpreter:
 
 ```bash
-uv run python -c "import causalpy, pymc, sys; print(sys.executable); print('causalpy', causalpy.__version__); print('pymc', pymc.__version__)"
+uv run python -c "import causalpy, nutpie, pymc, sys; print(sys.executable); print('causalpy', causalpy.__version__); print('pymc', pymc.__version__); print('nutpie', nutpie.__version__)"
 uv run python -c "import json, pathlib, sys; spec=pathlib.Path.home()/'Library/Jupyter/kernels/mixtape-causalpy/kernel.json'; argv=pathlib.Path(json.loads(spec.read_text())['argv'][0]); print(argv); assert argv.resolve()==pathlib.Path(sys.executable).resolve()"
 ```
 
-`causalpy` must be a 1.0 version, not `0.9.0`. `pymc` must be 6.x (6.3.2 or a newer 6.x). The assertion fails when the kernel still points at an older install. On Linux the kernelspec directory is `~/.local/share/jupyter/kernels/mixtape-causalpy`.
+`causalpy` must be a 1.0 version, not `0.9.0`. `pymc` must be 6.x (6.3.2 or a newer 6.x). `nutpie` must import. The assertion fails when the kernel still points at an older install. On Linux the kernelspec directory is `~/.local/share/jupyter/kernels/mixtape-causalpy`.
 
 ## Chapter → page mapping
 
