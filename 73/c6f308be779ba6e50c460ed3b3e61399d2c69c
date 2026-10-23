@@ -1,0 +1,32 @@
+README.md
+  h_63db634213747e 40,44
+REPO_PLAN.md
+  h_63db634213747e 427
+_freeze/notebooks/06_regression_discontinuity/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/07_instrumental_variables/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/08_panel_data/execute-results/html.json
+  h_63db634213747e 2,5
+_freeze/notebooks/09_difference_in_differences/execute-results/html.json
+  h_63db634213747e 2,5
+notebooks/06_regression_discontinuity.qmd
+  h_63db634213747e 416
+notebooks/07_instrumental_variables.qmd
+  h_63db634213747e 199
+pyproject.toml
+  h_63db634213747e 29
+uv.lock
+  h_63db634213747e 33-84,448-459,562-589,1133,1152,1176-1244,1328-1359,1433-1514,1826-1875,2836-2853
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "73c6f308be779ba6e50c460ed3b3e61399d2c69c",
+  "prompts": {},
+  "humans": {
+    "h_63db634213747e": {
+      "author": "Benjamin T. Vincent <inferencelab@gmail.com>"
+    }
+  }
+}
