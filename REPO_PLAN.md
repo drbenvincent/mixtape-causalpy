@@ -418,7 +418,7 @@ Per `mixtape_causalpy_translation_repo.md`, "done" means:
 
 ## Dependencies
 
-`uv sync` is the install. `pyproject.toml` is the dependency source and `uv.lock` pins the resolve. Do not add a second pin file. Python is `>=3.12`; `.python-version` pins 3.13 so a fresh `uv sync` matches the lock. Quarto is installed separately. Point `QUARTO_PYTHON` at `.venv/bin/python` so it does not pick up another interpreter.
+`uv sync` is the install. `pyproject.toml` is the dependency source and `uv.lock` pins the resolve. Do not add a second pin file. Python is `>=3.12`; `.python-version` pins 3.13 so a fresh `uv sync` matches the lock. Quarto is installed separately. `QUARTO_PYTHON` points Quarto's own discovery at `.venv/bin/python`. It does not override the `mixtape-causalpy` kernelspec. After `uv sync`, re-register that kernel from `.venv/bin/python` and confirm `kernel.json` `argv` resolves to that interpreter.
 
 **Key dependencies:**
 - **Python**: >=3.12 (3.13 pinned for `uv sync`)
@@ -427,7 +427,7 @@ Per `mixtape_causalpy_translation_repo.md`, "done" means:
 - **PyTensor**: >=3,<4 (pulled by PyMC 6)
 - **ArviZ**: >=1.1,<2
 - **Quarto executor**: `ipykernel`, `nbclient`, `nbformat`, `pyyaml`. `quarto render` imports these from `QUARTO_PYTHON`. They are not used by the analyses.
-- **Jupyter kernel**: `mixtape-causalpy` (local re-execution only; the site does not use WASM). CI registers that name so publish can resolve it. Committed `_freeze/` is what renders.
+- **Jupyter kernel**: `mixtape-causalpy`, registered from this checkout's `.venv`. A kernelspec that exists can still be an older install. CI registers the name only so publish can resolve it. Committed `_freeze/` is what renders.
 
 Confirm the stack after `uv sync`:
 

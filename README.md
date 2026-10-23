@@ -26,21 +26,22 @@ export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
 quarto preview
 ```
 
-The lock includes `ipykernel`, `nbclient`, `nbformat`, and `pyyaml` because Quarto imports them from `QUARTO_PYTHON` when it executes a chapter. They are not analysis dependencies.
+The lock includes `ipykernel`, `nbclient`, `nbformat`, and `pyyaml` because Quarto imports them from `QUARTO_PYTHON`. They are not analysis dependencies. `QUARTO_PYTHON` does not select the kernel named in a chapter. Re-run the `ipykernel install` command after every `uv sync` that replaces `.venv`.
 
-Quarto discovers Python on its own. Point `QUARTO_PYTHON` at this project's `.venv` so it does not pick up another interpreter. Copy `.vscode/settings.json.example` to `.vscode/settings.json` if you use the editor preview button. That file is gitignored.
+Copy `.vscode/settings.json.example` to `.vscode/settings.json` if you use the editor preview button. That file is gitignored.
 
 `quarto preview` serves the website. A full `quarto render` republishes from `_freeze/` and does not re-sample unless a `.qmd` changed. Preview and single-file render re-execute the chapter you are editing, which re-runs MCMC. After that, commit the updated `_freeze/` so CI can publish without sampling.
 
 ### Verify the stack
 
-A bare `pip install causalpy` still resolves to 0.9.0 until 1.0.0 final is the PyPI default. This project pins the 1.0 line (`causalpy>=1.0.0rc1,<2`) and PyMC 6. Confirm the environment `uv sync` created:
+A bare `pip install causalpy` still resolves to 0.9.0 until 1.0.0 final is the PyPI default. This project pins the 1.0 line (`causalpy>=1.0.0rc1,<2`) and PyMC 6. Confirm the environment `uv sync` created, and confirm the named kernel is that interpreter:
 
 ```bash
-uv run python -c "import causalpy, pymc; print('causalpy', causalpy.__version__); print('pymc', pymc.__version__)"
+uv run python -c "import causalpy, pymc, sys; print(sys.executable); print('causalpy', causalpy.__version__); print('pymc', pymc.__version__)"
+uv run python -c "import json, pathlib, sys; spec=pathlib.Path.home()/'Library/Jupyter/kernels/mixtape-causalpy/kernel.json'; argv=pathlib.Path(json.loads(spec.read_text())['argv'][0]); print(argv); assert argv.resolve()==pathlib.Path(sys.executable).resolve()"
 ```
 
-`causalpy` must be a 1.0 version, not `0.9.0`. `pymc` must be 6.x (6.3.2 or a newer 6.x).
+`causalpy` must be a 1.0 version, not `0.9.0`. `pymc` must be 6.x (6.3.2 or a newer 6.x). The assertion fails when the kernel still points at an older install. On Linux the kernelspec directory is `~/.local/share/jupyter/kernels/mixtape-causalpy`.
 
 ## Chapter → page mapping
 
