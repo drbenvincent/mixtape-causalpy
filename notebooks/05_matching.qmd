@@ -5,7 +5,7 @@ jupyter: mixtape-causalpy
 
 ## Causal Inference: The Mixtape → CausalPy
 
-**Mixtape chapter**: [Matching and Subclassification](https://mixtape-1ed.netlify.app/05-matching_and_subclassification)
+**Mixtape chapter**: [Matching and Subclassification](https://mixtape-1ed.netlify.app/05-matching_and_subclassification.html)
 
 **CausalPy method**: `InversePropensityWeighting`
 
@@ -35,15 +35,15 @@ CausalPy provides `InversePropensityWeighting` for propensity score-based estima
 | File | Description | Status |
 |------|-------------|--------|
 | `titanic.py` | Simple difference in outcomes | ✅ (conceptual) |
+| `training_example.py` | Age histograms. The $1,695 figure is not computed | ✅ (conceptual) |
+| `training_bias_reduction.py` | Eight-row illustration and `Y ~ X`. No matcher | ✅ (conceptual) |
 | `nsw_experimental.py` | NSW experimental benchmark | ✅ |
 | `nsw_pscore.py` | Propensity score estimation | ✅ |
 | `ipw.py` | Inverse propensity weighting | ✅ |
-| `teffects_ipw.py` | Treatment effects via IPW | ✅ |
-| `titanic_subclassification.py` | Subclassification | ⏭️ (no CausalPy) |
-| `training_example.py` | Training program example | ⏭️ (no CausalPy) |
-| `training_bias_reduction.py` | Bias reduction via matching | ⏭️ (no CausalPy) |
-| `teffects_nn.py` | Nearest neighbor matching | ⏭️ (missing) |
-| `cem.py` | Coarsened exact matching | ⏭️ (missing) |
+| `teffects_ipw.py` | Not a 2021 chapter section | ⏭️ Not on this page |
+| `titanic_subclassification.py` | Subclassification | ⏭️ Callout |
+| `teffects_nn.py` | Nearest neighbor matching | ⏭️ Callout |
+| `cem.py` | Coarsened exact matching | ⏭️ Callout |
 
 
 ## Setup
@@ -56,7 +56,7 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import statsmodels.formula.api as smf
 import causalpy as cp
 
 # Add the src directory to path for our data utilities
@@ -102,6 +102,45 @@ print("\nThis is NOT necessarily the causal effect - it may be confounded!")
 ```
 
 ---
+
+## Training illustrations
+
+These scripts are pictures, in the same spirit as the Titanic difference. They are not matching estimators.
+
+### Age distributions
+
+`training_example.py` draws a histogram of treated age and a histogram of control age. It does not estimate a treatment effect. The book's $1,695 figure is a hand table of matched earnings. This file does not produce that number, so it is not calculated here.
+
+```{python}
+#| label: fig-training-age
+#| fig-cap: "Age of treated and control units in the training illustration. Not a treatment effect."
+training_example = load_mixtape_data("training_example.dta")
+fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
+axes[0].hist(training_example["age_treat"].dropna(), bins=10, color="C0", edgecolor="black")
+axes[0].set_xlabel("Age (years)")
+axes[0].set_ylabel("Count")
+axes[0].set_title("Treated")
+axes[1].hist(training_example["age_control"].dropna(), bins=10, color="C1", edgecolor="black")
+axes[1].set_xlabel("Age (years)")
+axes[1].set_title("Control")
+plt.tight_layout()
+plt.show()
+```
+
+### Eight-row bias illustration
+
+`training_bias_reduction.py` writes potential outcomes by hand and fits `Y ~ X`. The fitted values are the script's control prediction. No nearest-neighbor matcher is built.
+
+```{python}
+bias = load_mixtape_data("training_bias_reduction.dta").copy()
+bias["Y1"] = 0
+bias.loc[bias["Unit"].isin(range(1, 5)), "Y1"] = 1
+bias["Y0"] = (4, 0, 5, 1, 4, 0, 5, 1)
+bias_fit = smf.ols("Y ~ X", data=bias).fit()
+bias["u_hat0"] = bias_fit.predict(bias)
+bias[["Unit", "Y1", "Y0", "Y", "D", "X", "u_hat0"]]
+```
+
 
 ## Example 2: NSW Experimental Benchmark
 
@@ -387,7 +426,7 @@ plt.show()
 | Propensity model | Logistic regression (statsmodels) | Bayesian logistic (PyMC) |
 | Weighting | Manual Horvitz-Thompson | CausalPy `robust` scheme |
 | Uncertainty | Bootstrap or asymptotic | Bayesian posterior |
-| Specification | Polynomial terms + interactions | Linear in covariates |
+| Specification | Polynomials in age, education, and prior earnings, plus `educ * re74`, then a 0.1–0.9 propensity trim | Linear in standardized covariates. No polynomials, no `educ * re74`, and no trim. Rows are not dropped to imitate that screen |
 
 ### The LaLonde Problem
 
@@ -403,43 +442,15 @@ IPW attempts to correct for these differences by reweighting, but:
 - No adjustment for unobservables
 
 ### This run
-Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE -$12,153.10, posterior sd $362.22, interval [-$12,863.06, -$11,443.15]. The experimental benchmark on this page is $1,794. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -$12,265, so the migration did not move this estimate off the LaLonde failure.
+Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the 200 draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -12,265 dollars, so the migration did not move this estimate off the LaLonde failure. The book's logit is not this specification: it includes polynomials, an `educ * re74` interaction, and a 0.1–0.9 trim. Those terms are not added here, and no rows are dropped to imitate the trim.
 
 ---
 
-## TODO: Subclassification
+::: {.callout-note}
+## Not estimated
 
-> **Not yet implemented**: Subclassification stratifies observations into propensity score bins and estimates effects within each stratum.
-
-**Mixtape reference**: `titanic_subclassification.py`
-
-**CausalPy tracking**: No current issue/PR for subclassification
-
-**When to revisit**: Would need a new method in CausalPy.
-
----
-
-## TODO: Nearest Neighbor Matching
-
-> **Not yet implemented**: Nearest neighbor matching pairs treated units with similar control units based on propensity scores or covariates.
-
-**Mixtape reference**: `teffects_nn.py` (file is empty in original repo)
-
-**CausalPy tracking**: No current issue/PR for matching
-
-**When to revisit**: Would need a new `cp.Matching` experiment class.
-
----
-
-## TODO: Coarsened Exact Matching (CEM)
-
-> **Not yet implemented**: CEM temporarily coarsens covariates and performs exact matching within coarsened strata.
-
-**Mixtape reference**: `cem.py` (file is empty in original repo)
-
-**CausalPy tracking**: No current issue/PR for CEM
-
-**When to revisit**: Would need a new experiment class in CausalPy.
+Subclassification (`titanic_subclassification.py`), nearest-neighbor matching (`teffects_nn.py`), and coarsened exact matching (`cem.py`) are not in CausalPy. The last two scripts are empty in the Mixtape repository. None of the three is run here. `teffects_ipw.py` is not a section of the 2021 chapter, so it is not added either.
+:::
 
 ---
 

@@ -20,11 +20,11 @@ Outputs are frozen in `_freeze/`. A project render republishes the saved plots a
 
 | Chapter | Page | CausalPy |
 |---------|------|----------|
-| 5. Matching and subclassification | [Matching](notebooks/05_matching.qmd) | Inverse propensity weighting; other matching methods are TODO |
-| 6. Regression discontinuity | [Regression discontinuity](notebooks/06_regression_discontinuity.qmd) | `RegressionDiscontinuity` |
-| 7. Instrumental variables | [Instrumental variables](notebooks/07_instrumental_variables.qmd) | `InstrumentalVariable` |
+| 5. Matching and subclassification | [Matching](notebooks/05_matching.qmd) | Inverse propensity weighting. Training illustrations are on the page. Other matching methods are callouts |
+| 6. Regression discontinuity | [Regression discontinuity](notebooks/06_regression_discontinuity.qmd) | `RegressionDiscontinuity`, including a donut comparison |
+| 7. Instrumental variables | [Instrumental variables](notebooks/07_instrumental_variables.qmd) | `InstrumentalVariable` for Card and the judge example. JIVE is a callout |
 | 8. Panel data | [Panel data](notebooks/08_panel_data.qmd) | `PanelRegression` |
-| 9. Difference-in-differences | [Difference-in-differences](notebooks/09_difference_in_differences.qmd) | `DifferenceInDifferences` |
+| 9. Difference-in-differences | [Difference-in-differences](notebooks/09_difference_in_differences.qmd) | `StaggeredDifferenceInDifferences` imputation for castle doctrine. Not a two-group two-period result |
 | 10. Synthetic control | [Synthetic control](notebooks/10_synthetic_control.qmd) | `SyntheticControl` |
 
 Source and setup: [drbenvincent/mixtape-causalpy](https://github.com/drbenvincent/mixtape-causalpy).

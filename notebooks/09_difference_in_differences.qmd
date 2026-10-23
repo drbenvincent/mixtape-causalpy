@@ -1,5 +1,5 @@
 ---
-title: 'Chapter 9: Difference-in-Differences'
+title: "Chapter 9: Difference-in-Differences"
 jupyter: mixtape-causalpy
 ---
 
@@ -7,48 +7,15 @@ jupyter: mixtape-causalpy
 
 **Mixtape chapter**: [Difference-in-Differences](https://mixtape-1ed.netlify.app/09-difference_in_differences.html)
 
-**CausalPy method**: `DifferenceInDifferences`
+**CausalPy method**: [`StaggeredDifferenceInDifferences`](https://causalpy.readthedocs.io/en/latest/api/generated/causalpy.experiments.staggered_did.StaggeredDifferenceInDifferences.html) for the castle-doctrine panel. [`DifferenceInDifferences`](https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html) estimates one group-by-post interaction. It is not the castle result.
 
----
+## Overview
 
-### Overview
+Adoption dates in the castle-doctrine panel are not a single year. A two-group, two-period coefficient is the wrong estimand for that design, and it is not what this page reports.
 
-Difference-in-Differences (DiD) is one of the most widely used identification strategies in applied economics. It compares the change in outcomes over time between a treatment group and a control group, under the assumption that both groups would have followed parallel trends in the absence of treatment.
+The fit below is the Borusyak, Jaravel, and Spiess imputation estimator [@borusyak2024], via scikit-learn `LinearRegression`. It is not a Bayesian fit. It is not Cheng and Hoekstra's two-way fixed-effects coefficient [@cheng2013], and it is not `castle_1.py`.
 
-This notebook covers:
-
-1. **Castle Doctrine** — Effect of "Stand Your Ground" laws on homicide rates
-2. **Abortion Legalization** — Effect of early abortion access on gonorrhea rates
-
-### What we'll cover
-
-1. Data exploration and parallel trends visualization
-2. Simple 2×2 DiD estimation with CausalPy
-3. Interpretation of the Average Treatment Effect on the Treated (ATT)
-4. Comparison to Mixtape results
-
-### Important Note on Staggered DiD
-
-The Mixtape examples use **staggered adoption** designs where different units receive treatment at different times. CausalPy's current `DifferenceInDifferences` implementation is designed for the **simple 2×2 case** (one treated group, one control group, pre and post periods).
-
-For staggered DiD, see:
-- CausalPy PR #621 (staggered DiD support)
-- Recent literature on issues with TWFE in staggered settings [@goodmanbacon2021; @callaway2021; @sun2021]
-
-In this notebook, we adapt the examples to work with CausalPy's 2×2 framework.
-
-### Mixtape files implemented
-
-| File | Description | Status |
-|------|-------------|--------|
-| `castle_1.py` | Castle doctrine - basic DiD | ✅ |
-| `castle_2.py` | Castle doctrine - event study | ⏭️ (staggered) |
-| `castle_3.py` | Castle doctrine - event study plot | ⏭️ (staggered) |
-| `castle_4.py` | Castle doctrine - alternative plot | ⏭️ (staggered) |
-| `castle_5.py` | Castle doctrine - robustness | ⏭️ (empty) |
-| `abortion_dd.py` | Abortion legalization DiD | ✅ |
-| `abortion_dd2.py` | Abortion DiD variations | ✅ |
-
+Snow, the minimum wage, block bootstrap, clustering, the Affordable Care Act, and maternity benefits have no script on this page. No dataset is added for them.
 
 ## Setup
 
@@ -60,414 +27,163 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 import causalpy as cp
 
-# Add the src directory to path for our data utilities
 import sys
 
 sys.path.insert(0, "../src")
 from mixtape_causalpy import load_castle, load_abortion
 
 %matplotlib inline
+%config InlineBackend.figure_format = 'retina'
 ```
 
----
+## Castle doctrine
 
-## Example 1: Castle Doctrine and Homicide Rates
+`castle.dta` is a state-year panel. `treatment_date` is the adoption year, and it is missing for states with no recorded adoption. The outcome used here is `l_homicide`, the log homicide rate.
 
-The Castle Doctrine (also known as "Stand Your Ground" laws) expands the legal right to use deadly force in self-defense. The Mixtape examines whether these laws increased homicide rates, following @cheng2013.
+`DifferenceInDifferences` estimates a single group-by-post interaction. That is not this panel, and it is not used as the result.
 
-**Key details:**
-- **Outcome**: Log homicide rate (`l_homicide`)
-- **Treatment**: Adoption of Castle Doctrine (`post` = 1 after adoption)
-- **Units**: U.S. states
-- **Time period**: 2000-2010
-
-### Adapting to 2×2 DiD
-
-Since CausalPy uses a 2×2 framework, we'll:
-1. Select states that adopted in 2006 (the largest cohort) as the **treated group**
-2. Use never-treated states as the **control group**
-3. Compare pre-2006 to post-2006 periods
+### Adoption timing
 
 ```{python}
-# Load the data
-castle = load_castle()
-print(f"Dataset shape: {castle.shape}")
-print(f"\nYears: {sorted(castle['year'].unique())}")
-print(f"\nStates: {castle['state'].nunique()}")
-```
+castle = load_castle().copy()
+castle["treatment_time"] = castle["treatment_date"].astype(float)
+n_missing_dates = int(castle["treatment_time"].isna().sum())
+castle.loc[castle["treatment_time"].isna(), "treatment_time"] = np.inf
 
-```{python}
-# Examine treatment timing
-treatment_dates = castle.groupby("state")["treatment_date"].first()
-print("Treatment adoption by year:")
-print(treatment_dates.value_counts().sort_index())
+timing = castle.groupby("state", as_index=False)["treatment_date"].first()
+n_states = int(timing["state"].nunique())
+n_years = int(castle["year"].nunique())
+n_never = int(timing["treatment_date"].isna().sum())
+panel_start = int(castle["year"].min())
+earliest_adoption = int(timing["treatment_date"].min())
 
-# Identify never-treated states
-never_treated = castle.groupby("state")["post"].max()
-never_treated_states = never_treated[never_treated == 0].index.tolist()
-print(f"\nNever-treated states: {len(never_treated_states)}")
-
-# Identify states that adopted in 2006
-adopted_2006 = treatment_dates[treatment_dates == 2006].index.tolist()
-print(f"States adopting in 2006: {len(adopted_2006)}")
-print(adopted_2006)
-```
-
-```{python}
-# Create simplified 2x2 DiD dataset
-# Treated: states that adopted in 2006
-# Control: never-treated states
-
-# Filter to our groups
-castle_2x2 = castle[castle["state"].isin(adopted_2006 + never_treated_states)].copy()
-
-# Create group indicator (1 = treated, 0 = control)
-castle_2x2["group"] = castle_2x2["state"].isin(adopted_2006).astype(int)
-
-# Create post_treatment indicator (1 = 2006 or later)
-castle_2x2["post_treatment"] = (castle_2x2["year"] >= 2006).astype(int)
-
-# Create unit identifier (required by CausalPy)
-castle_2x2["unit"] = castle_2x2["state"]
-
-print(f"2x2 dataset shape: {castle_2x2.shape}")
-print(f"\nGroup distribution:")
-print(castle_2x2.groupby(["group", "post_treatment"]).size().unstack())
-```
-
-### Visualize Parallel Trends
-
-Before running DiD, we should check whether treated and control groups followed similar trends pre-treatment. This is the key identifying assumption.
-
-```{python}
-# Plot average outcomes by group over time
-fig, ax = plt.subplots(figsize=(10, 6))
-
-# Calculate group means by year
-group_means = castle_2x2.groupby(["year", "group"])["l_homicide"].mean().unstack()
-
-# Plot
-ax.plot(
-    group_means.index, group_means[0], "o-", label="Control (never treated)", color="C0"
+timing["adoption"] = timing["treatment_date"].apply(
+    lambda v: "no adoption date" if pd.isna(v) else str(int(v))
 )
-ax.plot(
-    group_means.index, group_means[1], "s-", label="Treated (adopted 2006)", color="C1"
+year_order = sorted(y for y in timing["adoption"].unique() if y != "no adoption date")
+adoption_counts = (
+    timing.groupby("adoption").size().reindex(year_order + ["no adoption date"])
 )
-
-# Add vertical line at treatment
-ax.axvline(x=2006, color="red", linestyle="--", linewidth=2, label="Treatment (2006)")
-
-ax.set_xlabel("Year", fontsize=12)
-ax.set_ylabel("Log Homicide Rate", fontsize=12)
-ax.set_title("Castle Doctrine: Parallel Trends Check", fontsize=14)
-ax.legend()
-ax.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-```
-
-### CausalPy Difference-in-Differences Estimation
-
-Now we'll estimate the DiD effect using CausalPy's `DifferenceInDifferences` class.
-
-```{python}
-# For CausalPy DiD, we need a simpler time structure
-# Aggregate to pre/post periods
-castle_did = castle_2x2.copy()
-
-# Convert to pre (0) and post (1) time periods
-castle_did["t"] = castle_did["post_treatment"].astype(float)
-
-# Aggregate by state and period
-castle_agg = (
-    castle_did.groupby(["unit", "group", "t", "post_treatment"])
-    .agg({"l_homicide": "mean"})
-    .reset_index()
-)
-
-# Rename outcome
-castle_agg = castle_agg.rename(columns={"l_homicide": "y"})
-
-print("Aggregated data for DiD:")
-print(castle_agg.head(10))
-print(f"\nShape: {castle_agg.shape}")
-```
-
-```{python}
-# Run CausalPy DiD
-sample_kwargs = {
-    "tune": 1000,
-    "draws": 1000,
-    "chains": 2,
-    "cores": 1,  # Single core for macOS Jupyter compatibility
-    "target_accept": 0.95,
-    "progressbar": True,
-    "random_seed": 42,
-}
-
-castle_result = cp.DifferenceInDifferences(
-    castle_agg,
-    formula="y ~ 1 + group * post_treatment",
-    time_variable_name="t",
-    group_variable_name="group",
-    model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),
-).fit()
-```
-
-```{python}
-# View the results
-castle_result.summary()
-```
-
-```{python}
-# Plot the DiD result
-fig, ax = castle_result.plot(show=False)
-ax.set_xlabel("Time Period (0=Pre, 1=Post)")
-ax.set_ylabel("Log Homicide Rate")
-ax.set_title("Castle Doctrine: Difference-in-Differences Estimate")
-plt.tight_layout()
-plt.show()
-```
-
-### Interpretation
-
-The **causal impact** represents the Average Treatment Effect on the Treated (ATT) — the estimated change in log homicide rates attributable to Castle Doctrine adoption.
-
-**Key findings:**
-- The coefficient on `group:post_treatment` is the DiD estimate
-- CausalPy provides Bayesian credible intervals for uncertainty quantification
-- Compare this to the Mixtape's result from `castle_1.py` which uses weighted least squares with clustered standard errors
-
----
-
-## Example 2: Abortion Legalization and Gonorrhea Rates
-
-This example follows @donohue2001, but uses gonorrhea rates as a proxy rather than crime. It examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected that outcome.
-
-**Key details:**
-- **Outcome**: Log gonorrhea rate (`lnr`)
-- **Treatment**: Early abortion legalization (`repeal` = 1 for early-legalizing states)
-- **Units**: U.S. states × age cohorts
-- **Time period**: 1985-2000
-
-```{python}
-# Load the data
-abortion = load_abortion()
-print(f"Dataset shape: {abortion.shape}")
-
-# Filter to non-missing outcome
-abortion = abortion[~pd.isnull(abortion["lnr"])].copy()
-print(f"After dropping missing lnr: {abortion.shape}")
-```
-
-```{python}
-# Key columns
-print("Key columns:")
-print(abortion[["fip", "year", "repeal", "lnr", "bf15"]].describe())
-```
-
-```{python}
-# For DiD, focus on the bf15 cohort (as in abortion_dd.py)
-# bf15 = 1 indicates cohorts born after 1973 (affected by abortion legalization)
-abortion_bf15 = abortion[abortion["bf15"] == 1].copy()
-print(f"bf15 cohort shape: {abortion_bf15.shape}")
-
-# Check repeal status
 print(
-    f"\nRepeal states: {abortion_bf15['repeal'].sum() / len(abortion_bf15) * 100:.1f}%"
+    f"{n_states} states, {n_years} years, {n_never} with no adoption date"
 )
+print(f"Panel starts in {panel_start}; earliest recorded adoption is {earliest_adoption}")
+print(f"Missing treatment_date rows before recode: {n_missing_dates}")
+print(adoption_counts.to_string())
 ```
 
 ```{python}
-# Prepare data for CausalPy DiD
-# We'll create a simpler 2x2 by using 1985-1992 vs 1993-2000
-
-abortion_did = abortion_bf15.copy()
-
-# Treatment group (repeal states)
-abortion_did["group"] = abortion_did["repeal"].astype(int)
-
-# Post-treatment (1993 onwards - roughly when effects would manifest)
-abortion_did["post_treatment"] = (abortion_did["year"] >= 1993).astype(int)
-
-# Create unit identifier
-abortion_did["unit"] = abortion_did["fip"].astype(int).astype(str)
-
-# Time variable
-abortion_did["t"] = abortion_did["post_treatment"].astype(float)
-
-print(f"DiD dataset shape: {abortion_did.shape}")
-print(f"\nGroup × Post distribution:")
-print(abortion_did.groupby(["group", "post_treatment"]).size().unstack())
-```
-
-```{python}
-# Aggregate by state and period for cleaner DiD
-abortion_agg = (
-    abortion_did.groupby(["unit", "group", "t", "post_treatment"])
-    .agg({"lnr": "mean"})
-    .reset_index()
-)
-
-abortion_agg = abortion_agg.rename(columns={"lnr": "y"})
-
-print("Aggregated data:")
-print(abortion_agg.head(10))
-print(f"\nShape: {abortion_agg.shape}")
-```
-
-```{python}
-# Visualize parallel trends
-fig, ax = plt.subplots(figsize=(10, 6))
-
-# Calculate group means by year
-yearly_means = abortion_did.groupby(["year", "group"])["lnr"].mean().unstack()
-
-# Plot
-ax.plot(
-    yearly_means.index,
-    yearly_means[0],
-    "o-",
-    label="Control (no early repeal)",
-    color="C0",
-)
-ax.plot(
-    yearly_means.index,
-    yearly_means[1],
-    "s-",
-    label="Treated (early repeal)",
-    color="C1",
-)
-
-# Add vertical line at "treatment" time
-ax.axvline(x=1993, color="red", linestyle="--", linewidth=2, label="Post period (1993)")
-
-ax.set_xlabel("Year", fontsize=12)
-ax.set_ylabel("Log Gonorrhea Rate", fontsize=12)
-ax.set_title("Abortion Legalization: Parallel Trends Check", fontsize=14)
-ax.legend()
-ax.grid(True, alpha=0.3)
-
+#| label: fig-castle-adoption
+#| fig-cap: "States by recorded castle-doctrine adoption year, including states with no adoption date in the file."
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.bar(adoption_counts.index.astype(str), adoption_counts.values, color="C0")
+ax.set_xlabel("Recorded adoption year")
+ax.set_ylabel("States")
+ax.tick_params(axis="x", rotation=45)
 plt.tight_layout()
 plt.show()
 ```
 
+The file stores a missing `treatment_date` for `{python} n_never` states. `StaggeredDifferenceInDifferences` rejects missing treatment times. It does not read a missing date as never-treated. Those dates are recoded to `np.inf`, the class default for never-treated, before the fit. The states stay in the panel and are the never-treated controls. None are dropped.
+
+There is no already-treated cohort in the first year. The panel starts in `{python} panel_start` and the earliest recorded adoption is `{python} earliest_adoption`.
+
+### Imputation event-time contrasts
+
+The formula is state and year fixed effects. `C()` accepts the numeric year column, so year is not recoded to a string. `fit_intercept=False` is passed because the formula already contains an intercept. Leaving the default at `True` warns and clones the estimator with `fit_intercept=False`; it does not drop the intercept from the formula.
+
+`post` is an absorbing 0/1 column in the file. It is not passed as `treated_variable_name`. The absorbing-treatment check runs only when that argument is passed. `l_homicide` has no missing values, so there is nothing for a missing-outcome check to drop. The class's missing-value check on a treated column is about the treatment indicator, not the outcome.
+
 ```{python}
-# Run CausalPy DiD
-abortion_result = cp.DifferenceInDifferences(
-    abortion_agg,
-    formula="y ~ 1 + group * post_treatment",
-    time_variable_name="t",
-    group_variable_name="group",
-    model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),
+# fit_intercept=False: the formula already has an intercept. The adapter
+# warns and clones if the estimator is left at fit_intercept=True.
+result = cp.StaggeredDifferenceInDifferences(
+    castle,
+    formula="l_homicide ~ 1 + C(state) + C(year)",
+    unit_variable_name="state",
+    time_variable_name="year",
+    treatment_time_variable_name="treatment_time",
+    model=cp.skl_models.create_causalpy_compatible_class(LinearRegression)(
+        fit_intercept=False
+    ),
 ).fit()
+result.summary()
+castle_att = result.result.att_event_time
+att0 = castle_att.loc[castle_att["event_time"] == 0].iloc[0]
+att_m1 = castle_att.loc[castle_att["event_time"] == -1].iloc[0]
+singleton = castle_att.loc[castle_att["n_obs"] == 1, "event_time"]
 ```
 
-```{python}
-# View the results
-abortion_result.summary()
-```
+`att` is the mean of observed log homicide minus the prediction from the untreated fit, at that event time. It is not normalized to a zero reference period. The constructor's `reference_event_time` defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is `{python} f"{att_m1.att:+.3f}"`, not zero. Event time 0, the adoption year, is `{python} f"{att0.att:+.3f}"` log points, from `{python} int(att0.n_obs)` state-years.
+
+`att_std` is the residual standard deviation of the cell, not a clustered standard error and not a Bayesian interval. The plot's bars are 1.96 times that standard deviation divided by the square root of the cell size. A cell with one observation has no residual standard deviation, so it has no bar.
+
+That event-time 0 number is not Cheng and Hoekstra's two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.
 
 ```{python}
-# Plot the DiD result
-fig, ax = abortion_result.plot(show=False)
-ax.set_xlabel("Time Period (0=Pre, 1=Post)")
-ax.set_ylabel("Log Gonorrhea Rate")
-ax.set_title("Abortion Legalization: Difference-in-Differences Estimate")
-plt.tight_layout()
+#| label: fig-castle-event-time
+#| fig-cap: "Event-time imputation contrasts for the log homicide rate. Bars are 1.96 times the cell residual standard deviation over the square root of the cell size, not clustered intervals. No pre-treatment cell is normalized to zero."
+fig, axes = result.plot(show=False)
+axes[0].set_xlabel("Event time (years since adoption)")
+axes[0].set_ylabel("Imputation contrast (log homicide rate)")
+axes[0].set_title("Castle doctrine: imputation contrasts")
+fig.tight_layout()
 plt.show()
 ```
 
----
+The vertical line is the adoption year. The horizontal line at zero is the zero-effect line, not an omitted reference period.
 
-## Comparison to Mixtape Results
+::: {.callout-note}
+## What this fit is not
 
-### Key Differences
+This is not `castle_1.py`. That script regresses log homicide on an absorbing treatment indicator, state and year effects, and region-by-year effects, with standard errors clustered by state. This page does not estimate that coefficient.
 
-| Aspect | Mixtape | This Notebook |
-|--------|---------|---------------|
-| Estimation | Weighted OLS with clustered SEs | Bayesian linear regression |
-| Treatment timing | Staggered (TWFE) | Simplified 2×2 |
-| Uncertainty | Frequentist confidence intervals | Bayesian credible intervals |
-| Covariates | Many controls included | None (simple specification) |
+`castle_2.py` is an event study with leads and lags, estimated by weighted least squares, with region-by-year effects and clustered standard errors. `castle_3.py` and `castle_4.py` plot those weighted least-squares estimates. CausalPy does not implement that weighted least-squares event study. The table above is the imputation substitute, not those figures.
 
-### Why the Results May Differ
+`castle_5.py` is empty. The R script decomposes `l_homicide ~ post` with the Bacon decomposition. It is not run.
 
-1. **Aggregation**: We simplified the staggered design to 2×2, which changes the effective sample
-2. **No covariates**: Mixtape includes many control variables (demographics, spending, etc.)
-3. **No weighting**: Mixtape uses population weights
-4. **Bayesian estimation**: Different uncertainty quantification approach
+[PR #584](https://github.com/pymc-labs/CausalPy/pull/584) is an open proposal for a common-timing event study. It is not this staggered design, and it is not a castle-doctrine specification.
+:::
 
-### This run
-Castle Doctrine 2×2, `random_seed=42`: causal impact 0.09, 94% interval [-0.42, 0.58]. Abortion-legalization proxy: -0.06, 94% interval [-0.93, 0.82]. Both intervals include zero. These are not the Mixtape's weighted, covariate-adjusted estimates.
+::: {.callout-note}
+## Bacon decomposition and triple differences
 
-### Event Study (TODO)
+A Bacon decomposition would split a two-way fixed-effects coefficient into timing comparisons. CausalPy does not implement it, and none is computed. This file also has no already-treated cohort in `{python} panel_start`.
 
-The Mixtape's `castle_2.py` through `castle_4.py` implement event study designs that show dynamic treatment effects over time. This requires:
-- Lead and lag indicators relative to treatment
-- Plotting coefficients with confidence/credible intervals
+Triple differences (`abortion_ddd.py`, `abortion_ddd2.py`) are not in CausalPy. The write-up is [`proposals/proposal_triple_diff.md`](../proposals/proposal_triple_diff.md). That proposal is not a Bacon decomposition.
+:::
 
-See CausalPy PR #584 for event study support.
+## Abortion legalization
 
----
+The book's abortion exercise is a two-way fixed-effects regression. Treatment is an early-repeal indicator interacted with year, on state-years from 1985 to 2000, with state and year effects and controls. A split of the sample at 1993 is not that design. It is not used here, and the regression is not fit.
 
-## TODO: Event Study Design
+```{python}
+abortion = load_abortion()
+print(f"Rows: {len(abortion)}; years {int(abortion['year'].min())}–{int(abortion['year'].max())}")
+print(abortion["repeal"].value_counts(dropna=False).to_string())
+```
 
-> **Not yet implemented**: Event study designs require lead/lag indicators around treatment timing, which is related to staggered DiD.
+::: {.callout-note}
+## Abortion scripts are not run
 
-**Mixtape reference**: `castle_2.py`, `castle_3.py`, `castle_4.py`
-
-**CausalPy tracking**:
-- Event study plots: PR #584
-- Staggered DiD: PR #621
-
-**When to revisit**: Once CausalPy adds staggered DiD or event study support.
-
----
-
-## TODO: Triple Differences (DDD)
-
-> **Not yet implemented**: Triple differences adds a third differencing dimension and is not currently supported by CausalPy.
-
-**Mixtape reference**: `abortion_ddd.py`, `abortion_ddd2.py`
-
-**CausalPy tracking**: No current issue/PR for DDD
-
-**When to revisit**: Would need a new experiment class in CausalPy.
-
----
+`abortion_dd.py` and `abortion_dd2.py` are the two-way fixed-effects regressions above. `DifferenceInDifferences` estimates one group-by-post interaction, which is not those regressions. Neither is run on this page.
+:::
 
 ## Summary
 
-In this notebook, we demonstrated CausalPy's `DifferenceInDifferences` experiment using two classic examples from the Mixtape:
-
-1. **Castle Doctrine**: Estimated the effect of Stand Your Ground laws on homicide rates by comparing states that adopted in 2006 to never-treated states
-
-2. **Abortion Legalization**: Estimated the effect of early abortion access on gonorrhea rates
-
-**Key takeaways:**
-
-- CausalPy's DiD is designed for the classic 2×2 case
-- For staggered designs (common in applied work), adaptations are needed
-- Bayesian estimation provides intuitive uncertainty quantification
-- The `plot()` method visualizes the counterfactual and causal impact
-
-**Next steps:**
-- When CausalPy adds staggered DiD support, return to implement the full event study analyses
-- Consider adding covariates to the formula for richer specifications
-
----
+One estimator is run: the imputation event-time contrasts for castle doctrine. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.
 
 ::: {.callout-note}
 ## Further reading
 
 - First edition: [Chapter 9: Difference-in-Differences](https://mixtape-1ed.netlify.app/09-difference_in_differences.html)
-- CausalPy: [Difference-in-differences](https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html)
-- [CausalPy PR #621](https://github.com/pymc-labs/CausalPy/pull/621) tracks staggered DiD support. This page does not estimate a staggered design.
+- CausalPy: [Difference-in-differences](https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html) is the two-group class. It is not the castle result.
+- @borusyak2024
+- @cheng2013
 :::
 
 ## References

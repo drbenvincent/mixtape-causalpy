@@ -33,6 +33,7 @@ This notebook covers the @card1995 example, which estimates the returns to schoo
 | File | Description | Status |
 |------|-------------|--------|
 | `card.py` | @card1995 returns to schooling IV | ✅ |
+| `bail.py` | Judge-leniency example. JIVE is a callout, not a fit | ✅ |
 
 
 ## Setup
@@ -55,7 +56,7 @@ from causalpy.pymc_models import InstrumentalVariableRegression
 import sys
 
 sys.path.insert(0, "../src")
-from mixtape_causalpy import load_card
+from mixtape_causalpy import load_card, load_judge
 
 %matplotlib inline
 ```
@@ -151,9 +152,12 @@ First, let's estimate the returns to schooling using OLS. This estimate is likel
 ```{python}
 import statsmodels.api as sm
 
-# OLS regression (as in card.py)
+# OLS on the same complete cases the IV fit uses. Seven rows are missing `married`.
+card = df.dropna(
+    subset=["lwage", "educ", "nearc4", "exper", "black", "south", "married", "smsa"]
+).copy()
 ols_formula = "lwage ~ educ + exper + black + south + married + smsa"
-ols_result = sm.OLS.from_formula(ols_formula, data=df).fit()
+ols_result = sm.OLS.from_formula(ols_formula, data=card).fit()
 
 print("OLS Results (Naive):")
 print(f"Returns to schooling (educ coefficient): {ols_result.params['educ']:.4f}")
@@ -169,9 +173,10 @@ print(
 
 Now we use CausalPy's `InstrumentalVariable` experiment to estimate the causal effect of education on wages, using `nearc4` as an instrument.
 
-CausalPy implements IV as a Bayesian model that jointly estimates:
-1. **First stage**: `educ ~ nearc4` (instrument → treatment)
-2. **Second stage**: `lwage ~ educ` (treatment → outcome)
+CausalPy implements IV as a Bayesian model that jointly estimates the two stages. Both stages include the controls from `card.py`: `exper`, `black`, `south`, `married`, and `smsa`.
+
+1. **First stage**: `educ ~ nearc4 + exper + black + south + married + smsa`
+2. **Second stage**: `lwage ~ educ + exper + black + south + married + smsa`
 
 This is modeled as a multivariate normal to capture the correlation between the treatment and outcome.
 
@@ -179,15 +184,11 @@ This is modeled as a multivariate normal to capture the correlation between the 
 # Prepare data for CausalPy
 # CausalPy requires separate dataframes for instruments and outcome
 
-# Instruments data: treatment variable + instrument(s)
-instruments_data = df[["educ", "nearc4"]].copy()
-
-# Outcome data: outcome variable + treatment variable
-data = df[["lwage", "educ"]].copy()
-
-# Formulas
-instruments_formula = "educ ~ 1 + nearc4"  # First stage
-formula = "lwage ~ 1 + educ"  # Second stage
+card_controls = ["exper", "black", "south", "married", "smsa"]
+instruments_data = card[["educ", "nearc4", *card_controls]].copy()
+data = card[["lwage", "educ", *card_controls]].copy()
+instruments_formula = "educ ~ 1 + nearc4 + " + " + ".join(card_controls)
+formula = "lwage ~ 1 + educ + " + " + ".join(card_controls)
 
 print(f"First stage formula: {instruments_formula}")
 print(f"Second stage formula: {formula}")
@@ -196,16 +197,8 @@ print(f"Outcome data shape: {data.shape}")
 ```
 
 ```{python}
-# Run the Bayesian IV model
-# Note: cores=1 required for Jupyter notebooks on macOS
-sample_kwargs = {
-    "tune": 1000,
-    "draws": 1000,
-    "chains": 2,
-    "cores": 1,  # Single core avoids multiprocessing issues on macOS
-    "target_accept": 0.95,
-    "random_seed": 42,
-}
+# Run the Bayesian IV model. Seed only; nutpie is the declared sampler.
+sample_kwargs = {"random_seed": 42}
 
 iv_result = InstrumentalVariable(
     instruments_data=instruments_data,
@@ -214,10 +207,10 @@ iv_result = InstrumentalVariable(
     formula=formula,
     model=InstrumentalVariableRegression(sample_kwargs=sample_kwargs),
 ).fit()
+iv_result.summary()
 ```
 
 ```{python}
-# View the posterior summary
 print("Bayesian IV Results:")
 summary = az.summary(
     iv_result.idata,
@@ -232,17 +225,18 @@ summary
 # Extract the treatment effect (coefficient on educ in second stage)
 beta_z = iv_result.idata["posterior"]["beta_z"]
 
-# Get the education coefficient (should be second element after intercept)
 educ_coef = beta_z.sel(covariates="educ").values.flatten()
-
-print(f"\n2SLS (Bayesian) Returns to Schooling:")
-print(f"  Mean: {np.mean(educ_coef):.4f}")
-print(f"  Std:  {np.std(educ_coef):.4f}")
+iv_educ_mean = float(np.mean(educ_coef))
+iv_2sls = dict(zip(iv_result.labels, iv_result.ols_beta_second_params, strict=True))
+iv_2sls_educ = float(iv_2sls["educ"])
+iv_rhat = float(az.rhat(iv_result.idata)["beta_z"].sel(covariates="educ"))
+print("2SLS reference fit (labels):", list(iv_2sls))
+print(f"Bayesian mean on educ: {iv_educ_mean:.4f}")
+print(f"2SLS reference on educ: {iv_2sls_educ:.4f}")
+print(f"r-hat on educ: {iv_rhat:.3f}")
 print(
-    f"  94% HDI: [{np.percentile(educ_coef, 3):.4f}, {np.percentile(educ_coef, 97):.4f}]"
-)
-print(
-    f"\nInterpretation: Each additional year of education causes a {np.mean(educ_coef) * 100:.1f}% increase in wages."
+    "The book runs `test nearc4` on the first stage. "
+    "This class does not return that F statistic, so it is not computed here."
 )
 ```
 
@@ -307,7 +301,7 @@ The Mixtape's IV analysis of the Card data shows:
 2. **IV estimate**: Often higher, suggesting ability bias may actually *downward* bias OLS (or measurement error attenuates it)
 
 ### This run
-OLS, with the notebook's covariates: 0.0712, 95% CI [0.0643, 0.0780]. Bayesian IV, instrument `nearc4`, second stage `lwage ~ 1 + educ` only, `random_seed=42`: mean 0.1826, 94% HDI [0.1438, 0.2260], r-hat 1.00. The IV estimate is higher than OLS in this specification. It is not the book's point estimate. The second stage omits the covariates in the Mixtape formula.
+OLS on the complete cases, with `exper`, `black`, `south`, `married`, and `smsa`: `{python} f"{ols_result.params['educ']:.4f}"`, 95% CI [`{python} f"{ols_result.conf_int().loc['educ', 0]:.4f}"`, `{python} f"{ols_result.conf_int().loc['educ', 1]:.4f}"`]. Seven rows missing `married` are dropped; that is the sample both fits use. Bayesian IV, instrument `nearc4`, same controls on both stages, `random_seed=42`: mean `{python} f"{iv_educ_mean:.4f}"`. The stored 2SLS reference fit on the same specification is `{python} f"{iv_2sls_educ:.4f}"`. r-hat on `educ` is `{python} f"{iv_rhat:.2f}"`. The book's first-stage F is not computed: the class does not return it.
 
 ### Differences from Book's Implementation
 
@@ -315,7 +309,8 @@ OLS, with the notebook's covariates: 0.0712, 95% CI [0.0643, 0.0780]. Bayesian I
 |--------|---------|----------|
 | Estimation | linearmodels IV2SLS | Bayesian (PyMC) |
 | Inference | Frequentist SEs | Posterior credible intervals |
-| Controls | Included in formula | Simplified (educ + nearc4 only) |
+| Controls | In both stages | Same controls, on both stages |
+| First-stage F | `test nearc4` | Not returned. Not computed here |
 | Output | Point estimate | Full posterior distribution |
 
 ### Notes on the IV Estimate
@@ -326,6 +321,58 @@ The IV estimate is often *larger* than OLS for returns to schooling. This seems 
 2. **Local Average Treatment Effect (LATE)**: IV estimates the effect for "compliers" — people whose education is actually affected by college proximity. This group may have higher returns than average.
 3. **Heterogeneous effects**: The marginal return to schooling for those on the margin of attending college may be higher
 
+
+## Judge fixed-effects example
+
+`python/bail.py` is the judge-leniency design. One Bayesian fit is shown, with the script's minimum controls. The maximum-control specification is not fit. JIVE is not ported.
+
+`jail3` is the treatment. `guilt` is the outcome. `judge_pre_1` through `judge_pre_7` are the instruments. `bailDate` is converted to days since 1970-01-01 and entered as a control, with `day`, `day2`, and `t1` through `t5`. The book's estimator is linear 2SLS, so `binary_treatment=False`. `plot()` raises `NotImplementedError` and is not called.
+
+```{python}
+judge = load_judge()
+judge["bailDate"] = (judge["bailDate"] - pd.Timestamp("1970-01-01")).dt.days
+judge_instruments = [f"judge_pre_{i}" for i in range(1, 8)]
+judge_controls = ["day", "day2", "bailDate", "t1", "t2", "t3", "t4", "t5"]
+judge_fit = InstrumentalVariable(
+    instruments_data=judge[["jail3", *judge_instruments, *judge_controls]],
+    data=judge[["guilt", "jail3", *judge_controls]],
+    instruments_formula="jail3 ~ 1 + " + " + ".join(judge_instruments + judge_controls),
+    formula="guilt ~ 1 + jail3 + " + " + ".join(judge_controls),
+    model=InstrumentalVariableRegression(sample_kwargs=sample_kwargs),
+    binary_treatment=False,
+).fit()
+judge_fit.summary()
+judge_jail = judge_fit.idata["posterior"]["beta_z"].sel(covariates="jail3").values.flatten()
+judge_2sls = dict(zip(judge_fit.labels, judge_fit.ols_beta_second_params, strict=True))
+judge_lo = float(np.quantile(judge_jail, 0.03))
+judge_hi = float(np.quantile(judge_jail, 0.97))
+judge_rhat = float(az.rhat(judge_fit.idata)["beta_z"].sel(covariates="jail3"))
+print(f"jail3 posterior mean: {judge_jail.mean():.4f}")
+print(f"jail3 94% interval: [{judge_lo:.4f}, {judge_hi:.4f}]")
+print(f"2SLS reference on jail3: {judge_2sls['jail3']:.5f}")
+print(f"r-hat on jail3: {judge_rhat:.3f}")
+```
+
+```{python}
+#| label: fig-judge-iv
+#| fig-cap: "Posterior draws of the jail3 coefficient. The dashed line is the 2SLS reference on the same specification. The draws do not concentrate on that reference."
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.hist(judge_jail, bins=40, color="C0", edgecolor="black")
+ax.axvline(judge_2sls["jail3"], color="C3", linestyle="--", label="2SLS reference")
+ax.set_xlabel("jail3 coefficient")
+ax.set_ylabel("Count")
+ax.legend()
+plt.tight_layout()
+plt.show()
+```
+
+The 2SLS second-stage coefficient on `jail3` is `{python} f"{judge_2sls['jail3']:.5f}"`. The posterior mean is `{python} f"{judge_jail.mean():.3f}"`, the 3rd-to-97th percentile interval is [`{python} f"{judge_lo:.2f}"`, `{python} f"{judge_hi:.2f}"`], and r-hat is `{python} f"{judge_rhat:.2f}"`. An r-hat that far from 1 means the two chains did not mix, so that mean and interval are not a usable posterior summary. The default outcome-stage prior is a normal centered on the 2SLS coefficients with scale 1. That scale is enormous relative to a per-day coefficient, and the posterior interval is about as wide as the prior. This run does not recover a precise leniency effect. It is the one Bayesian fit on the script's minimum controls, not a match to the book's 2SLS result.
+
+::: {.callout-note}
+## JIVE is not ported
+
+`bail.py` also calls `SteinIV.jive_est` through rpy2. That estimator is not in CausalPy. It is not implemented here, and no Stock-Yogo critical value is added.
+:::
 ## Summary
 
 This notebook demonstrated:

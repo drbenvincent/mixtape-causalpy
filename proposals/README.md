@@ -10,15 +10,15 @@ This directory contains feature proposals for CausalPy, identified during the Mi
 | [Panel Fixed Effects](proposal_panel_fe.md) | `cp.PanelRegression` | Ch 8 | Superseded — shipped |
 | [Triple Differences](proposal_triple_diff.md) | `cp.TripleDifferences` | Ch 9 | 📝 Proposed |
 
-## Already In Progress
+## Shipped in CausalPy 1.0
 
-These features are already being worked on in CausalPy:
+[PR #621](https://github.com/pymc-labs/CausalPy/pull/621) (staggered difference-in-differences) and [PR #610](https://github.com/pymc-labs/CausalPy/pull/610) (`donut_hole`) are merged. The pages are `notebooks/09_difference_in_differences.qmd` and `notebooks/06_regression_discontinuity.qmd`.
 
-| Feature | CausalPy PR | Mixtape Notebook |
-|---------|-------------|------------------|
-| Staggered DiD | [PR #621](https://github.com/pymc-labs/CausalPy/pull/621) | `09_difference_in_differences.ipynb` |
-| Donut RD | [PR #610](https://github.com/pymc-labs/CausalPy/pull/610) | `06_regression_discontinuity.ipynb` |
-| Event Study | [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) | `09_difference_in_differences.ipynb` |
+## Still open
+
+| Feature | CausalPy PR | Page |
+|---------|-------------|------|
+| Event study | [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) | `notebooks/09_difference_in_differences.qmd`. Common-timing event study, not the castle design. |
 
 ## How to Use These Proposals
 
