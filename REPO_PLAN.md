@@ -26,11 +26,11 @@ This keeps the repo focused and avoids maintaining parallel "baseline" implement
 
 | Chapter | Total | ✅ Done | ⏭️ Skip | ⬜ Todo |
 |----------|-------|---------|---------|---------|
-| `05_matching` | 10 | 5 | 5 | 0 |
-| `06_rd` | 14 | 8 | 6 | 0 |
-| `07_iv` | 2 | 1 | 0 | 1 |
+| `05_matching` | 10 | 6 | 4 | 0 |
+| `06_rd` | 14 | 12 | 2 | 0 |
+| `07_iv` | 2 | 2 | 0 | 0 |
 | `08_panel` | 1 | 1 | 0 | 0 |
-| `09_did` | 9 | 3 | 6 | 0 |
+| `09_did` | 9 | 1 | 8 | 0 |
 | `10_sc` | 3 | 3 | 0 | 0 |
 | `00_data` | 11 | 0 | 11 | 0 |
 
@@ -154,19 +154,19 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 |--------------|-------------|----------|----------|--------|
 | `titanic.py` | Simple difference in outcomes | `05_matching` | 📖 Conceptual | ✅ |
 | `titanic_subclassification.py` | Subclassification example | `05_matching` | ⏭️ Skip | ⏭️ |
-| `training_example.py` | Training program example | `05_matching` | ⏭️ Skip | ⏭️ |
-| `training_bias_reduction.py` | Bias reduction via matching | `05_matching` | ⏭️ Skip | ⏭️ |
+| `training_example.py` | Age histograms; the book's $1,695 figure is a hand table, not computed | `05_matching` | 📖 Conceptual | ✅ |
+| `training_bias_reduction.py` | Eight-row illustration and an OLS fit of Y on X; no matcher | `05_matching` | 📖 Conceptual | ✅ |
 | `nsw_experimental.py` | NSW experimental benchmark | `05_matching` | 📖 Conceptual | ✅ |
 | `nsw_pscore.py` | Propensity score estimation | `05_matching` | ⚠️ Partial | ✅ |
 | `ipw.py` | Inverse propensity weighting | `05_matching` | ✅ Native | ✅ |
-| `teffects_ipw.py` | Treatment effects via IPW | `05_matching` | ✅ Native | ✅ |
+| `teffects_ipw.py` | Not a 2021 chapter section. Not on the page. | `05_matching` | ⏭️ Skip | ⏭️ |
 | `teffects_nn.py` | Nearest neighbor matching | `05_matching` | ❌ Missing | ⏭️ |
 | `cem.py` | Coarsened exact matching | `05_matching` | ❌ Missing | ⏭️ |
 
 **Page**: `notebooks/05_matching.qmd`
 - Demonstrate CausalPy's `InversePropensityWeighting` with NSW data
-- Include balance diagnostics and overlap plots
-- **TODO placeholder** for: NN matching, subclassification, CEM (not yet in CausalPy)
+- Training illustrations are on the page. Subclassification, nearest neighbor, and CEM are callouts
+- `teffects_ipw.py` is not a 2021 chapter section and is not on the page
 
 ---
 
@@ -174,27 +174,26 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `lmb_1.py` | Lee, Moretti, Butler - close elections RD | `06_rd` | ✅ Native | ✅ |
+| `lmb_1.py` | Lee, Moretti, Butler — windowed difference in means, not a covariate placebo | `06_rd` | ✅ Native | ✅ |
 | `lmb_2.py` | LMB with polynomial | `06_rd` | ✅ Native | ✅ |
 | `lmb_3.py` | LMB first stage | `06_rd` | ✅ Native | ✅ |
 | `lmb_4.py` | LMB IK bandwidth | `06_rd` | ✅ Native | ✅ |
 | `lmb_5.py` | LMB quadratic interactions | `06_rd` | ✅ Native | ✅ |
 | `lmb_6.py` | LMB kernel-weighted | `06_rd` | ✅ Native | ✅ |
-| `lmb_7.py` | LMB visualization | `06_rd` | ✅ Native | ✅ |
+| `lmb_7.py` | LMB visualization. Kernel panel is the nonparametric picture; no second smoother | `06_rd` | ✅ Native | ✅ |
 | `lmb_8.R` | LMB kernel-smoothed visualization | `06_rd` | ✅ Native | ✅ |
-| `lmb_9.py` | LMB donut RD | `06_rd` | ❌ Missing | ⏭️ |
-| `lmb_10.py` | LMB robustness | `06_rd` | ❌ Missing | ⏭️ |
-| `rdd_simulate1.py` | RD simulation - potential outcomes | `06_rd` | 📖 Conceptual | ⏭️ |
-| `rdd_simulate2.py` | RD simulation - treatment effect | `06_rd` | 📖 Conceptual | ⏭️ |
-| `rdd_simulate3.py` | RD simulation - nonlinear | `06_rd` | 📖 Conceptual | ⏭️ |
-| `rdd_simulate4.py` | RD simulation - no discontinuity | `06_rd` | 📖 Conceptual | ⏭️ |
+| `lmb_9.py` | `rdrobust` bandwidth, not donut. Callout. Not CCT or IK | `06_rd` | ❌ Missing | ⏭️ |
+| `lmb_10.py` | McCrary density test. Callout. `McCraryDensityTest` is not called | `06_rd` | ❌ Missing | ⏭️ |
+| `rdd_simulate1.py` | RD simulation — potential outcomes | `06_rd` | 📖 Conceptual | ✅ |
+| `rdd_simulate2.py` | RD simulation — treatment effect | `06_rd` | 📖 Conceptual | ✅ |
+| `rdd_simulate3.py` | RD simulation — nonlinear | `06_rd` | 📖 Conceptual | ✅ |
+| `rdd_simulate4.py` | RD simulation — no discontinuity | `06_rd` | 📖 Conceptual | ✅ |
 
 **Page**: `notebooks/06_regression_discontinuity.qmd`
 - Main example: Lee-Moretti-Butler close elections using `RegressionDiscontinuity`
-- Show sharp RD estimation with bandwidth sensitivity
-- Demonstrate diagnostic plots (binned scatter, bandwidth sensitivity)
-- Kernel-smoothed RD visualization (from R's `lmb_8.R`)
-- Reference: donut RD via PR #610 when merged
+- Donut comparison uses the quadratic specification, bandwidth 0.05, and `donut_hole=0.01`
+- Fuzzy RD, regression kink, and covariate continuity are callouts
+- `lmb_9.py` and `lmb_10.py` are callouts
 
 ---
 
@@ -202,14 +201,12 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `card.py` | Card (1995) returns to schooling | `07_iv` | ✅ Native | ✅ |
-| `bail.py` | Stevenson judge-leniency design (OLS, 2SLS, JIVE). Not a panel-FE exercise and not this notebook. JIVE is not a CausalPy estimator. Not implemented. | `07_iv` | ⚠️ Partial | ⬜ |
+| `card.py` | Card (1995) returns to schooling, with the book's controls in both stages | `07_iv` | ✅ Native | ✅ |
+| `bail.py` | Judge fixed effects. One Bayesian IV fit. JIVE is a callout, not ported | `07_iv` | ⚠️ Partial | ✅ |
 
 **Page**: `notebooks/07_instrumental_variables.qmd`
-- Card's proximity to college as instrument for education
-- Use CausalPy's `InstrumentalVariable` experiment
-- Show first-stage diagnostics, compare OLS vs 2SLS
-- `bail.py` is Chapter 7, not Chapter 8. Not implemented on this page.
+- Card's proximity to college as instrument for education, with `exper`, `black`, `south`, `married`, and `smsa` in both stages
+- `bail.py` is Chapter 7. The page fits `guilt` on `jail3` with the script's small control set. No first-stage F is reported. JIVE is not run
 - Reference: fuzzy RD (issue #221) for connection to RD chapter
 
 ---
@@ -234,22 +231,20 @@ Not this page, and not waiting on panel FE:
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `abortion_dd.py` | Abortion legalization DiD | `09_did` | ✅ Native | ✅ |
-| `abortion_dd2.py` | Abortion DiD variations | `09_did` | ✅ Native | ✅ |
+| `abortion_dd.py` | Abortion legalization TWFE. Callout; the 1993 split is not the book's design and is not fit | `09_did` | ⏭️ Skip | ⏭️ |
+| `abortion_dd2.py` | Abortion DiD variations. Callout | `09_did` | ⏭️ Skip | ⏭️ |
 | `abortion_ddd.py` | Triple differences | `09_did` | ⏭️ Skip | ⏭️ |
 | `abortion_ddd2.py` | Triple differences variations | `09_did` | ⏭️ Skip | ⏭️ |
-| `castle_1.py` | Castle doctrine - basic DiD | `09_did` | ✅ Native | ✅ |
-| `castle_2.py` | Castle doctrine - event study | `09_did` | ⚠️ Partial | ⏭️ |
-| `castle_3.py` | Castle doctrine - robustness | `09_did` | ⚠️ Partial | ⏭️ |
-| `castle_4.py` | Castle doctrine - extensions | `09_did` | ⚠️ Partial | ⏭️ |
-| `castle_5.py` | Castle doctrine - placebo | `09_did` | ❌ Missing | ⏭️ |
+| `castle_1.py` | TWFE not run. The page estimates the BJS imputation instead, and that fit is not this script | `09_did` | ⚠️ Partial | ⏭️ |
+| `castle_2.py` | Event-time table from the BJS imputation, not the script's WLS event study | `09_did` | ⚠️ Partial | ✅ |
+| `castle_3.py` | WLS event-study plot. Callout | `09_did` | ⚠️ Partial | ⏭️ |
+| `castle_4.py` | WLS event-study plot. Callout | `09_did` | ⚠️ Partial | ⏭️ |
+| `castle_5.py` | Empty Python file. The R script is a Bacon decomposition. Callout | `09_did` | ❌ Missing | ⏭️ |
 
 **Page**: `notebooks/09_difference_in_differences.qmd`
-- Main examples: Castle doctrine + abortion legalization
-- Use CausalPy's `DifferenceInDifferences` experiment
-- Show parallel trends checks, event study plots
-- Reference: staggered DiD (PR #621), event study (PR #584)
-- Include placebo/robustness tests
+- Castle doctrine uses `StaggeredDifferenceInDifferences` with scikit-learn `LinearRegression`. Not TWFE, and not a Bayesian fit
+- Abortion, triple differences, the Bacon decomposition, and the WLS event study are callouts
+- [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) is a common-timing event study. It is not this staggered design
 
 ---
 
@@ -276,13 +271,11 @@ Some Mixtape examples require CausalPy features that don't exist yet. This secti
 
 ### Open PRs (In Progress)
 
-These features are being actively developed in CausalPy:
+[PR #621](https://github.com/pymc-labs/CausalPy/pull/621) and [PR #610](https://github.com/pymc-labs/CausalPy/pull/610) are merged. Staggered difference-in-differences and `donut_hole` are in CausalPy 1.0.0rc1.
 
 | Feature | CausalPy PR | Page to update |
 |---------|-------------|----------------|
-| Staggered DiD | [PR #621](https://github.com/pymc-labs/CausalPy/pull/621) | `notebooks/09_difference_in_differences.qmd` |
-| Event Study | [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) | `notebooks/09_difference_in_differences.qmd` |
-| Donut RD | [PR #610](https://github.com/pymc-labs/CausalPy/pull/610) | `notebooks/06_regression_discontinuity.qmd` |
+| Event study | [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) | `notebooks/09_difference_in_differences.qmd`. Common-timing event study, not the castle-doctrine design. Still open. |
 
 ### Feature Proposals (Not Yet Started)
 

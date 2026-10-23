@@ -34,13 +34,14 @@ This notebook follows the structure of the Mixtape chapter [@cunningham2021]:
 
 | File | Description | Status |
 |------|-------------|--------|
-| `rdd_simulate1-4` | Pedagogical simulations | ✅ Done |
+| `rdd_simulate1-3` | Pedagogical simulations | ✅ Done |
+| `rdd_simulate4` | No-discontinuity simulation | ✅ Done |
 | `lmb_1-2` | Naive comparisons (motivation) | ✅ Done |
 | `lmb_3-6` | RD specifications | ✅ **CausalPy** |
-| `lmb_7` | Three RD plots | ⚠️ Partial (no loess) |
+| `lmb_7` | Three RD plots | ✅ Done |
 | `lmb_8.R` | Kernel-smoothed plot | ✅ Done |
-| `lmb_9.R` | rdrobust optimal bandwidth | 📌 Placeholder |
-| `lmb_10.R` | McCrary density test | 📌 Placeholder |
+| `lmb_9.py` | rdrobust bandwidth | ⏭️ Callout |
+| `lmb_10.py` | McCrary density test | ⏭️ Callout |
 
 
 ## Setup
@@ -149,7 +150,62 @@ plt.suptitle(
 )
 plt.tight_layout()
 plt.show()
+
 ```
+
+```{python}
+#| label: fig-rdd-simulate4
+#| fig-cap: "Simulated outcome with a smooth conditional expectation and no planted jump at 140. Curves are the fully interacted polynomial fit on each side of the cutoff."
+# rdd_simulate4: no discontinuity. Reset the seed so this cell matches the
+# script's DGP rather than continuing the stream from simulate1-3.
+np.random.seed(12282020)
+sim4 = pd.DataFrame({"x": np.random.normal(100, 50, 1000)})
+sim4.loc[sim4.x < 0, "x"] = 0
+sim4["x2"] = sim4["x"] ** 2
+sim4["x3"] = sim4["x"] ** 3
+sim4["D"] = (sim4["x"] > 140).astype(int)
+sim4["y3"] = (
+    10000
+    + 0 * sim4["D"]
+    - 100 * sim4["x"]
+    + sim4["x"] ** 2
+    + np.random.normal(0, 1000, 1000)
+)
+sim4 = sim4[sim4.x < 280]
+sim4_fit = smf.ols(
+    "y3 ~ D + x + x2 + x3 + D*x + D*x2 + D*x3", data=sim4
+).fit()
+sim4_d = float(sim4_fit.params["D"])
+# The formula's D coefficient is the intercept gap at x=0. The jump the
+# figure is about is the predicted difference at the cutoff.
+cutoff = pd.DataFrame(
+    {
+        "x": [140.0, 140.0],
+        "x2": [140.0**2, 140.0**2],
+        "x3": [140.0**3, 140.0**3],
+        "D": [0, 1],
+    }
+)
+sim4_jump = float(np.diff(sim4_fit.predict(cutoff))[0])
+
+fig, ax = plt.subplots(figsize=(8, 5))
+colors = ["C0" if d == 0 else "C3" for d in sim4["D"]]
+ax.scatter(sim4["x"], sim4["y3"], c=colors, alpha=0.25, s=16)
+for d, color in [(0, "C0"), (1, "C3")]:
+    side = sim4[sim4["D"] == d].sort_values("x")
+    ax.plot(side["x"], sim4_fit.predict(side), color=color, linewidth=2)
+ax.axvline(x=140, color="gray", linestyle="--", linewidth=2)
+ax.set_xlabel("Running variable (X)")
+ax.set_ylabel("Outcome (Y)")
+ax.set_title("No planted jump: flexible fit")
+plt.tight_layout()
+plt.show()
+print(f"Formula D coefficient (intercept gap at x=0): {sim4_d:.1f}")
+print(f"Predicted gap at the cutoff x=140: {sim4_jump:.1f}")
+```
+
+The data-generating process plants a jump of zero at 140. The script's formula is `y3 ~ D * (x + x2 + x3)`, so its `D` coefficient is the intercept gap at x = 0, not the jump at the cutoff. The same fit's predicted gap at 140 is `{python} f"{sim4_jump:.0f}"`, against an outcome near 15,000 and noise with standard deviation 1,000. A linear fit on each side of a curved conditional expectation can still look like a discontinuity; that failure is the previous simulation, not this one.
+
 
 ---
 
@@ -245,6 +301,24 @@ result_quad = cp.RegressionDiscontinuity(
 result_quad.summary()
 ```
 
+```{python}
+# Donut robustness on the same quadratic specification. Hole width 0.01 is
+# inside the 0.05 bandwidth. This is not lmb_9.py: that script calls rdrobust.
+result_donut = cp.RegressionDiscontinuity(
+    data=df_clean,
+    formula="score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated",
+    running_variable_name="demvoteshare_c",
+    model=cp.pymc_models.LinearRegression(
+        sample_kwargs={"progressbar": True, "random_seed": 42}
+    ),
+    treatment_threshold=0.0,
+    bandwidth=0.05,
+    donut_hole=0.01,
+).fit()
+result_donut.summary()
+```
+
+
 ### CausalPy RD Plot
 
 ```{python}
@@ -266,51 +340,50 @@ plt.show()
 # Summary of CausalPy RD estimates across specifications
 print("CausalPy RD Estimates: Treatment Effect at Threshold")
 print("=" * 60)
+rd_effects = {}
 for name, result in [
     ("Linear", result_linear),
     ("Interaction", result_interact),
     ("Quadratic+BW", result_quad),
+    ("Donut 0.01", result_donut),
 ]:
     disc = result.result.discontinuity_at_threshold
     mean_eff = float(disc.mean())
     ci_lo = float(disc.quantile(0.03))
     ci_hi = float(disc.quantile(0.97))
+    rd_effects[name] = (mean_eff, ci_lo, ci_hi)
     print(f"{name:15s}: {mean_eff:5.1f} [94% CI: {ci_lo:.1f}, {ci_hi:.1f}]")
 print()
 ```
 
+The donut fit uses the same quadratic formula, bandwidth 0.05, and seed as the no-hole fit. It drops observations within 0.01 of the cutoff. The no-hole discontinuity is `{python} f"{rd_effects['Quadratic+BW'][0]:.1f}"` ADA points; the donut discontinuity is `{python} f"{rd_effects['Donut 0.01'][0]:.1f}"`. This is not `lmb_9.py`.
+
+::: {.callout-note}
+## Checks this page does not run
+
+Fuzzy regression discontinuity and the regression kink design are not estimated. `RegressionDiscontinuity` is a sharp design. It has no fuzzy or kink estimator.
+
+`lmb_9.py` selects a bandwidth with `rdrobust`. CausalPy has no data-driven bandwidth selector. The grid below is a manual sensitivity check. It is not a CCT or IK bandwidth, and it is not `rdrobust`.
+
+`lmb_10.py` is a density test. `McCraryDensityTest` is not called. The histogram is a picture of the running variable, not that test.
+
+Section 6.3.2 discusses covariate balance with the Lee, Moretti, and Butler figure (real income, high-school share, Black population share, voting-age population). The Mixtape scripts do not fit those placebos. `lmb-data.dta` has columns with those names. This page does not add a covariate placebo. `lmb_1.py` is a windowed difference in means, not that check.
+:::
+
 ```{python}
-# =============================================================================
-# TODO: lmb_9 - Optimal Bandwidth Selection (rdrobust) - Awaiting CausalPy support
-# =============================================================================
-# R code: rdrobust(y = lmb_data$score, x = lmb_data$demvoteshare, c = 0.5)
-# CausalPy has manual bandwidth but no data-driven IK/CCT selection
-print("PLACEHOLDER: rdrobust optimal bandwidth selection not in CausalPy")
-print("Using manual bandwidth sensitivity analysis instead (see below).")
-```
-
-### Validity Check: McCrary Density Test (lmb_10) — PLACEHOLDER
-
-```{python}
-# =============================================================================
-# TODO: lmb_10 - McCrary Density Test - Awaiting CausalPy support
-# =============================================================================
-# R code: DCdensity(lmb_data$demvoteshare, cutpoint = 0.5)
-# Tests for manipulation at threshold (bunching)
-print("PLACEHOLDER: McCrary density test not in CausalPy")
-print("Visual inspection of running variable density below:")
-
-# Visual check (not a formal test)
+#| label: fig-lmb-running-density
+#| fig-cap: "Histogram of Democratic vote share. This is not a McCrary density test."
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.hist(df_clean["demvoteshare"], bins=50, density=True, alpha=0.7, edgecolor="black")
-ax.axvline(x=0.5, color="red", linestyle="--", linewidth=2, label="Threshold")
-ax.set_xlabel("Democratic Vote Share")
+ax.axvline(x=0.5, color="C3", linestyle="--", linewidth=2, label="Threshold")
+ax.set_xlabel("Democratic vote share")
 ax.set_ylabel("Density")
-ax.set_title("Running Variable Distribution (Visual Manipulation Check)")
+ax.set_title("Running variable")
 ax.legend()
+plt.tight_layout()
 plt.show()
-print("No obvious bunching at threshold. Formal test would confirm.")
 ```
+
 
 ---
 
@@ -388,6 +461,7 @@ ax.set_xlabel("Democratic Vote Share")
 ax.set_ylabel("ADA Score")
 ax.set_title("Kernel-Smoothed RD Plot (lmb_8)")
 ax.legend()
+
 ax.set_xlim(0.25, 0.75)
 ax.set_ylim(0, 100)
 plt.tight_layout()
@@ -396,6 +470,8 @@ print(
     f"Kernel discontinuity estimate: ~{kernel_smooth(above_k['demvoteshare'].values, above_k['score'].values, [0.501])[0] - kernel_smooth(below_k['demvoteshare'].values, below_k['score'].values, [0.499])[0]:.0f} ADA points"
 )
 ```
+
+The kernel panel is a Gaussian smoother. `lmb_8.R` uses a box kernel (`ksmooth`, bandwidth 0.1). A second smoother is not added; this panel already shows the nonparametric shape.
 
 ---
 
@@ -413,7 +489,7 @@ for bw in bandwidths:
             formula="score ~ 1 + demvoteshare_c + treated",
             running_variable_name="demvoteshare_c",
             model=cp.pymc_models.LinearRegression(
-                sample_kwargs={"progressbar": False, "cores": 1, "random_seed": 42}
+                sample_kwargs={"progressbar": False, "random_seed": 42}
             ),
             treatment_threshold=0.0,
             bandwidth=bw,
@@ -469,16 +545,18 @@ if len(bw_df) > 0:
 
 ### This run
 
-The discontinuity is `result.discontinuity_at_threshold`, not the `treated` coefficient.
+
+The discontinuity is `result.result.discontinuity_at_threshold`, not the `treated` coefficient. Intervals are the 3rd and 97th percentiles of that posterior.
 
 | Specification | Treatment effect | 94% interval |
 |---------------|------------------|--------------|
-| Linear, full sample | 58.4 | [57.2, 59.6] |
-| Interaction, full sample | 55.4 | [54.1, 56.7] |
-| Quadratic, ±5pp bandwidth | 47.0 | [44.3, 49.7] |
-| Local linear, bandwidth 0.02–0.25 | 46.3 to 47.9 | see the bandwidth cell |
+| Linear, full sample | `{python} f"{rd_effects['Linear'][0]:.1f}"` | `{python} f"[{rd_effects['Linear'][1]:.1f}, {rd_effects['Linear'][2]:.1f}]"` |
+| Interaction, full sample | `{python} f"{rd_effects['Interaction'][0]:.1f}"` | `{python} f"[{rd_effects['Interaction'][1]:.1f}, {rd_effects['Interaction'][2]:.1f}]"` |
+| Quadratic, ±5pp, no hole | `{python} f"{rd_effects['Quadratic+BW'][0]:.1f}"` | `{python} f"[{rd_effects['Quadratic+BW'][1]:.1f}, {rd_effects['Quadratic+BW'][2]:.1f}]"` |
+| Quadratic, ±5pp, hole 0.01 | `{python} f"{rd_effects['Donut 0.01'][0]:.1f}"` | `{python} f"[{rd_effects['Donut 0.01'][1]:.1f}, {rd_effects['Donut 0.01'][2]:.1f}]"` |
+| Local linear, bandwidth `{python} f"{bw_df['bw'].min():.2f}"`–`{python} f"{bw_df['bw'].max():.2f}"` | `{python} f"{lo:.1f}"` to `{python} f"{hi:.1f}"` | see the bandwidth cell |
 
-The close-election result is the local one, about 47 ADA points, and it is stable across those bandwidths. Full-sample linear and interaction fits use observations far from the cutoff, so they are a different estimand and come out larger. Do not read the table as four replications of 47.
+The close-election result is the local quadratic one, `{python} f"{rd_effects['Quadratic+BW'][0]:.1f}"` ADA points. Full-sample linear and interaction fits use observations far from the cutoff, so they are a different estimand. Do not read the table as replications of that local number. The donut row drops observations within 0.01 of the cutoff and is the robustness check, not a second design.
 
 ### Comparison: Mixtape vs CausalPy
 
@@ -486,7 +564,7 @@ The close-election result is the local one, about 47 ADA points, and it is stabl
 |--------|---------------|---------------------|
 | Estimation | Frequentist | Bayesian (PyMC) |
 | Uncertainty | Confidence intervals | Credible intervals |
-| Bandwidth selection | rdrobust (auto) | Manual |
+| Bandwidth selection | `rdrobust` | Manual grid, not `rdrobust` |
 
 ---
 
@@ -495,7 +573,7 @@ The close-election result is the local one, about 47 ADA points, and it is stabl
 
 - First edition: [Chapter 6: Regression Discontinuity](https://mixtape-1ed.netlify.app/06-regression_discontinuity.html)
 - CausalPy: [Regression discontinuity](https://causalpy.readthedocs.io/en/latest/notebooks/regression-discontinuity-drinking-pymc.html)
-- McCrary, Justin (2008). "Manipulation of the Running Variable in the Regression Discontinuity Design: A Density Test." *Journal of Econometrics* 142 (2): 698–714. The density-test cell on this page is a placeholder and does not run the test.
+- McCrary, Justin (2008). "Manipulation of the Running Variable in the Regression Discontinuity Design: A Density Test." *Journal of Econometrics* 142 (2): 698–714. The density test is not run on this page.
 :::
 
 ## References
