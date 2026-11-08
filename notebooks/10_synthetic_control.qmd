@@ -522,6 +522,12 @@ Placebo-in-space: Texas is larger than all 10 placebos. The two-sided permutatio
 | Observation noise | Not a Bayesian prior | Data-scaled `sigma` (`auto_scale_sigma=True`), not the pre-1.0 `HalfNormal(1)` prior |
 | Donor weights, this run | Sparse in the book | Diffuse. Largest posterior mean weight about 0.03 |
 
+::: {.callout-note}
+## Covariate matching is not available
+
+The book matches Texas to a synthetic control on pre-treatment incarceration and on covariates such as income, unemployment, and high-school share. `SyntheticControl` matches on the outcome series only. There is no covariate argument to pass, and no covariate-matching helper is invented here.
+:::
+
 ## Summary
 
 This notebook demonstrated:

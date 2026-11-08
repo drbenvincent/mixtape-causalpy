@@ -28,6 +28,7 @@ To clear the cache, simply delete this directory.
 | LMB | `lmb-data.dta` | Ch 6: RD | Lee-Moretti-Butler close elections data |
 | Castle | `castle.dta` | Ch 9: DiD | Castle doctrine (Stand Your Ground) laws |
 | Card | `card.dta` | Ch 7: IV | Card (1995) returns to schooling |
+| Judge FE | `judge_fe.dta` | Ch 7: IV | Judge-leniency example used by `python/bail.py`. Fetched from the Mixtape repo. Not committed and not relicensed here. |
 | Texas | `texas.dta` | Ch 10: SC | Texas incarceration for synthetic control |
 | NSW | `nsw_mixtape.dta` | Ch 5: Matching | National Supported Work experimental data |
 | Abortion | `abortion.dta` | Ch 9: DiD | Abortion legalization effects |
