@@ -13,7 +13,7 @@ jupyter: mixtape-causalpy
 
 Adoption dates in the castle-doctrine panel are not a single year. A two-group, two-period coefficient is the wrong estimand for that design, and it is not what this page reports.
 
-The fit below is the Borusyak, Jaravel, and Spiess imputation estimator [@borusyak2024], via scikit-learn `LinearRegression`. It is not a Bayesian fit. It is not Cheng and Hoekstra's two-way fixed-effects coefficient [@cheng2013], and it is not `castle_1.py`.
+The fit below is the Borusyak, Jaravel, and Spiess imputation estimator [@borusyak2024]. The untreated outcome is a Bayesian linear model. It is not Cheng and Hoekstra's two-way fixed-effects coefficient [@cheng2013], and it is not `castle_1.py`.
 
 Snow, the minimum wage, block bootstrap, clustering, the Affordable Care Act, and maternity benefits have no script on this page. No dataset is added for them.
 
@@ -27,7 +27,6 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
 
 import causalpy as cp
 
@@ -94,39 +93,42 @@ There is no already-treated cohort in the first year. The panel starts in `{pyth
 
 ### Imputation event-time contrasts
 
-The formula is state and year fixed effects. `C()` accepts the numeric year column, so year is not recoded to a string. `fit_intercept=False` is passed because the formula already contains an intercept. Leaving the default at `True` warns and clones the estimator with `fit_intercept=False`; it does not drop the intercept from the formula.
+The formula is state and year fixed effects. `C()` accepts the numeric year column, so year is not recoded to a string. The `1` in the formula is the intercept column of the design matrix. The Bayesian model multiplies that matrix by its coefficient vector and does not add a second intercept.
 
 `post` is an absorbing 0/1 column in the file. It is not passed as `treated_variable_name`. The absorbing-treatment check runs only when that argument is passed. `l_homicide` has no missing values, so there is nothing for a missing-outcome check to drop. The class's missing-value check on a treated column is about the treatment indicator, not the outcome.
 
 ```{python}
-# fit_intercept=False: the formula already has an intercept. The adapter
-# warns and clones if the estimator is left at fit_intercept=True.
 result = cp.StaggeredDifferenceInDifferences(
     castle,
     formula="l_homicide ~ 1 + C(state) + C(year)",
     unit_variable_name="state",
     time_variable_name="year",
     treatment_time_variable_name="treatment_time",
-    model=cp.skl_models.create_causalpy_compatible_class(LinearRegression)(
-        fit_intercept=False
+    model=cp.pymc_models.LinearRegression(
+        sample_kwargs={
+            "chains": 2,
+            "tune": 100,
+            "draws": 200,
+            "progressbar": True,
+            "random_seed": 42,
+        }
     ),
 ).fit()
 result.summary()
 castle_att = result.result.att_event_time
 att0 = castle_att.loc[castle_att["event_time"] == 0].iloc[0]
 att_m1 = castle_att.loc[castle_att["event_time"] == -1].iloc[0]
-singleton = castle_att.loc[castle_att["n_obs"] == 1, "event_time"]
 ```
 
-`att` is the mean of observed log homicide minus the prediction from the untreated fit, at that event time. It is not normalized to a zero reference period. The constructor's `reference_event_time` defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is `{python} f"{att_m1.att:+.3f}"`, not zero. Event time 0, the adoption year, is `{python} f"{att0.att:+.3f}"` log points, from `{python} int(att0.n_obs)` state-years.
+`att` is the posterior mean of the unit-averaged imputation contrast at that event time: observed log homicide minus the untreated prediction. It is not normalized to a zero reference period. The constructor's `reference_event_time` defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is `{python} f"{att_m1.att:+.3f}"`, not zero. Event time 0, the adoption year, is `{python} f"{att0.att:+.3f}"` log points, from `{python} int(att0.n_obs)` state-years. Its 94% interval is `{python} f"[{att0.att_lower:+.3f}, {att0.att_upper:+.3f}]"`.
 
-`att_std` is the residual standard deviation of the cell, not a clustered standard error and not a Bayesian interval. The plot's bars are 1.96 times that standard deviation divided by the square root of the cell size. A cell with one observation has no residual standard deviation, so it has no bar.
+`att_lower` and `att_upper` are the 3rd and 97th percentiles of that contrast. The plot labels those bars as a 94% HDI. They are not residual standard errors, and a cell with one observation still has a bar. `nuts_sampler` is omitted, so the installed nutpie sampler is selected. No `cores` argument is passed.
 
 That event-time 0 number is not Cheng and Hoekstra's two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.
 
 ```{python}
 #| label: fig-castle-event-time
-#| fig-cap: "Event-time imputation contrasts for the log homicide rate. Bars are 1.96 times the cell residual standard deviation over the square root of the cell size, not clustered intervals. No pre-treatment cell is normalized to zero."
+#| fig-cap: "Event-time imputation contrasts for the log homicide rate. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors. No pre-treatment cell is normalized to zero."
 fig, axes = result.plot(show=False)
 axes[0].set_xlabel("Event time (years since adoption)")
 axes[0].set_ylabel("Imputation contrast (log homicide rate)")
