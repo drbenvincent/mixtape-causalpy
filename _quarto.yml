@@ -15,8 +15,6 @@ website:
   search: true
   navbar:
     left:
-      - href: index.qmd
-        text: Home
       - text: Attribution
         href: attribution.qmd
       - text: "Mixtape (1st ed.)"
@@ -49,6 +47,7 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
+    css: styles.css
     toc: true
     code-copy: true
     code-overflow: wrap

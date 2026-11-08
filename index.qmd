@@ -1,30 +1,143 @@
 ---
 title: "The Mixtape in CausalPy"
+subtitle: "Bayesian re-implementations of the first-edition code examples"
 author:
   - name: Benjamin T. Vincent
     url: https://drbenvincent.github.io/
+title-block-banner: "#e7f1fb"
+title-block-banner-color: "#17324d"
 suppress-bibliography: true
+format:
+  html:
+    toc: false
 ---
 
-Unofficial. This site is not affiliated with, endorsed by, or authorized by Scott Cunningham, Baylor University, Yale University Press, or PyMC Labs. It re-implements code examples from the first edition of Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) (Yale University Press, 2021) with [CausalPy](https://causalpy.readthedocs.io). It is a translation of the analyses, not a copy of the book. Credit, dataset citations, and the upstream license notice are on the [attribution page](attribution.qmd).
+Scott Cunningham, [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) (Yale University Press, 2021). The examples are estimated in [CausalPy](https://causalpy.readthedocs.io).
 
-This site does not cover the second edition, [*Causal Inference: The Remix*](https://mixtape.scunning.com/). Identification narrative stays on the first-edition book site.
+::: {.callout-note}
+## Unofficial
 
-A translation by [Benjamin T. Vincent](https://drbenvincent.github.io/).
+This site is not affiliated with, endorsed by, or authorized by Scott Cunningham, Baylor University, Yale University Press, or PyMC Labs. It is a translation of the analyses, not a copy of the book. Credit, dataset citations, and the upstream license notice are on the [attribution page](attribution.qmd).
+:::
 
-Estimates are Bayesian (PyMC) unless a section says otherwise. Numbers will not match the book's OLS tables exactly. Each chapter records where they differ and why.
+## What will not match
 
-Outputs are frozen in `_freeze/`. A project render republishes the saved plots and does not re-sample. Re-running a chapter is a local edit, not a CI step.
+::: {.grid}
+
+::: {.g-col-12 .g-col-sm-4}
+::: {.home-fact}
+**Bayesian, not OLS.** Estimates are PyMC posteriors unless a section says otherwise. Numbers will not match the book's OLS tables exactly. Each chapter records where they differ and why.
+:::
+:::
+
+::: {.g-col-12 .g-col-sm-4}
+::: {.home-fact}
+**First edition only.** This site does not cover the second edition, [*Causal Inference: The Remix*](https://mixtape.scunning.com/).
+:::
+:::
+
+::: {.g-col-12 .g-col-sm-4}
+::: {.home-fact}
+**Recomputed, not copied.** Plots are new. These pages do not reproduce the book's figures or the identification narrative.
+:::
+:::
+
+:::
 
 ## Chapters
 
-| Chapter | Page | CausalPy |
-|---------|------|----------|
-| 5. Matching and subclassification | [Matching](notebooks/05_matching.qmd) | Inverse propensity weighting. Training illustrations are on the page. Other matching methods are callouts |
-| 6. Regression discontinuity | [Regression discontinuity](notebooks/06_regression_discontinuity.qmd) | `RegressionDiscontinuity`, including a donut comparison |
-| 7. Instrumental variables | [Instrumental variables](notebooks/07_instrumental_variables.qmd) | `InstrumentalVariable` for Card and the judge example. JIVE is a callout |
-| 8. Panel data | [Panel data](notebooks/08_panel_data.qmd) | `PanelRegression` |
-| 9. Difference-in-differences | [Difference-in-differences](notebooks/09_difference_in_differences.qmd) | `StaggeredDifferenceInDifferences` imputation for castle doctrine. Not a two-group two-period result |
-| 10. Synthetic control | [Synthetic control](notebooks/10_synthetic_control.qmd) | `SyntheticControl` |
+::: {.grid}
+
+::: {.g-col-12 .g-col-sm-6}
+::: {.card .h-100 .chapter-card}
+::: {.card-body}
+[Matching and subclassification](notebooks/05_matching.qmd){.card-title .stretched-link}
+
+Chapter 5 · [Partial]{.partial}
+
+NSW job training against CPS controls. Inverse propensity weighting. Training illustrations are on the page. Other matching methods are callouts.
+:::
+::: {.card-footer}
+`InversePropensityWeighting`
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-sm-6}
+::: {.card .h-100 .chapter-card}
+::: {.card-body}
+[Regression discontinuity](notebooks/06_regression_discontinuity.qmd){.card-title .stretched-link}
+
+Chapter 6
+
+Close elections in Lee, Moretti, and Butler, plus the simulations that show a linear fit inventing a jump. Includes a donut comparison.
+:::
+::: {.card-footer}
+`RegressionDiscontinuity`
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-sm-6}
+::: {.card .h-100 .chapter-card}
+::: {.card-body}
+[Instrumental variables](notebooks/07_instrumental_variables.qmd){.card-title .stretched-link}
+
+Chapter 7
+
+Card's returns to schooling. Growing up near a four-year college instruments for years of education. The judge-leniency example is also fit. JIVE is a callout.
+:::
+::: {.card-footer}
+`InstrumentalVariable`
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-sm-6}
+::: {.card .h-100 .chapter-card}
+::: {.card-body}
+[Panel data](notebooks/08_panel_data.qmd){.card-title .stretched-link}
+
+Chapter 8
+
+Provider fixed effects on the Survey of Adult Service Providers. Within estimates are checked against the book's point estimates. The Bayesian interval is not a clustered standard error.
+:::
+::: {.card-footer}
+`PanelRegression`
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-sm-6}
+::: {.card .h-100 .chapter-card}
+::: {.card-body}
+[Difference-in-differences](notebooks/09_difference_in_differences.qmd){.card-title .stretched-link}
+
+Chapter 9
+
+Castle doctrine, fit with `StaggeredDifferenceInDifferences` imputation. Not a two-group two-period result.
+:::
+::: {.card-footer}
+`StaggeredDifferenceInDifferences`
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-sm-6}
+::: {.card .h-100 .chapter-card}
+::: {.card-body}
+[Synthetic control](notebooks/10_synthetic_control.qmd){.card-title .stretched-link}
+
+Chapter 10
+
+Texas prison-capacity expansion, a synthetic donor pool, and placebo-in-space checks.
+:::
+::: {.card-footer}
+`SyntheticControl`
+:::
+:::
+:::
+
+:::
 
 Source and setup: [drbenvincent/mixtape-causalpy](https://github.com/drbenvincent/mixtape-causalpy).
