@@ -1,0 +1,60 @@
+/* Homepage classes in index.qmd. Chapter pages do not use them. */
+
+.home-fact {
+  border-top: 2px solid var(--bs-primary);
+  padding-top: 0.75rem;
+  height: 100%;
+}
+
+.home-fact strong {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.chapter-card {
+  border-top: 3px solid var(--bs-primary);
+}
+
+.chapter-card:hover {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0.35rem 1rem rgba(0, 0, 0, 0.06);
+}
+
+.chapter-card .card-title {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--bs-link-color);
+  text-decoration: none;
+}
+
+.chapter-card .card-title:hover {
+  color: var(--bs-link-hover-color);
+  text-decoration: underline;
+}
+
+.chapter-card .card-body > p:first-of-type {
+  color: var(--bs-secondary-color, var(--bs-secondary));
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.chapter-card .partial {
+  color: var(--bs-primary);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.chapter-card .card-footer {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color, var(--bs-secondary));
+  background: transparent;
+}
+
+.chapter-card .card-footer code {
+  color: inherit;
+}
