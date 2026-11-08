@@ -242,7 +242,7 @@ Not this page, and not waiting on panel FE:
 | `castle_5.py` | Empty Python file. The R script is a Bacon decomposition. Callout | `09_did` | ❌ Missing | ⏭️ |
 
 **Page**: `notebooks/09_difference_in_differences.qmd`
-- Castle doctrine uses `StaggeredDifferenceInDifferences` with scikit-learn `LinearRegression`. Not TWFE, and not a Bayesian fit
+- Castle doctrine uses `StaggeredDifferenceInDifferences` with PyMC `LinearRegression`, sampled with nutpie. Not TWFE. Fixed effects stay in the formula
 - Abortion, triple differences, the Bacon decomposition, and the WLS event study are callouts
 - [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) is a common-timing event study. It is not this staggered design
 
