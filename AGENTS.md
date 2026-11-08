@@ -2,7 +2,7 @@
 
 Work practices for AI assistants (and humans) contributing to this repo.
 
-**Edition:** first edition only (2021). Ground truth is https://mixtape-1ed.netlify.app/. https://mixtape.scunning.com/ is now *Causal Inference: The Remix* and is not a source for this repo. See [issue #4](https://github.com/drbenvincent/mixtape-causalpy/issues/4).
+**Edition:** first edition only (2021). Ground truth is https://mixtape-1ed.netlify.app/. https://mixtape.scunning.com/ is now *Causal Inference: The Remix* and is not a source for this repo. See [DECISIONS.md](DECISIONS.md).
 
 ## Before Starting Work
 

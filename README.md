@@ -2,7 +2,7 @@
 
 Unofficial. This repository is not affiliated with, endorsed by, or authorized by Scott Cunningham, Yale University Press, or PyMC Labs. It re-implements the code examples from the **first edition** of Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) (Yale University Press, 2021) using [CausalPy](https://causalpy.readthedocs.io).
 
-It does **not** cover the second edition, [*Causal Inference: The Remix*](https://mixtape.scunning.com/) (2026). There is no public Remix code repository to translate yet. See [issue #4](https://github.com/drbenvincent/mixtape-causalpy/issues/4).
+It does **not** cover the second edition, [*Causal Inference: The Remix*](https://mixtape.scunning.com/) (2026). There is no public Remix code repository to translate yet. See [DECISIONS.md](DECISIONS.md).
 
 Read the chapters at **<https://drbenvincent.github.io/mixtape-causalpy/>**. GitHub shows the `.qmd` source only; the Pages site is the rendered reader surface, including the saved plots. Site credit is on the [attribution page](attribution.qmd).
 
