@@ -1,6 +1,6 @@
 # Mixtape → CausalPy Translation Repo Plan
 
-**Edition: first edition only (2021).** This plan does not cover *Causal Inference: The Remix*. See [issue #4](https://github.com/drbenvincent/mixtape-causalpy/issues/4). `https://mixtape.scunning.com` is now the Remix and is not ground truth here.
+**Edition: first edition only (2021).** This plan does not cover *Causal Inference: The Remix*. See [DECISIONS.md](DECISIONS.md). `https://mixtape.scunning.com` is now the Remix and is not ground truth here.
 
 This document outlines the structure and implementation plan for translating the code examples from Scott Cunningham's [*Causal Inference: The Mixtape*](https://mixtape-1ed.netlify.app/) into a CausalPy Quarto website. Chapters are independent `.qmd` pages, not a numbered book and not Jupyter notebooks.
 
