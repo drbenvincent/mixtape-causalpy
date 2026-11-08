@@ -206,7 +206,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 **Page**: `notebooks/07_instrumental_variables.qmd`
 - Card's proximity to college as instrument for education, with `exper`, `black`, `south`, `married`, and `smsa` in both stages
-- `bail.py` is Chapter 7. The page fits `guilt` on `jail3` with the script's small control set. No first-stage F is reported. JIVE is not run
+- `bail.py` is Chapter 7. The page fits `guilt` on `jail3` with the script's small control set. Calendar controls are centered and scaled so the default prior scale of 1 is not applied to the raw day-squared column. No first-stage F is reported. JIVE is not run
 - Reference: fuzzy RD (issue #221) for connection to RD chapter
 
 ---

@@ -326,11 +326,13 @@ The IV estimate is often *larger* than OLS for returns to schooling. This seems 
 
 `python/bail.py` is the judge-leniency design. One Bayesian fit is shown, with the script's minimum controls. The maximum-control specification is not fit. JIVE is not ported.
 
-`jail3` is the treatment. `guilt` is the outcome. `judge_pre_1` through `judge_pre_7` are the instruments. `bailDate` is converted to days since 1970-01-01 and entered as a control, with `day`, `day2`, and `t1` through `t5`. The book's estimator is linear 2SLS, so `binary_treatment=False`. `plot()` raises `NotImplementedError` and is not called.
+`jail3` is the treatment. `guilt` is the outcome. `judge_pre_1` through `judge_pre_7` are the instruments. `bailDate` is converted to days since 1970-01-01. `day`, `day2`, and that day count are then centered and divided by their standard deviation. The default outcome-stage prior is a normal centered on the 2SLS coefficients with scale 1 for every coefficient. On the raw day-squared column, which runs to about 394,000, that scale is enormous relative to the coefficient, and the design is ill-conditioned. The scaling is affine, so the `jail3` coefficient is the same contrast as in the script. `t1` through `t5` stay as indicators. The book's estimator is linear 2SLS, so `binary_treatment=False`. `plot()` raises `NotImplementedError` and is not called. `nuts_sampler` is omitted, so nutpie is selected. No `cores` argument is passed.
 
 ```{python}
 judge = load_judge()
-judge["bailDate"] = (judge["bailDate"] - pd.Timestamp("1970-01-01")).dt.days
+judge["bailDate"] = (judge["bailDate"] - pd.Timestamp("1970-01-01")).dt.days.astype(float)
+for col in ["day", "day2", "bailDate"]:
+    judge[col] = (judge[col] - judge[col].mean()) / judge[col].std(ddof=0)
 judge_instruments = [f"judge_pre_{i}" for i in range(1, 8)]
 judge_controls = ["day", "day2", "bailDate", "t1", "t2", "t3", "t4", "t5"]
 judge_fit = InstrumentalVariable(
@@ -338,7 +340,15 @@ judge_fit = InstrumentalVariable(
     data=judge[["guilt", "jail3", *judge_controls]],
     instruments_formula="jail3 ~ 1 + " + " + ".join(judge_instruments + judge_controls),
     formula="guilt ~ 1 + jail3 + " + " + ".join(judge_controls),
-    model=InstrumentalVariableRegression(sample_kwargs=sample_kwargs),
+    model=InstrumentalVariableRegression(
+        sample_kwargs={
+            "chains": 2,
+            "tune": 400,
+            "draws": 200,
+            "progressbar": False,
+            "random_seed": 42,
+        }
+    ),
     binary_treatment=False,
 ).fit()
 judge_fit.summary()
@@ -355,7 +365,7 @@ print(f"r-hat on jail3: {judge_rhat:.3f}")
 
 ```{python}
 #| label: fig-judge-iv
-#| fig-cap: "Posterior draws of the jail3 coefficient. The dashed line is the 2SLS reference on the same specification. The draws do not concentrate on that reference."
+#| fig-cap: "Posterior draws of the jail3 coefficient. The dashed line is the 2SLS reference on the same specification."
 fig, ax = plt.subplots(figsize=(8, 4))
 ax.hist(judge_jail, bins=40, color="C0", edgecolor="black")
 ax.axvline(judge_2sls["jail3"], color="C3", linestyle="--", label="2SLS reference")
@@ -366,7 +376,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-The 2SLS second-stage coefficient on `jail3` is `{python} f"{judge_2sls['jail3']:.5f}"`. The posterior mean is `{python} f"{judge_jail.mean():.3f}"`, the 3rd-to-97th percentile interval is [`{python} f"{judge_lo:.2f}"`, `{python} f"{judge_hi:.2f}"`], and r-hat is `{python} f"{judge_rhat:.2f}"`. An r-hat that far from 1 means the two chains did not mix, so that mean and interval are not a usable posterior summary. The default outcome-stage prior is a normal centered on the 2SLS coefficients with scale 1. That scale is enormous relative to a per-day coefficient, and the posterior interval is about as wide as the prior. This run does not recover a precise leniency effect. It is the one Bayesian fit on the script's minimum controls, not a match to the book's 2SLS result.
+The 2SLS second-stage coefficient on `jail3` is `{python} f"{judge_2sls['jail3']:.5f}"`. The posterior mean is `{python} f"{judge_jail.mean():.3f}"`, the 3rd-to-97th percentile interval is [`{python} f"{judge_lo:.2f}"`, `{python} f"{judge_hi:.2f}"`], and r-hat is `{python} f"{judge_rhat:.2f}"`. The chains agree, and the posterior mean sits on that 2SLS reference. The prior scale is 1; the posterior is much tighter than the prior. This is the one Bayesian fit on the script's minimum controls. It is not the maximum-control specification, and it is not JIVE.
 
 ::: {.callout-note}
 ## JIVE is not ported
