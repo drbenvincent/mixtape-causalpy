@@ -68,7 +68,7 @@ In 1993, Texas dramatically expanded prison capacity. The synthetic control meth
 Key variables:
 - **`statefip`**: State FIPS code (48 = Texas)
 - **`year`**: Year (1985-2000)
-- **`bmprison`**: Black male prison admission rate per 100,000
+- **`bmprison`**: Black male prison admission rate. The book calls this per capita. It does not say per 100,000.
 - **`state`**: State name
 
 ```{python}
@@ -154,7 +154,7 @@ ax.axvline(
 )
 
 ax.set_xlabel("Year", fontsize=12)
-ax.set_ylabel("Black Male Prison Admission Rate (per 100k)", fontsize=12)
+ax.set_ylabel("Black male prison admission rate", fontsize=12)
 ax.set_title("Texas vs Selected Control States", fontsize=14)
 ax.legend(loc="upper left", fontsize=10)
 
@@ -174,6 +174,17 @@ CausalPy 1.0 scales the observation-noise prior from the treated unit's pre-trea
 
 ```{python}
 # Run Synthetic Control with CausalPy
+def print_fit_diagnostics(label, idata):
+    rhat = az.rhat(idata).to_dataset()
+    max_rhat = float(np.nanmax(rhat.to_array().values))
+    n_div = int(idata["sample_stats"]["diverging"].sum())
+    min_ess = float(np.nanmin(az.ess(idata, method="bulk").to_dataset().to_array().values))
+    print(
+        f"{label}: max r-hat {max_rhat:.4f}, divergences {n_div}, "
+        f"min bulk ESS {min_ess:.0f}"
+    )
+    return max_rhat, n_div, min_ess
+
 result = cp.SyntheticControl(
     df_wide,
     treatment_time,
@@ -181,16 +192,13 @@ result = cp.SyntheticControl(
     treated_units=[treated_unit],
     model=cp.pymc_models.WeightedSumFitter(
         sample_kwargs={
-            "tune": 1000,
-            "draws": 1000,
-            "chains": 4,
-            "cores": 4,
             "target_accept": 0.95,
             "progressbar": True,
             "random_seed": 42,
         }
     ),
 ).fit()
+print_fit_diagnostics("Texas", result.idata)
 ```
 
 ```{python}
@@ -206,7 +214,7 @@ CausalPy provides a built-in plot showing the actual treated unit vs the synthet
 # Plot the synthetic control results
 fig, ax = result.plot(plot_predictors=True, show=False)
 ax[0].set_xlabel("Year")
-ax[0].set_ylabel("Black Male Prison Admission Rate (per 100k)")
+ax[0].set_ylabel("Black male prison admission rate")
 ax[0].set_title("Texas Prison Reform: Actual vs Synthetic Control")
 plt.show()
 ```
@@ -228,6 +236,14 @@ weights_df = pd.DataFrame({"state": control_units, "weight": weights_mean}).sort
 # Show top contributing states
 print("Top 10 Donor Weights:")
 print(weights_df.head(10).to_string(index=False))
+top_donor = weights_df.iloc[0]
+top_donor_state = str(top_donor["state"])
+top_donor_weight = float(top_donor["weight"])
+plot_frame = result.get_plot_data(treated_unit=treated_unit)
+pre_fit = plot_frame.loc[result.datapre.index]
+pre_corr = float(
+    np.corrcoef(pre_fit[treated_unit].to_numpy(), pre_fit["prediction"].to_numpy())[0, 1]
+)
 ```
 
 ```{python}
@@ -306,6 +322,13 @@ CausalPy provides a convenient `effect_summary()` method for decision-ready repo
 # Generate effect summary
 stats = result.effect_summary(treated_unit=treated_unit)
 print(stats.text)
+gap_draws = result.result.impact_post.mean(dim="obs_ind")
+if "treated_units" in gap_draws.dims:
+    gap_draws = gap_draws.sel(treated_units=treated_unit)
+gap_mean = float(gap_draws.mean())
+gap_lo = float(gap_draws.quantile(0.025))
+gap_hi = float(gap_draws.quantile(0.975))
+p_increase = float((gap_draws > 0).mean())
 ```
 
 ```{python}
@@ -346,6 +369,7 @@ placebo_states = [
 
 # Store results
 placebo_gaps = {}
+placebo_diagnostics = []
 texas_gap = result.result.impact_post.mean(dim=["chain", "draw"]).values.flatten()
 
 print("Running placebo tests (this may take a few minutes)...")
@@ -366,16 +390,14 @@ for state in placebo_states:
             treated_units=[state],
             model=cp.pymc_models.WeightedSumFitter(
                 sample_kwargs={
-                    "tune": 500,  # Faster for placebo tests
-                    "draws": 500,
-                    "chains": 4,
-                    "cores": 4,
-                    "target_accept": 0.9,
+                    "target_accept": 0.95,  # default-length render: Georgia r-hat 1.0289, 69 divergences
                     "progressbar": False,
                     "random_seed": 42,
                 }
             ),
         ).fit()
+        max_rhat, n_div, min_ess = print_fit_diagnostics(state, placebo_result.idata)
+        placebo_diagnostics.append((state, max_rhat, n_div, min_ess))
 
         # Store the mean gap
         gap = placebo_result.result.impact_post.mean(dim=["chain", "draw"]).values.flatten()
@@ -387,6 +409,14 @@ for state in placebo_states:
 
 print("-" * 50)
 print(f"Completed {len(placebo_gaps)} placebo tests")
+if placebo_diagnostics:
+    worst = max(placebo_diagnostics, key=lambda row: (row[1], row[2]))
+    total_div = sum(row[2] for row in placebo_diagnostics)
+    print(
+        f"Placebo fits: {len(placebo_diagnostics)}, "
+        f"worst max r-hat {worst[1]:.4f} ({worst[0]}), "
+        f"total divergences {total_div}"
+    )
 ```
 
 ```{python}
@@ -490,10 +520,17 @@ ax.legend(fontsize=11)
 plt.tight_layout()
 plt.show()
 
-print(
-    f"\nTexas's effect ({texas_mean_effect:,.0f}) is larger in absolute value than "
-    f"all {len(placebo_mean_effects)} placebo effects."
-)
+if n_extreme == 0:
+    placebo_ranking_sentence = (
+        f"Texas is larger in absolute value than all {len(placebo_mean_effects)} placebos."
+    )
+else:
+    placebo_ranking_sentence = (
+        f"Texas is not larger than all {len(placebo_mean_effects)} placebos. "
+        f"{n_extreme} of {len(placebo_mean_effects)} placebo effects are at least as extreme."
+    )
+print()
+print(placebo_ranking_sentence)
 print(
     f"With {len(placebo_mean_effects)} placebos the smallest two-sided p-value "
     f"this design can return is {1 / (len(placebo_mean_effects) + 1):.3f}. "
@@ -505,11 +542,11 @@ print(
 
 ### This run (CausalPy 1.0.0rc1, `auto_scale_sigma=True`)
 
-Pre-treatment correlation between Texas and synthetic Texas is 0.9717. Posterior mean donor weights are diffuse: the largest is California at 0.0317. A pre-1.0 run of this page, under the old `HalfNormal(1)` observation prior, concentrated weight on Florida, New York, and Illinois (about 0.38, 0.36, and 0.24).
+Pre-treatment correlation between Texas and synthetic Texas is `{python} f"{pre_corr:.4f}"`. Posterior mean donor weights are diffuse: the largest is `{python} top_donor_state` at `{python} f"{top_donor_weight:.4f}"`. A pre-1.0 run of this page, under the old `HalfNormal(1)` observation prior, concentrated weight on Florida, New York, and Illinois (about 0.38, 0.36, and 0.24).
 
-Mean post-treatment gap: 42,478, 95% interval [38,858, 45,799]. Posterior probability of an increase: 1.0. The same page under the old prior reported about 21,069. Those magnitudes are not comparable.
+Mean post-treatment gap: `{python} f"{gap_mean:,.0f}"`, 95% interval [`{python} f"{gap_lo:,.0f}"`, `{python} f"{gap_hi:,.0f}"`]. Posterior probability of an increase: `{python} f"{p_increase:.1f}"`. The same page under the old prior reported about 21,069. Those magnitudes are not comparable.
 
-Placebo-in-space: Texas is larger than all 10 placebos. The two-sided permutation p-value is 0.091, the smallest value 10 placebos can produce. This design cannot reject at 5%. The direction matches the Mixtape. The donor pool and the effect size do not match a pre-1.0 CausalPy run, and they are not a sparse `Synth` solution.
+Placebo-in-space: `{python} placebo_ranking_sentence` The two-sided permutation p-value is `{python} f"{p_value:.3f}"`. The smallest value `{python} len(placebo_mean_effects)` placebos can produce is `{python} f"{1 / (len(placebo_mean_effects) + 1):.3f}"`. This design cannot reject at 5%. The direction matches the Mixtape. The donor pool and the effect size do not match a pre-1.0 CausalPy run, and they are not a sparse `Synth` solution.
 
 ### Differences from the book's implementation
 
@@ -520,7 +557,7 @@ Placebo-in-space: Texas is larger than all 10 placebos. The two-sided permutatio
 | Inference | Point estimates | Full posterior distributions |
 | Covariates | Multiple predictors | Outcome matching only |
 | Observation noise | Not a Bayesian prior | Data-scaled `sigma` (`auto_scale_sigma=True`), not the pre-1.0 `HalfNormal(1)` prior |
-| Donor weights, this run | Sparse in the book | Diffuse. Largest posterior mean weight about 0.03 |
+| Donor weights, this run | Sparse in the book | Diffuse. Largest posterior mean weight `{python} f"{top_donor_weight:.3f}"` |
 
 ::: {.callout-note}
 ## Covariate matching is not available
@@ -539,7 +576,7 @@ This notebook demonstrated:
 5. **Effect summaries**: average and cumulative causal impacts
 6. **Placebo-in-space tests**: permutation inference against 10 donor states
 
-Texas's post-1993 incarceration rate is higher than the synthetic control, and the posterior probability of an increase under this model is 1.0. Texas's mean gap is larger than all 10 placebo gaps. That permutation result is the strongest this 10-placebo design can give (p = 0.091), not a 5% test. Posterior mean weights are diffuse under CausalPy 1.0's default `auto_scale_sigma=True`, so the gap size is not the pre-1.0 number and not a sparse `Synth` weight vector.
+Texas's post-1993 incarceration rate is higher than the synthetic control, and the posterior probability of an increase under this model is `{python} f"{p_increase:.1f}"`. `{python} placebo_ranking_sentence` The two-sided permutation p-value is `{python} f"{p_value:.3f}"`. That is not a 5% test. Posterior mean weights are diffuse under CausalPy 1.0's default `auto_scale_sigma=True`, so the gap size is not the pre-1.0 number and not a sparse `Synth` weight vector.
 
 ---
 

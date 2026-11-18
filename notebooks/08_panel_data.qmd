@@ -295,9 +295,6 @@ This is the CausalPy result. `fe_method="demeaned"`, time-varying formula only, 
 
 ```{python}
 sample_kwargs = {
-    "tune": 1000,
-    "draws": 1000,
-    "chains": 2,
     "target_accept": 0.95,
     "random_seed": 42,
     "progressbar": False,
@@ -311,6 +308,15 @@ bayes = cp.PanelRegression(
     fe_method="demeaned",
     model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),
 ).fit()
+import arviz as az
+
+rhat = az.rhat(bayes.idata).to_dataset()
+max_rhat = float(np.nanmax(rhat.to_array().values))
+n_div = int(bayes.idata["sample_stats"]["diverging"].sum())
+min_ess = float(
+    np.nanmin(az.ess(bayes.idata, method="bulk").to_dataset().to_array().values)
+)
+print(f"max r-hat {max_rhat:.4f}, divergences {n_div}, min bulk ESS {min_ess:.0f}")
 
 if bayes.time_fe_variable is not None or bayes.fe_method != "demeaned":
     raise RuntimeError("Bayesian fit must be one-way demeaned provider FE")
