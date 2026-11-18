@@ -138,13 +138,13 @@ div.csl-indent {
 <link rel="stylesheet" href="../styles.css">
 <meta property="og:title" content="Chapter 9: Difference-in-Differences – The Mixtape in CausalPy">
 <meta property="og:description" content="Unofficial CausalPy translations of the code examples from Scott Cunningham, Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher.">
-<meta property="og:image" content="https://drbenvincent.github.io/mixtape-causalpy/notebooks/09_difference_in_differences_files/figure-html/cell-6-output-1.png">
+<meta property="og:image" content="https://drbenvincent.github.io/mixtape-causalpy/notebooks/09_difference_in_differences_files/figure-html/fig-castle-adoption-output-1.png">
 <meta property="og:site_name" content="The Mixtape in CausalPy">
-<meta property="og:image:height" content="1132">
-<meta property="og:image:width" content="1903">
+<meta property="og:image:height" content="759">
+<meta property="og:image:width" content="1902">
 <meta name="twitter:title" content="Chapter 9: Difference-in-Differences – The Mixtape in CausalPy">
 <meta name="twitter:description" content="Unofficial CausalPy translations of the code examples from Scott Cunningham, Causal Inference: The Mixtape (Yale University Press, 2021). Not affiliated with the author or the publisher.">
-<meta name="twitter:image" content="https://drbenvincent.github.io/mixtape-causalpy/notebooks/09_difference_in_differences_files/figure-html/cell-6-output-1.png">
+<meta name="twitter:image" content="https://drbenvincent.github.io/mixtape-causalpy/notebooks/09_difference_in_differences_files/figure-html/fig-castle-adoption-output-1.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -268,31 +268,16 @@ div.csl-indent {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#causal-inference-the-mixtape-causalpy" id="toc-causal-inference-the-mixtape-causalpy" class="nav-link active" data-scroll-target="#causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</a>
-  <ul class="collapse">
+  <li><a href="#causal-inference-the-mixtape-causalpy" id="toc-causal-inference-the-mixtape-causalpy" class="nav-link active" data-scroll-target="#causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</a></li>
   <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
-  <li><a href="#what-well-cover" id="toc-what-well-cover" class="nav-link" data-scroll-target="#what-well-cover">What we’ll cover</a></li>
-  <li><a href="#important-note-on-staggered-did" id="toc-important-note-on-staggered-did" class="nav-link" data-scroll-target="#important-note-on-staggered-did">Important Note on Staggered DiD</a></li>
-  <li><a href="#mixtape-files-implemented" id="toc-mixtape-files-implemented" class="nav-link" data-scroll-target="#mixtape-files-implemented">Mixtape files implemented</a></li>
-  </ul></li>
   <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
-  <li><a href="#example-1-castle-doctrine-and-homicide-rates" id="toc-example-1-castle-doctrine-and-homicide-rates" class="nav-link" data-scroll-target="#example-1-castle-doctrine-and-homicide-rates">Example 1: Castle Doctrine and Homicide Rates</a>
+  <li><a href="#castle-doctrine" id="toc-castle-doctrine" class="nav-link" data-scroll-target="#castle-doctrine">Castle doctrine</a>
   <ul class="collapse">
-  <li><a href="#adapting-to-22-did" id="toc-adapting-to-22-did" class="nav-link" data-scroll-target="#adapting-to-22-did">Adapting to 2×2 DiD</a></li>
-  <li><a href="#visualize-parallel-trends" id="toc-visualize-parallel-trends" class="nav-link" data-scroll-target="#visualize-parallel-trends">Visualize Parallel Trends</a></li>
-  <li><a href="#causalpy-difference-in-differences-estimation" id="toc-causalpy-difference-in-differences-estimation" class="nav-link" data-scroll-target="#causalpy-difference-in-differences-estimation">CausalPy Difference-in-Differences Estimation</a></li>
-  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  <li><a href="#adoption-timing" id="toc-adoption-timing" class="nav-link" data-scroll-target="#adoption-timing">Adoption timing</a></li>
+  <li><a href="#imputation-event-time-contrasts" id="toc-imputation-event-time-contrasts" class="nav-link" data-scroll-target="#imputation-event-time-contrasts">Imputation event-time contrasts</a></li>
+  <li><a href="#optional-bayesian-sample" id="toc-optional-bayesian-sample" class="nav-link" data-scroll-target="#optional-bayesian-sample">Optional Bayesian sample</a></li>
   </ul></li>
-  <li><a href="#example-2-abortion-legalization-and-gonorrhea-rates" id="toc-example-2-abortion-legalization-and-gonorrhea-rates" class="nav-link" data-scroll-target="#example-2-abortion-legalization-and-gonorrhea-rates">Example 2: Abortion Legalization and Gonorrhea Rates</a></li>
-  <li><a href="#comparison-to-mixtape-results" id="toc-comparison-to-mixtape-results" class="nav-link" data-scroll-target="#comparison-to-mixtape-results">Comparison to Mixtape Results</a>
-  <ul class="collapse">
-  <li><a href="#key-differences" id="toc-key-differences" class="nav-link" data-scroll-target="#key-differences">Key Differences</a></li>
-  <li><a href="#why-the-results-may-differ" id="toc-why-the-results-may-differ" class="nav-link" data-scroll-target="#why-the-results-may-differ">Why the Results May Differ</a></li>
-  <li><a href="#this-run" id="toc-this-run" class="nav-link" data-scroll-target="#this-run">This run</a></li>
-  <li><a href="#event-study-todo" id="toc-event-study-todo" class="nav-link" data-scroll-target="#event-study-todo">Event Study (TODO)</a></li>
-  </ul></li>
-  <li><a href="#todo-event-study-design" id="toc-todo-event-study-design" class="nav-link" data-scroll-target="#todo-event-study-design">TODO: Event Study Design</a></li>
-  <li><a href="#todo-triple-differences-ddd" id="toc-todo-triple-differences-ddd" class="nav-link" data-scroll-target="#todo-triple-differences-ddd">TODO: Triple Differences (DDD)</a></li>
+  <li><a href="#abortion-legalization" id="toc-abortion-legalization" class="nav-link" data-scroll-target="#abortion-legalization">Abortion legalization</a></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -323,85 +308,17 @@ div.csl-indent {
 <section id="causal-inference-the-mixtape-causalpy" class="level2">
 <h2 class="anchored" data-anchor-id="causal-inference-the-mixtape-causalpy">Causal Inference: The Mixtape → CausalPy</h2>
 <p><strong>Mixtape chapter</strong>: <a href="https://mixtape-1ed.netlify.app/09-difference_in_differences.html">Difference-in-Differences</a></p>
-<p><strong>CausalPy method</strong>: <code>DifferenceInDifferences</code></p>
-<hr>
-<section id="overview" class="level3">
-<h3 class="anchored" data-anchor-id="overview">Overview</h3>
-<p>Difference-in-Differences (DiD) is one of the most widely used identification strategies in applied economics. It compares the change in outcomes over time between a treatment group and a control group, under the assumption that both groups would have followed parallel trends in the absence of treatment.</p>
-<p>This notebook covers:</p>
-<ol type="1">
-<li><strong>Castle Doctrine</strong> — Effect of “Stand Your Ground” laws on homicide rates</li>
-<li><strong>Abortion Legalization</strong> — Effect of early abortion access on gonorrhea rates</li>
-</ol>
+<p><strong>CausalPy method</strong>: <a href="https://causalpy.readthedocs.io/en/latest/api/generated/causalpy.experiments.staggered_did.StaggeredDifferenceInDifferences.html"><code>StaggeredDifferenceInDifferences</code></a> for the castle-doctrine panel. <a href="https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html"><code>DifferenceInDifferences</code></a> estimates one group-by-post interaction. It is not the castle result.</p>
 </section>
-<section id="what-well-cover" class="level3">
-<h3 class="anchored" data-anchor-id="what-well-cover">What we’ll cover</h3>
-<ol type="1">
-<li>Data exploration and parallel trends visualization</li>
-<li>Simple 2×2 DiD estimation with CausalPy</li>
-<li>Interpretation of the Average Treatment Effect on the Treated (ATT)</li>
-<li>Comparison to Mixtape results</li>
-</ol>
-</section>
-<section id="important-note-on-staggered-did" class="level3">
-<h3 class="anchored" data-anchor-id="important-note-on-staggered-did">Important Note on Staggered DiD</h3>
-<p>The Mixtape examples use <strong>staggered adoption</strong> designs where different units receive treatment at different times. CausalPy’s current <code>DifferenceInDifferences</code> implementation is designed for the <strong>simple 2×2 case</strong> (one treated group, one control group, pre and post periods).</p>
-<p>For staggered DiD, see: - CausalPy PR #621 (staggered DiD support) - Recent literature on issues with TWFE in staggered settings <span class="citation" data-cites="goodmanbacon2021 callaway2021 sun2021">(<a href="#ref-goodmanbacon2021" role="doc-biblioref">Goodman-Bacon 2021</a>; <a href="#ref-callaway2021" role="doc-biblioref">Callaway and Sant’Anna 2021</a>; <a href="#ref-sun2021" role="doc-biblioref">Sun and Abraham 2021</a>)</span></p>
-<p>In this notebook, we adapt the examples to work with CausalPy’s 2×2 framework.</p>
-</section>
-<section id="mixtape-files-implemented" class="level3">
-<h3 class="anchored" data-anchor-id="mixtape-files-implemented">Mixtape files implemented</h3>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>File</th>
-<th>Description</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>castle_1.py</code></td>
-<td>Castle doctrine - basic DiD</td>
-<td>✅</td>
-</tr>
-<tr class="even">
-<td><code>castle_2.py</code></td>
-<td>Castle doctrine - event study</td>
-<td>⏭️ (staggered)</td>
-</tr>
-<tr class="odd">
-<td><code>castle_3.py</code></td>
-<td>Castle doctrine - event study plot</td>
-<td>⏭️ (staggered)</td>
-</tr>
-<tr class="even">
-<td><code>castle_4.py</code></td>
-<td>Castle doctrine - alternative plot</td>
-<td>⏭️ (staggered)</td>
-</tr>
-<tr class="odd">
-<td><code>castle_5.py</code></td>
-<td>Castle doctrine - robustness</td>
-<td>⏭️ (empty)</td>
-</tr>
-<tr class="even">
-<td><code>abortion_dd.py</code></td>
-<td>Abortion legalization DiD</td>
-<td>✅</td>
-</tr>
-<tr class="odd">
-<td><code>abortion_dd2.py</code></td>
-<td>Abortion DiD variations</td>
-<td>✅</td>
-</tr>
-</tbody>
-</table>
-</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Adoption dates in the castle-doctrine panel are not a single year. A two-group, two-period coefficient is the wrong estimand for that design, and it is not what this page reports.</p>
+<p>The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator <span class="citation" data-cites="borusyak2024">(<a href="#ref-borusyak2024" role="doc-biblioref">Borusyak et al. 2024</a>)</span>. The untreated outcome is <code>sklearn.linear_model.LinearRegression</code> on state and year fixed effects. It is not Cheng and Hoekstra’s two-way fixed-effects coefficient <span class="citation" data-cites="cheng2013">(<a href="#ref-cheng2013" role="doc-biblioref">Cheng and Hoekstra 2013</a>)</span>, and it is not <code>castle_1.py</code>. A short Bayesian sample of the same formula is optional. It is not the required result.</p>
+<p>Snow, the minimum wage, block bootstrap, clustering, the Affordable Care Act, and maternity benefits have no script on this page. No dataset is added for them.</p>
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="46606cf3" class="cell" data-execution_count="1">
+<div id="03d8976c" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -411,196 +328,173 @@ div.csl-indent {
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> causalpy <span class="im">as</span> cp</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the src directory to path for our data utilities</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="st">"../src"</span>)</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mixtape_causalpy <span class="im">import</span> load_castle, load_abortion</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<hr>
-</section>
-<section id="example-1-castle-doctrine-and-homicide-rates" class="level2">
-<h2 class="anchored" data-anchor-id="example-1-castle-doctrine-and-homicide-rates">Example 1: Castle Doctrine and Homicide Rates</h2>
-<p>The Castle Doctrine (also known as “Stand Your Ground” laws) expands the legal right to use deadly force in self-defense. The Mixtape examines whether these laws increased homicide rates, following <span class="citation" data-cites="cheng2013">Cheng and Hoekstra (<a href="#ref-cheng2013" role="doc-biblioref">2013</a>)</span>.</p>
-<p><strong>Key details:</strong> - <strong>Outcome</strong>: Log homicide rate (<code>l_homicide</code>) - <strong>Treatment</strong>: Adoption of Castle Doctrine (<code>post</code> = 1 after adoption) - <strong>Units</strong>: U.S. states - <strong>Time period</strong>: 2000-2010</p>
-<section id="adapting-to-22-did" class="level3">
-<h3 class="anchored" data-anchor-id="adapting-to-22-did">Adapting to 2×2 DiD</h3>
-<p>Since CausalPy uses a 2×2 framework, we’ll: 1. Select states that adopted in 2006 (the largest cohort) as the <strong>treated group</strong> 2. Use never-treated states as the <strong>control group</strong> 3. Compare pre-2006 to post-2006 periods</p>
-<div id="01dceb65" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>castle <span class="op">=</span> load_castle()</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset shape: </span><span class="sc">{</span>castle<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Years: </span><span class="sc">{</span><span class="bu">sorted</span>(castle[<span class="st">'year'</span>].unique())<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">States: </span><span class="sc">{</span>castle[<span class="st">'state'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Dataset shape: (550, 185)
-
-Years: [np.int16(2000), np.int16(2001), np.int16(2002), np.int16(2003), np.int16(2004), np.int16(2005), np.int16(2006), np.int16(2007), np.int16(2008), np.int16(2009), np.int16(2010)]
-
-States: 50</code></pre>
-</div>
-</div>
-<div id="776f4b39" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Examine treatment timing</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>treatment_dates <span class="op">=</span> castle.groupby(<span class="st">"state"</span>)[<span class="st">"treatment_date"</span>].first()</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Treatment adoption by year:"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(treatment_dates.value_counts().sort_index())</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify never-treated states</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>never_treated <span class="op">=</span> castle.groupby(<span class="st">"state"</span>)[<span class="st">"post"</span>].<span class="bu">max</span>()</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>never_treated_states <span class="op">=</span> never_treated[never_treated <span class="op">==</span> <span class="dv">0</span>].index.tolist()</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Never-treated states: </span><span class="sc">{</span><span class="bu">len</span>(never_treated_states)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify states that adopted in 2006</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>adopted_2006 <span class="op">=</span> treatment_dates[treatment_dates <span class="op">==</span> <span class="dv">2006</span>].index.tolist()</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"States adopting in 2006: </span><span class="sc">{</span><span class="bu">len</span>(adopted_2006)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(adopted_2006)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Treatment adoption by year:
-treatment_date
-2005.0     3
-2006.0    11
-2007.0     4
-2008.0     2
-2009.0     1
-Name: count, dtype: int64
-
-Never-treated states: 29
-States adopting in 2006: 11
-['Alabama', 'Georgia', 'Indiana', 'Kansas', 'Kentucky', 'Louisiana', 'Michigan', 'Mississippi', 'Oklahoma', 'South Carolina', 'South Dakota']</code></pre>
-</div>
-</div>
-<div id="879f54d6" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create simplified 2x2 DiD dataset</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Treated: states that adopted in 2006</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Control: never-treated states</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to our groups</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>castle_2x2 <span class="op">=</span> castle[castle[<span class="st">"state"</span>].isin(adopted_2006 <span class="op">+</span> never_treated_states)].copy()</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create group indicator (1 = treated, 0 = control)</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>castle_2x2[<span class="st">"group"</span>] <span class="op">=</span> castle_2x2[<span class="st">"state"</span>].isin(adopted_2006).astype(<span class="bu">int</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create post_treatment indicator (1 = 2006 or later)</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>castle_2x2[<span class="st">"post_treatment"</span>] <span class="op">=</span> (castle_2x2[<span class="st">"year"</span>] <span class="op">&gt;=</span> <span class="dv">2006</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Create unit identifier (required by CausalPy)</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>castle_2x2[<span class="st">"unit"</span>] <span class="op">=</span> castle_2x2[<span class="st">"state"</span>]</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"2x2 dataset shape: </span><span class="sc">{</span>castle_2x2<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Group distribution:"</span>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(castle_2x2.groupby([<span class="st">"group"</span>, <span class="st">"post_treatment"</span>]).size().unstack())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2x2 dataset shape: (440, 188)
-
-Group distribution:
-post_treatment    0    1
-group                   
-0               174  145
-1                66   55</code></pre>
-</div>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>config InlineBackend.figure_format <span class="op">=</span> <span class="st">'retina'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="visualize-parallel-trends" class="level3">
-<h3 class="anchored" data-anchor-id="visualize-parallel-trends">Visualize Parallel Trends</h3>
-<p>Before running DiD, we should check whether treated and control groups followed similar trends pre-treatment. This is the key identifying assumption.</p>
-<div id="1dc1ccb4" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot average outcomes by group over time</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate group means by year</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>group_means <span class="op">=</span> castle_2x2.groupby([<span class="st">"year"</span>, <span class="st">"group"</span>])[<span class="st">"l_homicide"</span>].mean().unstack()</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    group_means.index, group_means[<span class="dv">0</span>], <span class="st">"o-"</span>, label<span class="op">=</span><span class="st">"Control (never treated)"</span>, color<span class="op">=</span><span class="st">"C0"</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    group_means.index, group_means[<span class="dv">1</span>], <span class="st">"s-"</span>, label<span class="op">=</span><span class="st">"Treated (adopted 2006)"</span>, color<span class="op">=</span><span class="st">"C1"</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Add vertical line at treatment</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="dv">2006</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Treatment (2006)"</span>)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Year"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Log Homicide Rate"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Castle Doctrine: Parallel Trends Check"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="castle-doctrine" class="level2">
+<h2 class="anchored" data-anchor-id="castle-doctrine">Castle doctrine</h2>
+<p><code>castle.dta</code> is a state-year panel. <code>treatment_date</code> is the adoption year, and it is missing for states with no recorded adoption. The outcome used here is <code>l_homicide</code>, the log homicide rate.</p>
+<p><code>DifferenceInDifferences</code> estimates a single group-by-post interaction. That is not this panel, and it is not used as the result.</p>
+<section id="adoption-timing" class="level3">
+<h3 class="anchored" data-anchor-id="adoption-timing">Adoption timing</h3>
+<div id="dcc90f48" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>castle <span class="op">=</span> load_castle().copy()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>castle[<span class="st">"treatment_time"</span>] <span class="op">=</span> castle[<span class="st">"treatment_date"</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n_missing_dates <span class="op">=</span> <span class="bu">int</span>(castle[<span class="st">"treatment_time"</span>].isna().<span class="bu">sum</span>())</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>castle.loc[castle[<span class="st">"treatment_time"</span>].isna(), <span class="st">"treatment_time"</span>] <span class="op">=</span> np.inf</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>timing <span class="op">=</span> castle.groupby(<span class="st">"state"</span>, as_index<span class="op">=</span><span class="va">False</span>)[<span class="st">"treatment_date"</span>].first()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>n_states <span class="op">=</span> <span class="bu">int</span>(timing[<span class="st">"state"</span>].nunique())</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>n_years <span class="op">=</span> <span class="bu">int</span>(castle[<span class="st">"year"</span>].nunique())</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>n_never <span class="op">=</span> <span class="bu">int</span>(timing[<span class="st">"treatment_date"</span>].isna().<span class="bu">sum</span>())</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>panel_start <span class="op">=</span> <span class="bu">int</span>(castle[<span class="st">"year"</span>].<span class="bu">min</span>())</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>earliest_adoption <span class="op">=</span> <span class="bu">int</span>(timing[<span class="st">"treatment_date"</span>].<span class="bu">min</span>())</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>timing[<span class="st">"adoption"</span>] <span class="op">=</span> timing[<span class="st">"treatment_date"</span>].<span class="bu">apply</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lambda</span> v: <span class="st">"no adoption date"</span> <span class="cf">if</span> pd.isna(v) <span class="cf">else</span> <span class="bu">str</span>(<span class="bu">int</span>(v))</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>year_order <span class="op">=</span> <span class="bu">sorted</span>(y <span class="cf">for</span> y <span class="kw">in</span> timing[<span class="st">"adoption"</span>].unique() <span class="cf">if</span> y <span class="op">!=</span> <span class="st">"no adoption date"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>adoption_counts <span class="op">=</span> (</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    timing.groupby(<span class="st">"adoption"</span>).size().reindex(year_order <span class="op">+</span> [<span class="st">"no adoption date"</span>])</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="sc">{</span>n_states<span class="sc">}</span><span class="ss"> states, </span><span class="sc">{</span>n_years<span class="sc">}</span><span class="ss"> years, </span><span class="sc">{</span>n_never<span class="sc">}</span><span class="ss"> with no adoption date"</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Panel starts in </span><span class="sc">{</span>panel_start<span class="sc">}</span><span class="ss">; earliest recorded adoption is </span><span class="sc">{</span>earliest_adoption<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Missing treatment_date rows before recode: </span><span class="sc">{</span>n_missing_dates<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(adoption_counts.to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>50 states, 11 years, 29 with no adoption date
+Panel starts in 2000; earliest recorded adoption is 2005
+Missing treatment_date rows before recode: 319
+adoption
+2005                 3
+2006                11
+2007                 4
+2008                 2
+2009                 1
+no adoption date    29</code></pre>
+</div>
+</div>
+<div id="cell-fig-castle-adoption" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ax.bar(adoption_counts.index.astype(<span class="bu">str</span>), adoption_counts.values, color<span class="op">=</span><span class="st">"C0"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Recorded adoption year"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"States"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ax.tick_params(axis<span class="op">=</span><span class="st">"x"</span>, rotation<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-6-output-1.png" width="952" height="566" class="figure-img"></p>
+<div id="fig-castle-adoption" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-castle-adoption-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="09_difference_in_differences_files/figure-html/fig-castle-adoption-output-1.png" width="951" height="380" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-castle-adoption-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: States by recorded castle-doctrine adoption year, including states with no adoption date in the file.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>The file stores a missing <code>treatment_date</code> for 29 states. <code>StaggeredDifferenceInDifferences</code> rejects missing treatment times. It does not read a missing date as never-treated. Those dates are recoded to <code>np.inf</code>, the class default for never-treated, before the fit. The states stay in the panel and are the never-treated controls. None are dropped.</p>
+<p>There is no already-treated cohort in the first year. The panel starts in 2000 and the earliest recorded adoption is 2005.</p>
 </section>
-<section id="causalpy-difference-in-differences-estimation" class="level3">
-<h3 class="anchored" data-anchor-id="causalpy-difference-in-differences-estimation">CausalPy Difference-in-Differences Estimation</h3>
-<p>Now we’ll estimate the DiD effect using CausalPy’s <code>DifferenceInDifferences</code> class.</p>
-<div id="f869c873" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For CausalPy DiD, we need a simpler time structure</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate to pre/post periods</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>castle_did <span class="op">=</span> castle_2x2.copy()</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to pre (0) and post (1) time periods</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>castle_did[<span class="st">"t"</span>] <span class="op">=</span> castle_did[<span class="st">"post_treatment"</span>].astype(<span class="bu">float</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate by state and period</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>castle_agg <span class="op">=</span> (</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    castle_did.groupby([<span class="st">"unit"</span>, <span class="st">"group"</span>, <span class="st">"t"</span>, <span class="st">"post_treatment"</span>])</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    .agg({<span class="st">"l_homicide"</span>: <span class="st">"mean"</span>})</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename outcome</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>castle_agg <span class="op">=</span> castle_agg.rename(columns<span class="op">=</span>{<span class="st">"l_homicide"</span>: <span class="st">"y"</span>})</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Aggregated data for DiD:"</span>)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(castle_agg.head(<span class="dv">10</span>))</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Shape: </span><span class="sc">{</span>castle_agg<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="imputation-event-time-contrasts" class="level3">
+<h3 class="anchored" data-anchor-id="imputation-event-time-contrasts">Imputation event-time contrasts</h3>
+<p>The required formula is state and year fixed effects. <code>C()</code> accepts the numeric year column, so year is not recoded to a string. The <code>1</code> in the formula is the intercept column of the design matrix. <code>sklearn.linear_model.LinearRegression</code> fits that matrix. It does not add a second intercept.</p>
+<p><code>post</code> is an absorbing 0/1 column in the file. It is not passed as <code>treated_variable_name</code>. The absorbing-treatment check runs only when that argument is passed. <code>l_homicide</code> has no missing values, so there is nothing for a missing-outcome check to drop. The class’s missing-value check on a treated column is about the treatment indicator, not the outcome.</p>
+<p><code>StaggeredDifferenceInDifferences</code> has no weight argument. <code>popwt</code> is not passed, and this is not the book’s population-weighted least squares.</p>
+<div id="fc3c4a72" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ols_result <span class="op">=</span> cp.StaggeredDifferenceInDifferences(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    castle,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"l_homicide ~ 1 + C(state) + C(year)"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    unit_variable_name<span class="op">=</span><span class="st">"state"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"year"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    treatment_time_variable_name<span class="op">=</span><span class="st">"treatment_time"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    never_treated_value<span class="op">=</span>np.inf,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>LinearRegression(),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>ols_att <span class="op">=</span> ols_result.result.att_event_time</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ols_att.to_string(index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>ols0 <span class="op">=</span> ols_att.loc[ols_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="dv">0</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>ols_m1 <span class="op">=</span> ols_att.loc[ols_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>].iloc[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Aggregated data for DiD:
-          unit  group    t  post_treatment         y
-0      Alabama      1  0.0               0  1.988068
-1      Alabama      1  1.0               1  1.991113
-2     Arkansas      0  0.0               0  1.837906
-3     Arkansas      0  1.0               1  1.828874
-4   California      0  0.0               0  1.913331
-5   California      0  1.0               1  1.760559
-6     Colorado      0  0.0               0  1.352683
-7     Colorado      0  1.0               1  1.139777
-8  Connecticut      0  0.0               0  1.095385
-9  Connecticut      0  1.0               1  1.254133
-
-Shape: (80, 5)</code></pre>
+<pre><code> event_time       att  att_std  n_obs  identified
+         -9 -0.170673      NaN      1        True
+         -8 -0.025384 0.316705      3        True
+         -7 -0.191170 0.261356      7        True
+         -6  0.055426 0.155460     18        True
+         -5 -0.005128 0.160238     21        True
+         -4 -0.007609 0.142853     21        True
+         -3  0.019350 0.103468     21        True
+         -2  0.038205 0.176767     21        True
+         -1 -0.016849 0.146974     21        True
+          0  0.060178 0.260817     21        True
+          1  0.077707 0.265246     21        True
+          2  0.111066 0.298613     20        True
+          3  0.104144 0.301288     18        True
+          4  0.016706 0.265740     14        True
+          5  0.006112 0.086722      3        True</code></pre>
 </div>
 </div>
-<div id="20aa9884" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run CausalPy DiD</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tune"</span>: <span class="dv">1000</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"draws"</span>: <span class="dv">1000</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"chains"</span>: <span class="dv">2</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>castle_result <span class="op">=</span> cp.DifferenceInDifferences(</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    castle_agg,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"y ~ 1 + group * post_treatment"</span>,</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"t"</span>,</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    group_variable_name<span class="op">=</span><span class="st">"group"</span>,</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>att</code> is the point estimate of the unit-averaged imputation contrast at that event time: observed log homicide minus the untreated prediction. It is not normalized to a zero reference period. The constructor’s <code>reference_event_time</code> defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is -0.017, not zero. Event time 0, the adoption year, is +0.060 log points, from 21 state-years.</p>
+<p><code>att_std</code> is the residual dispersion of the unit-level contrasts in that cell. It is not a Borusyak–Jaravel–Spiess analytical standard error, and it is not a standard error clustered by state. That event-time 0 number is not Cheng and Hoekstra’s two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.</p>
+<div id="cell-fig-castle-event-time" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> ols_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Event time (years since adoption)"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Imputation contrast (log homicide rate)"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Castle doctrine: sklearn imputation contrasts"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-castle-event-time" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-castle-event-time-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="09_difference_in_differences_files/figure-html/fig-castle-event-time-output-1.png" width="991" height="589" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-castle-event-time-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Event-time imputation contrasts from the sklearn fit of log homicide. Bars are 1.96 times the residual standard deviation divided by the square root of the cell count. They are not clustered standard errors and not a Borusyak–Jaravel–Spiess analytical interval. No pre-treatment cell is normalized to zero.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The vertical line is the adoption year. The horizontal line at zero is the zero-effect line, not an omitted reference period.</p>
+</section>
+<section id="optional-bayesian-sample" class="level3">
+<h3 class="anchored" data-anchor-id="optional-bayesian-sample">Optional Bayesian sample</h3>
+<p>The same formula can be sampled. State and year dummies make a long NUTS run expensive, so this cell keeps the fixed effects and uses a short sample: 2 chains, 100 tune, and 200 draws. It is not the required fit. <code>nuts_sampler</code> is omitted, so the installed nutpie sampler is selected. No <code>cores</code> argument is passed.</p>
+<div id="06cb5bca" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bayes_result <span class="op">=</span> cp.StaggeredDifferenceInDifferences(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    castle,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"l_homicide ~ 1 + C(state) + C(year)"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    unit_variable_name<span class="op">=</span><span class="st">"state"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"year"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    treatment_time_variable_name<span class="op">=</span><span class="st">"treatment_time"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    never_treated_value<span class="op">=</span>np.inf,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"chains"</span>: <span class="dv">2</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"tune"</span>: <span class="dv">100</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"draws"</span>: <span class="dv">200</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>bayes_result.summary()</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>bayes_att <span class="op">=</span> bayes_result.result.att_event_time</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>bayes0 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="dv">0</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>bayes_m1 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>].iloc[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
@@ -610,364 +504,183 @@ Shape: (80, 5)</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>Sampling: [y_hat]
 Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
 Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
 Sampling: [y_hat]</code></pre>
 </div>
-</div>
-<div id="9037dd5a" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>castle_result.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>===========================Difference in Differences============================
-Formula: y ~ 1 + group * post_treatment
+<pre><code>======================Staggered Difference in Differences=======================
+Formula: l_homicide ~ 1 + C(state) + C(year)
+Number of units: 50
+Number of time periods: 11
+Treatment cohorts: [np.float64(2005.0), np.float64(2006.0), np.float64(2007.0), np.float64(2008.0), np.float64(2009.0)]
+Never-treated units: 29
 
-Results:
-Causal impact = 0.09$CI_{94\%}$[-0.45, 0.59]
+Event-time estimates:
+ event_time    type       att  att_lower  att_upper  n_obs  identified
+         -9 placebo -0.173238  -0.308444  -0.047268      1        True
+         -8 placebo -0.028904  -0.098688   0.048178      3        True
+         -7 placebo -0.193431  -0.246883  -0.138826      7        True
+         -6 placebo  0.054245   0.014622   0.096037     18        True
+         -5 placebo -0.004946  -0.036937   0.028012     21        True
+         -4 placebo -0.007699  -0.040897   0.024098     21        True
+         -3 placebo  0.019792  -0.016363   0.053151     21        True
+         -2 placebo  0.038417   0.000129   0.074554     21        True
+         -1 placebo -0.015819  -0.056210   0.023379     21        True
+          0     ATT  0.062316   0.013258   0.109186     21        True
+          1     ATT  0.080246   0.034558   0.132491     21        True
+          2     ATT  0.113179   0.064456   0.171729     20        True
+          3     ATT  0.105627   0.046224   0.169045     18        True
+          4     ATT  0.018414  -0.054663   0.093093     14        True
+          5     ATT  0.005383  -0.113671   0.123277      3        True
+
 Model coefficients:
-  Intercept             1.3, 94% HDI [1.1, 1.5]
-  group                 0.52, 94% HDI [0.13, 0.89]
-  post_treatment        -0.052, 94% HDI [-0.31, 0.22]
-  group:post_treatment  0.086, 94% HDI [-0.46, 0.58]</code></pre>
-</div>
-</div>
-<div id="7164412c" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the DiD result</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> castle_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Time Period (0=Pre, 1=Post)"</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Log Homicide Rate"</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Castle Doctrine: Difference-in-Differences Estimate"</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-10-output-1.png" width="708" height="469" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="interpretation" class="level3">
-<h3 class="anchored" data-anchor-id="interpretation">Interpretation</h3>
-<p>The <strong>causal impact</strong> represents the Average Treatment Effect on the Treated (ATT) — the estimated change in log homicide rates attributable to Castle Doctrine adoption.</p>
-<p><strong>Key findings:</strong> - The coefficient on <code>group:post_treatment</code> is the DiD estimate - CausalPy provides Bayesian credible intervals for uncertainty quantification - Compare this to the Mixtape’s result from <code>castle_1.py</code> which uses weighted least squares with clustered standard errors</p>
-<hr>
-</section>
-</section>
-<section id="example-2-abortion-legalization-and-gonorrhea-rates" class="level2">
-<h2 class="anchored" data-anchor-id="example-2-abortion-legalization-and-gonorrhea-rates">Example 2: Abortion Legalization and Gonorrhea Rates</h2>
-<p>This example follows <span class="citation" data-cites="donohue2001">Donohue and Levitt (<a href="#ref-donohue2001" role="doc-biblioref">2001</a>)</span>, but uses gonorrhea rates as a proxy rather than crime. It examines whether early access to legal abortion (in states that legalized before Roe v. Wade) affected that outcome.</p>
-<p><strong>Key details:</strong> - <strong>Outcome</strong>: Log gonorrhea rate (<code>lnr</code>) - <strong>Treatment</strong>: Early abortion legalization (<code>repeal</code> = 1 for early-legalizing states) - <strong>Units</strong>: U.S. states × age cohorts - <strong>Time period</strong>: 1985-2000</p>
-<div id="5670dd2d" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>abortion <span class="op">=</span> load_abortion()</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset shape: </span><span class="sc">{</span>abortion<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to non-missing outcome</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>abortion <span class="op">=</span> abortion[<span class="op">~</span>pd.isnull(abortion[<span class="st">"lnr"</span>])].copy()</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"After dropping missing lnr: </span><span class="sc">{</span>abortion<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Dataset shape: (19584, 39)
-After dropping missing lnr: (17921, 39)</code></pre>
-</div>
-</div>
-<div id="1d6fee02" class="cell" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Key columns</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Key columns:"</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion[[<span class="st">"fip"</span>, <span class="st">"year"</span>, <span class="st">"repeal"</span>, <span class="st">"lnr"</span>, <span class="st">"bf15"</span>]].describe())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Key columns:
-                fip          year        repeal           lnr          bf15
-count  17921.000000  17921.000000  17921.000000  17921.000000  17921.000000
-mean      28.587803   1992.526367      0.103454      5.284549      0.041125
-std       15.700468      4.605533      0.304559      2.129756      0.198585
-min        1.000000   1985.000000      0.000000     -1.791759      0.000000
-25%       16.000000   1989.000000      0.000000      3.538057      0.000000
-50%       28.000000   1993.000000      0.000000      5.239628      0.000000
-75%       41.000000   1997.000000      0.000000      7.124478      0.000000
-max       56.000000   2000.000000      1.000000     10.006608      1.000000</code></pre>
-</div>
-</div>
-<div id="b0d3adf2" class="cell" data-execution_count="12">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For DiD, focus on the bf15 cohort (as in abortion_dd.py)</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># bf15 = 1 indicates cohorts born after 1973 (affected by abortion legalization)</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>abortion_bf15 <span class="op">=</span> abortion[abortion[<span class="st">"bf15"</span>] <span class="op">==</span> <span class="dv">1</span>].copy()</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"bf15 cohort shape: </span><span class="sc">{</span>abortion_bf15<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Check repeal status</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="ch">\n</span><span class="ss">Repeal states: </span><span class="sc">{</span>abortion_bf15[<span class="st">'repeal'</span>]<span class="sc">.</span><span class="bu">sum</span>() <span class="op">/</span> <span class="bu">len</span>(abortion_bf15) <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>bf15 cohort shape: (737, 39)
-
-Repeal states: 10.9%</code></pre>
-</div>
-</div>
-<div id="ec4b4810" class="cell" data-execution_count="13">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for CausalPy DiD</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># We'll create a simpler 2x2 by using 1985-1992 vs 1993-2000</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>abortion_did <span class="op">=</span> abortion_bf15.copy()</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Treatment group (repeal states)</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>abortion_did[<span class="st">"group"</span>] <span class="op">=</span> abortion_did[<span class="st">"repeal"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Post-treatment (1993 onwards - roughly when effects would manifest)</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>abortion_did[<span class="st">"post_treatment"</span>] <span class="op">=</span> (abortion_did[<span class="st">"year"</span>] <span class="op">&gt;=</span> <span class="dv">1993</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Create unit identifier</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>abortion_did[<span class="st">"unit"</span>] <span class="op">=</span> abortion_did[<span class="st">"fip"</span>].astype(<span class="bu">int</span>).astype(<span class="bu">str</span>)</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Time variable</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>abortion_did[<span class="st">"t"</span>] <span class="op">=</span> abortion_did[<span class="st">"post_treatment"</span>].astype(<span class="bu">float</span>)</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"DiD dataset shape: </span><span class="sc">{</span>abortion_did<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Group × Post distribution:"</span>)</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion_did.groupby([<span class="st">"group"</span>, <span class="st">"post_treatment"</span>]).size().unstack())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>DiD dataset shape: (737, 42)
-
-Group × Post distribution:
-post_treatment    0    1
-group                   
-0               320  337
-1                40   40</code></pre>
-</div>
-</div>
-<div id="dd71721c" class="cell" data-execution_count="14">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate by state and period for cleaner DiD</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>abortion_agg <span class="op">=</span> (</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    abortion_did.groupby([<span class="st">"unit"</span>, <span class="st">"group"</span>, <span class="st">"t"</span>, <span class="st">"post_treatment"</span>])</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    .agg({<span class="st">"lnr"</span>: <span class="st">"mean"</span>})</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>abortion_agg <span class="op">=</span> abortion_agg.rename(columns<span class="op">=</span>{<span class="st">"lnr"</span>: <span class="st">"y"</span>})</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Aggregated data:"</span>)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion_agg.head(<span class="dv">10</span>))</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Shape: </span><span class="sc">{</span>abortion_agg<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Aggregated data:
-  unit  group    t  post_treatment         y
-0    1      0  0.0               0  8.655707
-1    1      0  1.0               1  8.102376
-2   10      0  0.0               0  8.857288
-3   10      0  1.0               1  8.505108
-4   11      0  0.0               0  8.838610
-5   11      0  1.0               1  8.474384
-6   12      0  0.0               0  8.603951
-7   12      0  1.0               1  7.899845
-8   13      0  0.0               0  8.730507
-9   13      0  1.0               1  7.656137
-
-Shape: (102, 5)</code></pre>
-</div>
-</div>
-<div id="2910f1c0" class="cell" data-execution_count="15">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize parallel trends</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate group means by year</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>yearly_means <span class="op">=</span> abortion_did.groupby([<span class="st">"year"</span>, <span class="st">"group"</span>])[<span class="st">"lnr"</span>].mean().unstack()</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    yearly_means.index,</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    yearly_means[<span class="dv">0</span>],</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"o-"</span>,</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Control (no early repeal)"</span>,</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"C0"</span>,</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    yearly_means.index,</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    yearly_means[<span class="dv">1</span>],</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"s-"</span>,</span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">"Treated (early repeal)"</span>,</span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"C1"</span>,</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Add vertical line at "treatment" time</span></span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span><span class="dv">1993</span>, color<span class="op">=</span><span class="st">"red"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"Post period (1993)"</span>)</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Year"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Log Gonorrhea Rate"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Abortion Legalization: Parallel Trends Check"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-16-output-1.png" width="952" height="566" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="32614bbc" class="cell" data-execution_count="16">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run CausalPy DiD</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>abortion_result <span class="op">=</span> cp.DifferenceInDifferences(</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    abortion_agg,</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"y ~ 1 + group * post_treatment"</span>,</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"t"</span>,</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    group_variable_name<span class="op">=</span><span class="st">"group"</span>,</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>).fit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [beta, y_hat, y_hat_sigma]
-Sampling: [y_hat]
-Sampling: [y_hat]
-Sampling: [y_hat]</code></pre>
-</div>
-</div>
-<div id="0b7c75e8" class="cell" data-execution_count="17">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>abortion_result.summary()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>===========================Difference in Differences============================
-Formula: y ~ 1 + group * post_treatment
-
-Results:
-Causal impact = -0.04$CI_{94\%}$[-0.88, 0.81]
 Model coefficients:
-  Intercept             8.3, 94% HDI [8.1, 8.5]
-  group                 -0.55, 94% HDI [-1.2, 0.0073]
-  post_treatment        -0.54, 94% HDI [-0.83, -0.28]
-  group:post_treatment  -0.044, 94% HDI [-0.84, 0.85]</code></pre>
+  Intercept                   2, 94% HDI [1.9, 2.1]
+  C(state)[T.Alaska]          -0.26, 94% HDI [-0.46, -0.069]
+  C(state)[T.Arizona]         0.04, 94% HDI [-0.16, 0.23]
+  C(state)[T.Arkansas]        -0.13, 94% HDI [-0.28, 0.012]
+  C(state)[T.California]      -0.12, 94% HDI [-0.26, 0.039]
+  C(state)[T.Colorado]        -0.7, 94% HDI [-0.86, -0.54]
+  C(state)[T.Connecticut]     -0.79, 94% HDI [-0.94, -0.65]
+  C(state)[T.Delaware]        -0.56, 94% HDI [-0.7, -0.42]
+  C(state)[T.Florida]         -0.25, 94% HDI [-0.42, -0.08]
+  C(state)[T.Georgia]         0.0056, 94% HDI [-0.15, 0.19]
+  C(state)[T.Hawaii]          -1.2, 94% HDI [-1.4, -1.1]
+  C(state)[T.Idaho]           -1.3, 94% HDI [-1.4, -1.1]
+  C(state)[T.Illinois]        -0.082, 94% HDI [-0.23, 0.061]
+  C(state)[T.Indiana]         -0.21, 94% HDI [-0.37, -0.04]
+  C(state)[T.Iowa]            -1.5, 94% HDI [-1.6, -1.4]
+  C(state)[T.Kansas]          -0.55, 94% HDI [-0.72, -0.35]
+  C(state)[T.Kentucky]        -0.4, 94% HDI [-0.59, -0.24]
+  C(state)[T.Louisiana]       0.54, 94% HDI [0.37, 0.71]
+  C(state)[T.Maine]           -1.5, 94% HDI [-1.7, -1.4]
+  C(state)[T.Maryland]        0.24, 94% HDI [0.1, 0.4]
+  C(state)[T.Massachusetts]   -0.99, 94% HDI [-1.2, -0.86]
+  C(state)[T.Michigan]        -0.089, 94% HDI [-0.28, 0.068]
+  C(state)[T.Minnesota]       -1.1, 94% HDI [-1.3, -1]
+  C(state)[T.Mississippi]     0.21, 94% HDI [0.033, 0.4]
+  C(state)[T.Missouri]        -0.15, 94% HDI [-0.32, -0.0013]
+  C(state)[T.Montana]         -0.96, 94% HDI [-1.1, -0.79]
+  C(state)[T.Nebraska]        -0.86, 94% HDI [-1, -0.71]
+  C(state)[T.Nevada]          0.063, 94% HDI [-0.084, 0.22]
+  C(state)[T.New Hampshire]   -1.8, 94% HDI [-2, -1.6]
+  C(state)[T.New Jersey]      -0.5, 94% HDI [-0.65, -0.35]
+  C(state)[T.New Mexico]      0.077, 94% HDI [-0.049, 0.23]
+  C(state)[T.New York]        -0.42, 94% HDI [-0.56, -0.28]
+  C(state)[T.North Carolina]  -0.12, 94% HDI [-0.24, 0.032]
+  C(state)[T.North Dakota]    -1.8, 94% HDI [-2, -1.7]
+  C(state)[T.Ohio]            -0.47, 94% HDI [-0.63, -0.3]
+  C(state)[T.Oklahoma]        -0.29, 94% HDI [-0.45, -0.099]
+  C(state)[T.Oregon]          -1.2, 94% HDI [-1.3, -1]
+  C(state)[T.Pennsylvania]    -0.25, 94% HDI [-0.4, -0.11]
+  C(state)[T.Rhode Island]    -0.88, 94% HDI [-1, -0.74]
+  C(state)[T.South Carolina]  0.045, 94% HDI [-0.11, 0.25]
+  C(state)[T.South Dakota]    -1.6, 94% HDI [-1.7, -1.4]
+  C(state)[T.Tennessee]       -0.025, 94% HDI [-0.19, 0.13]
+  C(state)[T.Texas]           -0.16, 94% HDI [-0.32, 0.012]
+  C(state)[T.Utah]            -1.2, 94% HDI [-1.4, -1.1]
+  C(state)[T.Vermont]         -1.4, 94% HDI [-1.5, -1.2]
+  C(state)[T.Virginia]        -0.28, 94% HDI [-0.43, -0.15]
+  C(state)[T.Washington]      -0.86, 94% HDI [-1, -0.72]
+  C(state)[T.West Virginia]   -0.73, 94% HDI [-0.9, -0.57]
+  C(state)[T.Wisconsin]       -0.83, 94% HDI [-0.99, -0.7]
+  C(state)[T.Wyoming]         -1.1, 94% HDI [-1.2, -0.92]
+  C(year)[T.2001]             0.019, 94% HDI [-0.04, 0.088]
+  C(year)[T.2002]             0.0001, 94% HDI [-0.062, 0.072]
+  C(year)[T.2003]             0.044, 94% HDI [-0.028, 0.11]
+  C(year)[T.2004]             0.04, 94% HDI [-0.032, 0.11]
+  C(year)[T.2005]             0.064, 94% HDI [-0.0014, 0.14]
+  C(year)[T.2006]             0.057, 94% HDI [-0.0088, 0.14]
+  C(year)[T.2007]             0.031, 94% HDI [-0.048, 0.11]
+  C(year)[T.2008]             0.032, 94% HDI [-0.051, 0.11]
+  C(year)[T.2009]             -0.11, 94% HDI [-0.19, -0.03]
+  C(year)[T.2010]             -0.13, 94% HDI [-0.21, -0.032]</code></pre>
 </div>
 </div>
-<div id="05876719" class="cell" data-execution_count="18">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the DiD result</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> abortion_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Time Period (0=Pre, 1=Post)"</span>)</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Log Gonorrhea Rate"</span>)</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Abortion Legalization: Difference-in-Differences Estimate"</span>)</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>On this sample, <code>att</code> is the posterior mean of the same unit-averaged contrast. Event time −1 is -0.016. Event time 0 is +0.062 log points. Its 94% interval is [+0.013, +0.109]. <code>att_lower</code> and <code>att_upper</code> are the 3rd and 97th percentiles of that contrast. They are not residual standard errors.</p>
+<div id="cell-fig-castle-event-time-bayes" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> bayes_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Event time (years since adoption)"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Imputation contrast (log homicide rate)"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Castle doctrine: optional Bayesian sample"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="09_difference_in_differences_files/figure-html/cell-19-output-1.png" width="708" height="469" class="figure-img"></p>
+<div id="fig-castle-event-time-bayes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-castle-event-time-bayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="09_difference_in_differences_files/figure-html/fig-castle-event-time-bayes-output-1.png" width="991" height="589" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-castle-event-time-bayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Optional short Bayesian sample of the same imputation formula. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<hr>
-</section>
-<section id="comparison-to-mixtape-results" class="level2">
-<h2 class="anchored" data-anchor-id="comparison-to-mixtape-results">Comparison to Mixtape Results</h2>
-<section id="key-differences" class="level3">
-<h3 class="anchored" data-anchor-id="key-differences">Key Differences</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 28%">
-<col style="width: 46%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Aspect</th>
-<th>Mixtape</th>
-<th>This Notebook</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Estimation</td>
-<td>Weighted OLS with clustered SEs</td>
-<td>Bayesian linear regression</td>
-</tr>
-<tr class="even">
-<td>Treatment timing</td>
-<td>Staggered (TWFE)</td>
-<td>Simplified 2×2</td>
-</tr>
-<tr class="odd">
-<td>Uncertainty</td>
-<td>Frequentist confidence intervals</td>
-<td>Bayesian credible intervals</td>
-</tr>
-<tr class="even">
-<td>Covariates</td>
-<td>Many controls included</td>
-<td>None (simple specification)</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="why-the-results-may-differ" class="level3">
-<h3 class="anchored" data-anchor-id="why-the-results-may-differ">Why the Results May Differ</h3>
-<ol type="1">
-<li><strong>Aggregation</strong>: We simplified the staggered design to 2×2, which changes the effective sample</li>
-<li><strong>No covariates</strong>: Mixtape includes many control variables (demographics, spending, etc.)</li>
-<li><strong>No weighting</strong>: Mixtape uses population weights</li>
-<li><strong>Bayesian estimation</strong>: Different uncertainty quantification approach</li>
-</ol>
-</section>
-<section id="this-run" class="level3">
-<h3 class="anchored" data-anchor-id="this-run">This run</h3>
-<p>Castle Doctrine 2×2, <code>random_seed=42</code>: causal impact 0.09, 94% interval [-0.42, 0.58]. Abortion-legalization proxy: -0.06, 94% interval [-0.93, 0.82]. Both intervals include zero. These are not the Mixtape’s weighted, covariate-adjusted estimates.</p>
-</section>
-<section id="event-study-todo" class="level3">
-<h3 class="anchored" data-anchor-id="event-study-todo">Event Study (TODO)</h3>
-<p>The Mixtape’s <code>castle_2.py</code> through <code>castle_4.py</code> implement event study designs that show dynamic treatment effects over time. This requires: - Lead and lag indicators relative to treatment - Plotting coefficients with confidence/credible intervals</p>
-<p>See CausalPy PR #584 for event study support.</p>
-<hr>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What this fit is not
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is not <code>castle_1.py</code>. That script is population-weighted least squares of log homicide on <code>post</code>, demographic and spending covariates, region-quarter indicators, state trends, and state and year effects, with standard errors clustered by state. This page does not estimate that coefficient. The class has no weight argument, so <code>popwt</code> is not used.</p>
+<p><code>castle_2.py</code> is an event study: leads 1–9 and lags 1–5, with <code>lag0</code> omitted, plus region-quarter indicators and state and year effects. It is population-weighted least squares, clustered by state. It does not include <code>castle_1.py</code>’s covariate list. <code>castle_3.py</code> and <code>castle_4.py</code> plot those weighted least-squares estimates. CausalPy does not implement that regression. The sklearn table above is the imputation substitute, not those figures.</p>
+<p><code>castle_5.py</code> is empty. The R script decomposes <code>l_homicide ~ post</code> with the Bacon decomposition. It is not run.</p>
+<p><a href="https://github.com/pymc-labs/CausalPy/pull/584">PR #584</a> is an open proposal for a common-timing event study. It is not this staggered design, and it is not a castle-doctrine specification.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Bacon decomposition and triple differences
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A Bacon decomposition would split a two-way fixed-effects coefficient into timing comparisons. CausalPy does not implement it, and none is computed. This file also has no already-treated cohort in 2000.</p>
+<p>Triple differences (<code>abortion_ddd.py</code>, <code>abortion_ddd2.py</code>) are not in CausalPy. The write-up is <a href="../proposals/proposal_triple_diff.md"><code>proposals/proposal_triple_diff.md</code></a>. That proposal is not a Bacon decomposition.</p>
+</div>
+</div>
 </section>
 </section>
-<section id="todo-event-study-design" class="level2">
-<h2 class="anchored" data-anchor-id="todo-event-study-design">TODO: Event Study Design</h2>
-<blockquote class="blockquote">
-<p><strong>Not yet implemented</strong>: Event study designs require lead/lag indicators around treatment timing, which is related to staggered DiD.</p>
-</blockquote>
-<p><strong>Mixtape reference</strong>: <code>castle_2.py</code>, <code>castle_3.py</code>, <code>castle_4.py</code></p>
-<p><strong>CausalPy tracking</strong>: - Event study plots: PR #584 - Staggered DiD: PR #621</p>
-<p><strong>When to revisit</strong>: Once CausalPy adds staggered DiD or event study support.</p>
-<hr>
-</section>
-<section id="todo-triple-differences-ddd" class="level2">
-<h2 class="anchored" data-anchor-id="todo-triple-differences-ddd">TODO: Triple Differences (DDD)</h2>
-<blockquote class="blockquote">
-<p><strong>Not yet implemented</strong>: Triple differences adds a third differencing dimension and is not currently supported by CausalPy.</p>
-</blockquote>
-<p><strong>Mixtape reference</strong>: <code>abortion_ddd.py</code>, <code>abortion_ddd2.py</code></p>
-<p><strong>CausalPy tracking</strong>: No current issue/PR for DDD</p>
-<p><strong>When to revisit</strong>: Would need a new experiment class in CausalPy.</p>
-<hr>
+<section id="abortion-legalization" class="level2">
+<h2 class="anchored" data-anchor-id="abortion-legalization">Abortion legalization</h2>
+<p>The book’s abortion exercise is a two-way fixed-effects regression. Treatment is an early-repeal indicator interacted with year, on state-years from 1985 to 2000, with state and year effects and controls. A split of the sample at 1993 is not that design. It is not used here, and the regression is not fit.</p>
+<div id="dba27e90" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>abortion <span class="op">=</span> load_abortion()</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rows: </span><span class="sc">{</span><span class="bu">len</span>(abortion)<span class="sc">}</span><span class="ss">; years </span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">min</span>())<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">max</span>())<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion[<span class="st">"repeal"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 19584; years 1985–2000
+repeal
+0.0    17664
+1.0     1920</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Abortion scripts are not run
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>abortion_dd.py</code> and <code>abortion_dd2.py</code> are the two-way fixed-effects regressions above. <code>DifferenceInDifferences</code> estimates one group-by-post interaction, which is not those regressions. Neither is run on this page.</p>
+</div>
+</div>
 </section>
 <section id="summary" class="level2">
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<p>In this notebook, we demonstrated CausalPy’s <code>DifferenceInDifferences</code> experiment using two classic examples from the Mixtape:</p>
-<ol type="1">
-<li><p><strong>Castle Doctrine</strong>: Estimated the effect of Stand Your Ground laws on homicide rates by comparing states that adopted in 2006 to never-treated states</p></li>
-<li><p><strong>Abortion Legalization</strong>: Estimated the effect of early abortion access on gonorrhea rates</p></li>
-</ol>
-<p><strong>Key takeaways:</strong></p>
-<ul>
-<li>CausalPy’s DiD is designed for the classic 2×2 case</li>
-<li>For staggered designs (common in applied work), adaptations are needed</li>
-<li>Bayesian estimation provides intuitive uncertainty quantification</li>
-<li>The <code>plot()</code> method visualizes the counterfactual and causal impact</li>
-</ul>
-<p><strong>Next steps:</strong> - When CausalPy adds staggered DiD support, return to implement the full event study analyses - Consider adding covariates to the formula for richer specifications</p>
-<hr>
+<p>The required estimator is the sklearn imputation for castle doctrine. The short Bayesian sample is optional and is not that result. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -980,8 +693,9 @@ Model coefficients:
 <div class="callout-body-container callout-body">
 <ul>
 <li>First edition: <a href="https://mixtape-1ed.netlify.app/09-difference_in_differences.html">Chapter 9: Difference-in-Differences</a></li>
-<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html">Difference-in-differences</a></li>
-<li><a href="https://github.com/pymc-labs/CausalPy/pull/621">CausalPy PR #621</a> tracks staggered DiD support. This page does not estimate a staggered design.</li>
+<li>CausalPy: <a href="https://causalpy.readthedocs.io/en/latest/notebooks/difference-in-differences-pymc.html">Difference-in-differences</a> is the two-group class. It is not the castle result.</li>
+<li><span class="citation" data-cites="borusyak2024">Borusyak et al. (<a href="#ref-borusyak2024" role="doc-biblioref">2024</a>)</span></li>
+<li><span class="citation" data-cites="cheng2013">Cheng and Hoekstra (<a href="#ref-cheng2013" role="doc-biblioref">2013</a>)</span></li>
 </ul>
 </div>
 </div>
@@ -989,20 +703,11 @@ Model coefficients:
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-callaway2021" class="csl-entry" role="listitem">
-Callaway, Brantly, and Pedro H. C. Sant’Anna. 2021. <span>“Difference-in-Differences with Multiple Time Periods.”</span> <em>Journal of Econometrics</em> 225 (2): 200–230. <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">https://doi.org/10.1016/j.jeconom.2020.12.001</a>.
+<div id="ref-borusyak2024" class="csl-entry" role="listitem">
+Borusyak, Kirill, Xavier Jaravel, and Jann Spiess. 2024. <span>“Revisiting Event-Study Designs: Robust and Efficient Estimation.”</span> <em>The Review of Economic Studies</em> 91 (6): 3253–85. <a href="https://doi.org/10.1093/restud/rdae007">https://doi.org/10.1093/restud/rdae007</a>.
 </div>
 <div id="ref-cheng2013" class="csl-entry" role="listitem">
 Cheng, Cheng, and Mark Hoekstra. 2013. <span>“Does Strengthening Self-Defense Law Deter Crime or Escalate Violence? Evidence from Expansions to Castle Doctrine.”</span> <em>Journal of Human Resources</em> 48 (3): 821–54. <a href="https://doi.org/10.3368/jhr.48.3.821">https://doi.org/10.3368/jhr.48.3.821</a>.
-</div>
-<div id="ref-donohue2001" class="csl-entry" role="listitem">
-Donohue, John J., III, and Steven D. Levitt. 2001. <span>“The Impact of Legalized Abortion on Crime.”</span> <em>Quarterly Journal of Economics</em> 116 (2): 379–420. <a href="https://doi.org/10.1162/00335530151144050">https://doi.org/10.1162/00335530151144050</a>.
-</div>
-<div id="ref-goodmanbacon2021" class="csl-entry" role="listitem">
-Goodman-Bacon, Andrew. 2021. <span>“Difference-in-Differences with Variation in Treatment Timing.”</span> <em>Journal of Econometrics</em> 225 (2): 254–77. <a href="https://doi.org/10.1016/j.jeconom.2021.03.014">https://doi.org/10.1016/j.jeconom.2021.03.014</a>.
-</div>
-<div id="ref-sun2021" class="csl-entry" role="listitem">
-Sun, Liyang, and Sarah Abraham. 2021. <span>“Estimating Dynamic Treatment Effects in Event Studies with Heterogeneous Treatment Effects.”</span> <em>Journal of Econometrics</em> 225 (2): 175–99. <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">https://doi.org/10.1016/j.jeconom.2020.09.006</a>.
 </div>
 </div>
 
