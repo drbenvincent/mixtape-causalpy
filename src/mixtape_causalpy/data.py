@@ -80,6 +80,17 @@ def load_card() -> pd.DataFrame:
     return load_mixtape_data("card.dta")
 
 
+def load_judge() -> pd.DataFrame:
+    """
+    Judge fixed-effects data for the Chapter 7 leniency example.
+
+    Used by ``python/bail.py``. Fetched from the Mixtape repo. Not committed
+    and not relicensed here.
+    """
+    return load_mixtape_data("judge_fe.dta")
+
+
+
 def load_texas() -> pd.DataFrame:
     """
     Texas incarceration data for synthetic control.

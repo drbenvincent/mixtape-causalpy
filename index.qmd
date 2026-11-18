@@ -55,7 +55,7 @@ This site is not affiliated with, endorsed by, or authorized by Scott Cunningham
 
 Chapter 5 · [Partial]{.partial}
 
-NSW job training against CPS controls. Inverse propensity weighting only. Nearest neighbor, subclassification, and coarsened exact matching are not in CausalPy yet.
+NSW job training against CPS controls. Inverse propensity weighting. Training illustrations are on the page. Other matching methods are callouts.
 :::
 ::: {.card-footer}
 `InversePropensityWeighting`
@@ -70,7 +70,7 @@ NSW job training against CPS controls. Inverse propensity weighting only. Neares
 
 Chapter 6
 
-Close elections in Lee, Moretti, and Butler, plus the simulations that show a linear fit inventing a jump.
+Close elections in Lee, Moretti, and Butler, plus the simulations that show a linear fit inventing a jump. Includes a donut comparison.
 :::
 ::: {.card-footer}
 `RegressionDiscontinuity`
@@ -85,7 +85,7 @@ Close elections in Lee, Moretti, and Butler, plus the simulations that show a li
 
 Chapter 7
 
-Card's returns to schooling. Growing up near a four-year college instruments for years of education.
+Card's returns to schooling. Growing up near a four-year college instruments for years of education. The judge-leniency example is also fit. JIVE is a callout.
 :::
 ::: {.card-footer}
 `InstrumentalVariable`
@@ -113,12 +113,12 @@ Provider fixed effects on the Survey of Adult Service Providers. Within estimate
 ::: {.card-body}
 [Difference-in-differences](notebooks/09_difference_in_differences.qmd){.card-title .stretched-link}
 
-Chapter 9 · [Partial]{.partial}
+Chapter 9
 
-Castle doctrine and early abortion legalization, fit as a 2×2. Staggered adoption is not in CausalPy yet.
+Castle doctrine, fit with `StaggeredDifferenceInDifferences` imputation. Not a two-group two-period result.
 :::
 ::: {.card-footer}
-`DifferenceInDifferences`
+`StaggeredDifferenceInDifferences`
 :::
 :::
 :::

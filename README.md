@@ -17,31 +17,38 @@ This is a **translation repo**, not a copy of the book. We recreate analyses and
 
 ## Setup
 
-Install with [uv](https://docs.astral.sh/uv/). `uv sync` is the only install path. It creates `.venv` from `pyproject.toml` and `uv.lock`, including the Python in `.python-version` (3.13) if you do not already have it. PyMC 6 installs from PyPI; conda is not required.
+A fresh machine needs [uv](https://docs.astral.sh/uv/), system [Quarto](https://quarto.org/docs/get-started/), and git. Do not install Quarto inside `.venv`. Do not use conda, miniforge, or `pip install causalpy`. A bare pip install still resolves to CausalPy 0.9.0. This project pins the 1.0 line (`causalpy>=1.0.0rc1,<2`) and PyMC 6 through `uv.lock`. `uv sync` is the only install path.
 
 ```bash
+git clone https://github.com/drbenvincent/mixtape-causalpy.git
+cd mixtape-causalpy
 uv sync
 uv run python -m ipykernel install --user --name mixtape-causalpy --display-name "Mixtape CausalPy"
+```
+
+`uv sync` creates `.venv` from `pyproject.toml` and `uv.lock`, and installs the Python in `.python-version` (3.13) if you do not already have it.
+
+Every chapter sets `jupyter: mixtape-causalpy`. Quarto runs that kernelspec's `argv`. It does not follow `QUARTO_PYTHON`, the active shell, or a kernel that only shares the display name. Register the kernel from this checkout's `.venv/bin/python`, then prove the spec points there:
+
+```bash
+uv run python -c "import json, pathlib, sys; from jupyter_client.kernelspec import find_kernel_specs; spec = pathlib.Path(find_kernel_specs()['mixtape-causalpy']) / 'kernel.json'; argv0 = pathlib.Path(json.loads(spec.read_text())['argv'][0]); expected = pathlib.Path(sys.prefix) / 'bin' / 'python'; print(argv0); assert argv0 == expected, (argv0, expected)"
+uv run python -c "import causalpy, nutpie, pymc, sys; print(sys.executable); print('causalpy', causalpy.__version__); print('pymc', pymc.__version__); print('nutpie', nutpie.__version__); assert causalpy.__version__.startswith('1.'); assert pymc.__version__.split('.')[0] == '6'"
+```
+
+`causalpy` must be a 1.0 version, not `0.9.0`. `pymc` must be 6.x. `nutpie` must import. The assertion fails when the kernel points at another checkout. Do not compare resolved binaries: two `.venv` directories can symlink to the same uv Python while using different site-packages. `quarto check` listing the name is not this check.
+
+Re-run the `ipykernel install` command after every `uv sync` that replaces `.venv`, and before rendering a different checkout. The kernelspec name is global. A second clone or a git worktree has its own `.venv`. Point the spec at the checkout you are about to render. Do not leave it pointed at a deleted worktree or an abandoned environment.
+
+```bash
 export QUARTO_PYTHON="$(pwd)/.venv/bin/python"
 quarto preview
 ```
 
-The lock includes `ipykernel`, `nbclient`, `nbformat`, and `pyyaml` because Quarto imports them from `QUARTO_PYTHON`. They are not analysis dependencies. `QUARTO_PYTHON` does not select the kernel named in a chapter. Re-run the `ipykernel install` command after every `uv sync` that replaces `.venv`.
+`QUARTO_PYTHON` is only for Quarto's own imports (`ipykernel`, `nbclient`, `nbformat`, `pyyaml`). Those packages are in the lock for that reason. They are not analysis dependencies. Setting the variable does not select the chapter kernel.
 
 Copy `.vscode/settings.json.example` to `.vscode/settings.json` if you use the editor preview button. That file is gitignored.
 
 `quarto preview` serves the website. A full `quarto render` republishes from `_freeze/` and does not re-sample unless a `.qmd` changed. Preview and single-file render re-execute the chapter you are editing, which re-runs MCMC. After that, commit the updated `_freeze/` so CI can publish without sampling.
-
-### Verify the stack
-
-A bare `pip install causalpy` still resolves to 0.9.0 until 1.0.0 final is the PyPI default. This project pins the 1.0 line (`causalpy>=1.0.0rc1,<2`) and PyMC 6. Confirm the environment `uv sync` created, and confirm the named kernel is that interpreter:
-
-```bash
-uv run python -c "import causalpy, nutpie, pymc, sys; print(sys.executable); print('causalpy', causalpy.__version__); print('pymc', pymc.__version__); print('nutpie', nutpie.__version__)"
-uv run python -c "import json, pathlib, sys; spec=pathlib.Path.home()/'Library/Jupyter/kernels/mixtape-causalpy/kernel.json'; argv=pathlib.Path(json.loads(spec.read_text())['argv'][0]); print(argv); assert argv.resolve()==pathlib.Path(sys.executable).resolve()"
-```
-
-`causalpy` must be a 1.0 version, not `0.9.0`. `pymc` must be 6.x (6.3.2 or a newer 6.x). `nutpie` must import. The assertion fails when the kernel still points at an older install. On Linux the kernelspec directory is `~/.local/share/jupyter/kernels/mixtape-causalpy`.
 
 ## Chapter → page mapping
 
