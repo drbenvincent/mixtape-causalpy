@@ -319,16 +319,15 @@ plt.show()
 CausalPy provides a convenient `effect_summary()` method for decision-ready reporting.
 
 ```{python}
-# Generate effect summary
+# Generate effect summary. The prose interval is this table's average-row HDI,
+# the same 95% interval stats.text prints, not the equal-tailed quantiles.
 stats = result.effect_summary(treated_unit=treated_unit)
 print(stats.text)
-gap_draws = result.result.impact_post.mean(dim="obs_ind")
-if "treated_units" in gap_draws.dims:
-    gap_draws = gap_draws.sel(treated_units=treated_unit)
-gap_mean = float(gap_draws.mean())
-gap_lo = float(gap_draws.quantile(0.025))
-gap_hi = float(gap_draws.quantile(0.975))
-p_increase = float((gap_draws > 0).mean())
+average = stats.table.loc["average"]
+gap_mean = float(average["mean"])
+gap_lo = float(average["hdi_lower"])
+gap_hi = float(average["hdi_upper"])
+p_increase = float(average["p_gt_0"])
 ```
 
 ```{python}

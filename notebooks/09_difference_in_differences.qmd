@@ -135,7 +135,7 @@ The vertical line is the adoption year. The horizontal line at zero is the zero-
 
 ### Optional Bayesian sample
 
-The same formula is sampled with `progressbar` and `random_seed` only, so draws, tune, chains, and cores are the library defaults. It is not the required fit. `nuts_sampler` is omitted, so the installed nutpie sampler is selected.
+The same formula is sampled with `progressbar`, `random_seed`, and `target_accept=0.95`. Draws, tune, chains, and cores are the library defaults. The `target_accept` value is the one raise after a default-length render with max r-hat 1.0375 and min bulk ESS 73. It is not the required fit. `nuts_sampler` is omitted, so the installed nutpie sampler is selected.
 
 ```{python}
 bayes_result = cp.StaggeredDifferenceInDifferences(
