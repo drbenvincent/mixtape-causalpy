@@ -242,7 +242,7 @@ Not this page, and not waiting on panel FE:
 | `castle_5.py` | Empty Python file. The R script is a Bacon decomposition. Callout | `09_did` | ❌ Missing | ⏭️ |
 
 **Page**: `notebooks/09_difference_in_differences.qmd`
-- Castle doctrine uses `StaggeredDifferenceInDifferences` with PyMC `LinearRegression`, sampled with nutpie. Not TWFE. Fixed effects stay in the formula
+- Castle doctrine uses `StaggeredDifferenceInDifferences` with `sklearn.linear_model.LinearRegression` as the required fit. A short PyMC sample of the same formula is optional. Not TWFE. Fixed effects stay in the formula. The class has no weight argument
 - Abortion, triple differences, the Bacon decomposition, and the WLS event study are callouts
 - [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) is a common-timing event study. It is not this staggered design
 
@@ -411,7 +411,7 @@ Per `mixtape_causalpy_translation_repo.md`, "done" means:
 
 ## Dependencies
 
-`uv sync` is the install. `pyproject.toml` is the dependency source and `uv.lock` pins the resolve. Do not add a second pin file. Python is `>=3.12`; `.python-version` pins 3.13 so a fresh `uv sync` matches the lock. Quarto is installed separately. `QUARTO_PYTHON` points Quarto's own discovery at `.venv/bin/python`. It does not override the `mixtape-causalpy` kernelspec. After `uv sync`, re-register that kernel from `.venv/bin/python` and confirm `kernel.json` `argv` resolves to that interpreter.
+`uv sync` is the only install. Do not use conda, miniforge, or `pip install causalpy`. `pyproject.toml` is the dependency source and `uv.lock` pins the resolve. Do not add a second pin file. Python is `>=3.12`; `.python-version` pins 3.13 so a fresh `uv sync` matches the lock. Quarto is installed on the system, not inside `.venv`. `QUARTO_PYTHON` points Quarto's own discovery at `.venv/bin/python`. It does not override the `mixtape-causalpy` kernelspec. That name is global. After `uv sync`, and before rendering a different checkout, re-register the kernel from that checkout's `.venv/bin/python` and confirm `kernel.json` `argv[0]` is that checkout's `.venv/bin/python`. Do not compare the resolved uv interpreter: two checkouts can share it. The commands are in `README.md`.
 
 **Key dependencies:**
 - **Python**: >=3.12 (3.13 pinned for `uv sync`)

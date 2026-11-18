@@ -13,7 +13,7 @@ jupyter: mixtape-causalpy
 
 Adoption dates in the castle-doctrine panel are not a single year. A two-group, two-period coefficient is the wrong estimand for that design, and it is not what this page reports.
 
-The fit below is the Borusyak, Jaravel, and Spiess imputation estimator [@borusyak2024]. The untreated outcome is a Bayesian linear model. It is not Cheng and Hoekstra's two-way fixed-effects coefficient [@cheng2013], and it is not `castle_1.py`.
+The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator [@borusyak2024]. The untreated outcome is `sklearn.linear_model.LinearRegression` on state and year fixed effects. It is not Cheng and Hoekstra's two-way fixed-effects coefficient [@cheng2013], and it is not `castle_1.py`. A short Bayesian sample of the same formula is optional. It is not the required result.
 
 Snow, the minimum wage, block bootstrap, clustering, the Affordable Care Act, and maternity benefits have no script on this page. No dataset is added for them.
 
@@ -29,6 +29,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import causalpy as cp
+from sklearn.linear_model import LinearRegression
 
 import sys
 
@@ -93,17 +94,57 @@ There is no already-treated cohort in the first year. The panel starts in `{pyth
 
 ### Imputation event-time contrasts
 
-The formula is state and year fixed effects. `C()` accepts the numeric year column, so year is not recoded to a string. The `1` in the formula is the intercept column of the design matrix. The Bayesian model multiplies that matrix by its coefficient vector and does not add a second intercept.
+The required formula is state and year fixed effects. `C()` accepts the numeric year column, so year is not recoded to a string. The `1` in the formula is the intercept column of the design matrix. `sklearn.linear_model.LinearRegression` fits that matrix. It does not add a second intercept.
 
 `post` is an absorbing 0/1 column in the file. It is not passed as `treated_variable_name`. The absorbing-treatment check runs only when that argument is passed. `l_homicide` has no missing values, so there is nothing for a missing-outcome check to drop. The class's missing-value check on a treated column is about the treatment indicator, not the outcome.
 
+`StaggeredDifferenceInDifferences` has no weight argument. `popwt` is not passed, and this is not the book's population-weighted least squares.
+
 ```{python}
-result = cp.StaggeredDifferenceInDifferences(
+ols_result = cp.StaggeredDifferenceInDifferences(
     castle,
     formula="l_homicide ~ 1 + C(state) + C(year)",
     unit_variable_name="state",
     time_variable_name="year",
     treatment_time_variable_name="treatment_time",
+    never_treated_value=np.inf,
+    model=LinearRegression(),
+).fit()
+ols_att = ols_result.result.att_event_time
+print(ols_att.to_string(index=False))
+ols0 = ols_att.loc[ols_att["event_time"] == 0].iloc[0]
+ols_m1 = ols_att.loc[ols_att["event_time"] == -1].iloc[0]
+```
+
+`att` is the point estimate of the unit-averaged imputation contrast at that event time: observed log homicide minus the untreated prediction. It is not normalized to a zero reference period. The constructor's `reference_event_time` defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is `{python} f"{ols_m1.att:+.3f}"`, not zero. Event time 0, the adoption year, is `{python} f"{ols0.att:+.3f}"` log points, from `{python} int(ols0.n_obs)` state-years.
+
+`att_std` is the residual dispersion of the unit-level contrasts in that cell. It is not a Borusyak–Jaravel–Spiess analytical standard error, and it is not a standard error clustered by state. That event-time 0 number is not Cheng and Hoekstra's two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.
+
+```{python}
+#| label: fig-castle-event-time
+#| fig-cap: "Event-time imputation contrasts from the sklearn fit of log homicide. Bars are 1.96 times the residual standard deviation divided by the square root of the cell count. They are not clustered standard errors and not a Borusyak–Jaravel–Spiess analytical interval. No pre-treatment cell is normalized to zero."
+fig, axes = ols_result.plot(show=False)
+axes[0].set_xlabel("Event time (years since adoption)")
+axes[0].set_ylabel("Imputation contrast (log homicide rate)")
+axes[0].set_title("Castle doctrine: sklearn imputation contrasts")
+fig.tight_layout()
+plt.show()
+```
+
+The vertical line is the adoption year. The horizontal line at zero is the zero-effect line, not an omitted reference period.
+
+### Optional Bayesian sample
+
+The same formula can be sampled. State and year dummies make a long NUTS run expensive, so this cell keeps the fixed effects and uses a short sample: 2 chains, 100 tune, and 200 draws. It is not the required fit. `nuts_sampler` is omitted, so the installed nutpie sampler is selected. No `cores` argument is passed.
+
+```{python}
+bayes_result = cp.StaggeredDifferenceInDifferences(
+    castle,
+    formula="l_homicide ~ 1 + C(state) + C(year)",
+    unit_variable_name="state",
+    time_variable_name="year",
+    treatment_time_variable_name="treatment_time",
+    never_treated_value=np.inf,
     model=cp.pymc_models.LinearRegression(
         sample_kwargs={
             "chains": 2,
@@ -114,42 +155,36 @@ result = cp.StaggeredDifferenceInDifferences(
         }
     ),
 ).fit()
-result.summary()
-castle_att = result.result.att_event_time
-att0 = castle_att.loc[castle_att["event_time"] == 0].iloc[0]
-att_m1 = castle_att.loc[castle_att["event_time"] == -1].iloc[0]
+bayes_result.summary()
+bayes_att = bayes_result.result.att_event_time
+bayes0 = bayes_att.loc[bayes_att["event_time"] == 0].iloc[0]
+bayes_m1 = bayes_att.loc[bayes_att["event_time"] == -1].iloc[0]
 ```
 
-`att` is the posterior mean of the unit-averaged imputation contrast at that event time: observed log homicide minus the untreated prediction. It is not normalized to a zero reference period. The constructor's `reference_event_time` defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is `{python} f"{att_m1.att:+.3f}"`, not zero. Event time 0, the adoption year, is `{python} f"{att0.att:+.3f}"` log points, from `{python} int(att0.n_obs)` state-years. Its 94% interval is `{python} f"[{att0.att_lower:+.3f}, {att0.att_upper:+.3f}]"`.
-
-`att_lower` and `att_upper` are the 3rd and 97th percentiles of that contrast. The plot labels those bars as a 94% HDI. They are not residual standard errors, and a cell with one observation still has a bar. `nuts_sampler` is omitted, so the installed nutpie sampler is selected. No `cores` argument is passed.
-
-That event-time 0 number is not Cheng and Hoekstra's two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.
+On this sample, `att` is the posterior mean of the same unit-averaged contrast. Event time −1 is `{python} f"{bayes_m1.att:+.3f}"`. Event time 0 is `{python} f"{bayes0.att:+.3f}"` log points. Its 94% interval is `{python} f"[{bayes0.att_lower:+.3f}, {bayes0.att_upper:+.3f}]"`. `att_lower` and `att_upper` are the 3rd and 97th percentiles of that contrast. They are not residual standard errors.
 
 ```{python}
-#| label: fig-castle-event-time
-#| fig-cap: "Event-time imputation contrasts for the log homicide rate. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors. No pre-treatment cell is normalized to zero."
-fig, axes = result.plot(show=False)
+#| label: fig-castle-event-time-bayes
+#| fig-cap: "Optional short Bayesian sample of the same imputation formula. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors."
+fig, axes = bayes_result.plot(show=False)
 axes[0].set_xlabel("Event time (years since adoption)")
 axes[0].set_ylabel("Imputation contrast (log homicide rate)")
-axes[0].set_title("Castle doctrine: imputation contrasts")
+axes[0].set_title("Castle doctrine: optional Bayesian sample")
 fig.tight_layout()
 plt.show()
 ```
 
-The vertical line is the adoption year. The horizontal line at zero is the zero-effect line, not an omitted reference period.
-
-::: {.callout-note}
+:::: {.callout-note}
 ## What this fit is not
 
-This is not `castle_1.py`. That script regresses log homicide on an absorbing treatment indicator, state and year effects, and region-by-year effects, with standard errors clustered by state. This page does not estimate that coefficient.
+This is not `castle_1.py`. That script is population-weighted least squares of log homicide on `post`, demographic and spending covariates, region-quarter indicators, state trends, and state and year effects, with standard errors clustered by state. This page does not estimate that coefficient. The class has no weight argument, so `popwt` is not used.
 
-`castle_2.py` is an event study with leads and lags, estimated by weighted least squares, with region-by-year effects and clustered standard errors. `castle_3.py` and `castle_4.py` plot those weighted least-squares estimates. CausalPy does not implement that weighted least-squares event study. The table above is the imputation substitute, not those figures.
+`castle_2.py` is an event study: leads 1–9 and lags 1–5, with `lag0` omitted, plus region-quarter indicators and state and year effects. It is population-weighted least squares, clustered by state. It does not include `castle_1.py`'s covariate list. `castle_3.py` and `castle_4.py` plot those weighted least-squares estimates. CausalPy does not implement that regression. The sklearn table above is the imputation substitute, not those figures.
 
 `castle_5.py` is empty. The R script decomposes `l_homicide ~ post` with the Bacon decomposition. It is not run.
 
 [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) is an open proposal for a common-timing event study. It is not this staggered design, and it is not a castle-doctrine specification.
-:::
+::::
 
 ::: {.callout-note}
 ## Bacon decomposition and triple differences
@@ -177,7 +212,7 @@ print(abortion["repeal"].value_counts(dropna=False).to_string())
 
 ## Summary
 
-One estimator is run: the imputation event-time contrasts for castle doctrine. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.
+The required estimator is the sklearn imputation for castle doctrine. The short Bayesian sample is optional and is not that result. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.
 
 ::: {.callout-note}
 ## Further reading

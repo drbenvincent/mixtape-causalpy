@@ -376,7 +376,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-The 2SLS second-stage coefficient on `jail3` is `{python} f"{judge_2sls['jail3']:.5f}"`. The posterior mean is `{python} f"{judge_jail.mean():.3f}"`, the 3rd-to-97th percentile interval is [`{python} f"{judge_lo:.2f}"`, `{python} f"{judge_hi:.2f}"`], and r-hat is `{python} f"{judge_rhat:.2f}"`. The chains agree, and the posterior mean sits on that 2SLS reference. The prior scale is 1; the posterior is much tighter than the prior. This is the one Bayesian fit on the script's minimum controls. It is not the maximum-control specification, and it is not JIVE.
+The 2SLS second-stage coefficient on `jail3` is `{python} f"{judge_2sls['jail3']:.5f}"`. The posterior mean is `{python} f"{judge_jail.mean():.3f}"`, the 3rd-to-97th percentile interval is [`{python} f"{judge_lo:.2f}"`, `{python} f"{judge_hi:.2f}"`], and r-hat is `{python} f"{judge_rhat:.2f}"`. This page does not treat that r-hat as agreement between chains. The sample is 2 chains, 400 tune, and 200 draws. A longer sample was killed before it finished, and this short run is not a mixing claim. The prior scale is 1. This is the minimum-control Bayesian fit. It is not the maximum-control specification, and it is not JIVE.
 
 ::: {.callout-note}
 ## JIVE is not ported

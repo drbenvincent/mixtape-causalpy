@@ -356,7 +356,7 @@ for name, result in [
 print()
 ```
 
-The donut fit uses the same quadratic formula, bandwidth 0.05, and seed as the no-hole fit. It drops observations within 0.01 of the cutoff. The no-hole discontinuity is `{python} f"{rd_effects['Quadratic+BW'][0]:.1f}"` ADA points; the donut discontinuity is `{python} f"{rd_effects['Donut 0.01'][0]:.1f}"`. This is not `lmb_9.py`.
+The donut fit uses the same quadratic formula, bandwidth 0.05, and seed as the no-hole fit. It drops observations within 0.01 of the cutoff. The no-hole discontinuity is `{python} f"{rd_effects['Quadratic+BW'][0]:.1f}"` ADA points; the donut discontinuity is `{python} f"{rd_effects['Donut 0.01'][0]:.1f}"`. This is not `lmb_9.py`, and 0.01 is not a hole width from the book. No script in the chapter drops a hole around 0.5.
 
 ::: {.callout-note}
 ## Checks this page does not run

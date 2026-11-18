@@ -442,14 +442,14 @@ IPW attempts to correct for these differences by reweighting, but:
 - No adjustment for unobservables
 
 ### This run
-Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the 200 draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -12,265 dollars, so the migration did not move this estimate off the LaLonde failure. The book's logit is not this specification: it includes polynomials, an `educ * re74` interaction, and a 0.1–0.9 trim. Those terms are not added here, and no rows are dropped to imitate the trim.
+Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the 200 draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -12,265 dollars, so the migration did not move this estimate off the LaLonde failure. The book's logit is not this specification: it includes polynomials, an `educ * re74` interaction, and a 0.1–0.9 trim. Those terms are not added here, and no rows are dropped to imitate the trim. `InversePropensityWeighting` has no trim argument and no ATT argument. Dropping rows outside 0.1–0.9 would be a hand edit, not a feature of the class.
 
 ---
 
 ::: {.callout-note}
 ## Not estimated
 
-Subclassification (`titanic_subclassification.py`), nearest-neighbor matching (`teffects_nn.py`), and coarsened exact matching (`cem.py`) are not in CausalPy. The last two scripts are empty in the Mixtape repository. None of the three is run here. `teffects_ipw.py` is not a section of the 2021 chapter, so it is not added either.
+Subclassification (`titanic_subclassification.py`), nearest-neighbor matching (`teffects_nn.py`), and coarsened exact matching (`cem.py`) are not in CausalPy. The last two scripts are empty in the Mixtape repository. None of the three is run here, and no pandas or R matcher is built. The write-up is [`proposals/proposal_matching.md`](../proposals/proposal_matching.md). `teffects_ipw.py` is not a section of the 2021 chapter, so it is not added either.
 :::
 
 ---

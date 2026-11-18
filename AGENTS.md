@@ -4,6 +4,26 @@ Work practices for AI assistants (and humans) contributing to this repo.
 
 **Edition:** first edition only (2021). Ground truth is https://mixtape-1ed.netlify.app/. https://mixtape.scunning.com/ is now *Causal Inference: The Remix* and is not a source for this repo. See [DECISIONS.md](DECISIONS.md).
 
+## Environment
+
+Render only with this checkout's uv environment. A fresh machine has no `.venv` and no `mixtape-causalpy` kernelspec. Create both before any `quarto render` or `quarto preview`. Do not use conda, miniforge, WebAssembly, or `pip install causalpy`.
+
+1. Install [uv](https://docs.astral.sh/uv/) and system [Quarto](https://quarto.org/docs/get-started/). Do not install Quarto inside the project environment.
+2. From the checkout that will be rendered:
+
+```bash
+uv sync
+uv run python -m ipykernel install --user --name mixtape-causalpy --display-name "Mixtape CausalPy"
+uv run python -c "import json, pathlib, sys; from jupyter_client.kernelspec import find_kernel_specs; spec = pathlib.Path(find_kernel_specs()['mixtape-causalpy']) / 'kernel.json'; argv0 = pathlib.Path(json.loads(spec.read_text())['argv'][0]); expected = pathlib.Path(sys.prefix) / 'bin' / 'python'; print(argv0); assert argv0 == expected, (argv0, expected)"
+uv run python -c "import causalpy, pymc, nutpie; assert causalpy.__version__.startswith('1.'); assert pymc.__version__.split('.')[0] == '6'"
+```
+
+3. Chapters set `jupyter: mixtape-causalpy`. Quarto executes that kernelspec's `argv`. `QUARTO_PYTHON` does not override it. `quarto check` listing the name is not the argv check.
+4. Re-register after every `uv sync` or environment replacement. The kernelspec name is global. A worktree uses that worktree's `.venv/bin/python`, not the main checkout and not a conda env left from an older install. After rendering a worktree, re-register from the long-lived checkout. Do not leave the user kernel pointed at a deleted worktree.
+5. A temporary `JUPYTER_PATH` spec is only for one worktree render whose interpreter must not replace the long-lived kernel. Unset it afterward. Do not treat `QUARTO_PYTHON`, the active shell, or the kernelspec name as proof the page ran on the project interpreter.
+
+The same commands are in `README.md`.
+
 ## Before Starting Work
 
 - [ ] Read `REPO_PLAN.md` to understand what's done and what's next
@@ -16,7 +36,7 @@ Work practices for AI assistants (and humans) contributing to this repo.
 - [ ] For examples marked ⏭️ Skip, add a TODO placeholder instead of implementing
 - [ ] Follow the chapter template in `REPO_PLAN.md`
 - [ ] Use the data loading utilities in `src/mixtape_causalpy/data.py`
-- [ ] Execute with the `mixtape-causalpy` Jupyter kernel only after its `kernel.json` `argv` is this checkout's `.venv/bin/python`. Re-register that kernel from `.venv` after `uv sync` or any environment replacement. `QUARTO_PYTHON` does not override a named kernel. Do not render with WebAssembly or a stray interpreter
+- [ ] Execute with the `mixtape-causalpy` kernel only after the Environment check above passes for this checkout
 
 ## After Completing Work
 
