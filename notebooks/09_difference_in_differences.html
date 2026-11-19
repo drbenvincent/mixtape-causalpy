@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-9df500bc446daa2b3f02ca8bb0ce7a59.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-f7c5b0c07833ff2a71924985ab701573.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -313,12 +313,12 @@ div.csl-indent {
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>Adoption dates in the castle-doctrine panel are not a single year. A two-group, two-period coefficient is the wrong estimand for that design, and it is not what this page reports.</p>
-<p>The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator <span class="citation" data-cites="borusyak2024">(<a href="#ref-borusyak2024" role="doc-biblioref">Borusyak et al. 2024</a>)</span>. The untreated outcome is <code>sklearn.linear_model.LinearRegression</code> on state and year fixed effects. It is not Cheng and Hoekstra’s two-way fixed-effects coefficient <span class="citation" data-cites="cheng2013">(<a href="#ref-cheng2013" role="doc-biblioref">Cheng and Hoekstra 2013</a>)</span>, and it is not <code>castle_1.py</code>. A short Bayesian sample of the same formula is optional. It is not the required result.</p>
+<p>The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator <span class="citation" data-cites="borusyak2024">(<a href="#ref-borusyak2024" role="doc-biblioref">Borusyak et al. 2024</a>)</span>. The untreated outcome is <code>sklearn.linear_model.LinearRegression</code> on state and year fixed effects. It is not Cheng and Hoekstra’s two-way fixed-effects coefficient <span class="citation" data-cites="cheng2013">(<a href="#ref-cheng2013" role="doc-biblioref">Cheng and Hoekstra 2013</a>)</span>, and it is not <code>castle_1.py</code>. A Bayesian sample of the same formula is optional. It is not the required result.</p>
 <p>Snow, the minimum wage, block bootstrap, clustering, the Affordable Care Act, and maternity benefits have no script on this page. No dataset is added for them.</p>
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="03d8976c" class="cell" data-execution_count="1">
+<div id="1942811a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -345,7 +345,7 @@ div.csl-indent {
 <p><code>DifferenceInDifferences</code> estimates a single group-by-post interaction. That is not this panel, and it is not used as the result.</p>
 <section id="adoption-timing" class="level3">
 <h3 class="anchored" data-anchor-id="adoption-timing">Adoption timing</h3>
-<div id="dcc90f48" class="cell" data-execution_count="2">
+<div id="1c20e3e9" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>castle <span class="op">=</span> load_castle().copy()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>castle[<span class="st">"treatment_time"</span>] <span class="op">=</span> castle[<span class="st">"treatment_date"</span>].astype(<span class="bu">float</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n_missing_dates <span class="op">=</span> <span class="bu">int</span>(castle[<span class="st">"treatment_time"</span>].isna().<span class="bu">sum</span>())</span>
@@ -413,7 +413,7 @@ Figure&nbsp;1: States by recorded castle-doctrine adoption year, including state
 <p>The required formula is state and year fixed effects. <code>C()</code> accepts the numeric year column, so year is not recoded to a string. The <code>1</code> in the formula is the intercept column of the design matrix. <code>sklearn.linear_model.LinearRegression</code> fits that matrix. It does not add a second intercept.</p>
 <p><code>post</code> is an absorbing 0/1 column in the file. It is not passed as <code>treated_variable_name</code>. The absorbing-treatment check runs only when that argument is passed. <code>l_homicide</code> has no missing values, so there is nothing for a missing-outcome check to drop. The class’s missing-value check on a treated column is about the treatment indicator, not the outcome.</p>
 <p><code>StaggeredDifferenceInDifferences</code> has no weight argument. <code>popwt</code> is not passed, and this is not the book’s population-weighted least squares.</p>
-<div id="fc3c4a72" class="cell" data-execution_count="4">
+<div id="b4d44519" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ols_result <span class="op">=</span> cp.StaggeredDifferenceInDifferences(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    castle,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"l_homicide ~ 1 + C(state) + C(year)"</span>,</span>
@@ -472,8 +472,8 @@ Figure&nbsp;2: Event-time imputation contrasts from the sklearn fit of log homic
 </section>
 <section id="optional-bayesian-sample" class="level3">
 <h3 class="anchored" data-anchor-id="optional-bayesian-sample">Optional Bayesian sample</h3>
-<p>The same formula can be sampled. State and year dummies make a long NUTS run expensive, so this cell keeps the fixed effects and uses a short sample: 2 chains, 100 tune, and 200 draws. It is not the required fit. <code>nuts_sampler</code> is omitted, so the installed nutpie sampler is selected. No <code>cores</code> argument is passed.</p>
-<div id="06cb5bca" class="cell" data-execution_count="6">
+<p>The same formula is sampled with <code>progressbar</code>, <code>random_seed</code>, and <code>target_accept=0.95</code>. Draws, tune, chains, and cores are the library defaults. The <code>target_accept</code> value is the one raise after a default-length render with max r-hat 1.0375 and min bulk ESS 73. It is not the required fit. <code>nuts_sampler</code> is omitted, so the installed nutpie sampler is selected.</p>
+<div id="2037d264" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bayes_result <span class="op">=</span> cp.StaggeredDifferenceInDifferences(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    castle,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"l_homicide ~ 1 + C(state) + C(year)"</span>,</span>
@@ -483,18 +483,25 @@ Figure&nbsp;2: Event-time imputation contrasts from the sklearn fit of log homic
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    never_treated_value<span class="op">=</span>np.inf,</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"chains"</span>: <span class="dv">2</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"tune"</span>: <span class="dv">100</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"draws"</span>: <span class="dv">200</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>).fit()</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>bayes_result.summary()</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>bayes_att <span class="op">=</span> bayes_result.result.att_event_time</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>bayes0 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="dv">0</span>].iloc[<span class="dv">0</span>]</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>bayes_m1 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>].iloc[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,  <span class="co"># default-length render: max r-hat 1.0375, min bulk ESS 73</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>rhat <span class="op">=</span> az.rhat(bayes_result.idata).to_dataset()</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>max_rhat <span class="op">=</span> <span class="bu">float</span>(np.nanmax(rhat.to_array().values))</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(bayes_result.idata[<span class="st">"sample_stats"</span>][<span class="st">"diverging"</span>].<span class="bu">sum</span>())</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>min_ess <span class="op">=</span> <span class="bu">float</span>(</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    np.nanmin(az.ess(bayes_result.idata, method<span class="op">=</span><span class="st">"bulk"</span>).to_dataset().to_array().values)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"max r-hat </span><span class="sc">{</span>max_rhat<span class="sc">:.4f}</span><span class="ss">, divergences </span><span class="sc">{</span>n_div<span class="sc">}</span><span class="ss">, min bulk ESS </span><span class="sc">{</span>min_ess<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>bayes_result.summary()</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>bayes_att <span class="op">=</span> bayes_result.result.att_event_time</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>bayes0 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="dv">0</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>bayes_m1 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>].iloc[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
@@ -508,7 +515,8 @@ Sampling: [beta, y_hat, y_hat_sigma]
 Sampling: [y_hat]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>======================Staggered Difference in Differences=======================
+<pre><code>max r-hat 1.0387, divergences 0, min bulk ESS 73
+======================Staggered Difference in Differences=======================
 Formula: l_homicide ~ 1 + C(state) + C(year)
 Number of units: 50
 Number of time periods: 11
@@ -517,87 +525,87 @@ Never-treated units: 29
 
 Event-time estimates:
  event_time    type       att  att_lower  att_upper  n_obs  identified
-         -9 placebo -0.173238  -0.308444  -0.047268      1        True
-         -8 placebo -0.028904  -0.098688   0.048178      3        True
-         -7 placebo -0.193431  -0.246883  -0.138826      7        True
-         -6 placebo  0.054245   0.014622   0.096037     18        True
-         -5 placebo -0.004946  -0.036937   0.028012     21        True
-         -4 placebo -0.007699  -0.040897   0.024098     21        True
-         -3 placebo  0.019792  -0.016363   0.053151     21        True
-         -2 placebo  0.038417   0.000129   0.074554     21        True
-         -1 placebo -0.015819  -0.056210   0.023379     21        True
-          0     ATT  0.062316   0.013258   0.109186     21        True
-          1     ATT  0.080246   0.034558   0.132491     21        True
-          2     ATT  0.113179   0.064456   0.171729     20        True
-          3     ATT  0.105627   0.046224   0.169045     18        True
-          4     ATT  0.018414  -0.054663   0.093093     14        True
-          5     ATT  0.005383  -0.113671   0.123277      3        True
+         -9 placebo -0.172163  -0.292986  -0.055180      1        True
+         -8 placebo -0.026239  -0.101534   0.046982      3        True
+         -7 placebo -0.191765  -0.246058  -0.137004      7        True
+         -6 placebo  0.055053   0.014062   0.094918     18        True
+         -5 placebo -0.004914  -0.042335   0.031549     21        True
+         -4 placebo -0.007252  -0.044007   0.029850     21        True
+         -3 placebo  0.019678  -0.018137   0.056623     21        True
+         -2 placebo  0.038534   0.000749   0.076074     21        True
+         -1 placebo -0.016540  -0.056737   0.024518     21        True
+          0     ATT  0.060592   0.014382   0.106220     21        True
+          1     ATT  0.078177   0.027685   0.127444     21        True
+          2     ATT  0.111283   0.054946   0.167128     20        True
+          3     ATT  0.104562   0.044942   0.163653     18        True
+          4     ATT  0.017331  -0.051696   0.086410     14        True
+          5     ATT  0.007049  -0.103810   0.117415      3        True
 
 Model coefficients:
 Model coefficients:
-  Intercept                   2, 94% HDI [1.9, 2.1]
-  C(state)[T.Alaska]          -0.26, 94% HDI [-0.46, -0.069]
-  C(state)[T.Arizona]         0.04, 94% HDI [-0.16, 0.23]
-  C(state)[T.Arkansas]        -0.13, 94% HDI [-0.28, 0.012]
-  C(state)[T.California]      -0.12, 94% HDI [-0.26, 0.039]
-  C(state)[T.Colorado]        -0.7, 94% HDI [-0.86, -0.54]
-  C(state)[T.Connecticut]     -0.79, 94% HDI [-0.94, -0.65]
-  C(state)[T.Delaware]        -0.56, 94% HDI [-0.7, -0.42]
-  C(state)[T.Florida]         -0.25, 94% HDI [-0.42, -0.08]
-  C(state)[T.Georgia]         0.0056, 94% HDI [-0.15, 0.19]
+  Intercept                   2, 94% HDI [1.8, 2.1]
+  C(state)[T.Alaska]          -0.26, 94% HDI [-0.46, -0.059]
+  C(state)[T.Arizona]         0.036, 94% HDI [-0.18, 0.23]
+  C(state)[T.Arkansas]        -0.13, 94% HDI [-0.29, 0.069]
+  C(state)[T.California]      -0.12, 94% HDI [-0.29, 0.062]
+  C(state)[T.Colorado]        -0.71, 94% HDI [-0.88, -0.53]
+  C(state)[T.Connecticut]     -0.79, 94% HDI [-0.97, -0.62]
+  C(state)[T.Delaware]        -0.56, 94% HDI [-0.73, -0.38]
+  C(state)[T.Florida]         -0.26, 94% HDI [-0.46, -0.052]
+  C(state)[T.Georgia]         0.0079, 94% HDI [-0.19, 0.2]
   C(state)[T.Hawaii]          -1.2, 94% HDI [-1.4, -1.1]
   C(state)[T.Idaho]           -1.3, 94% HDI [-1.4, -1.1]
-  C(state)[T.Illinois]        -0.082, 94% HDI [-0.23, 0.061]
-  C(state)[T.Indiana]         -0.21, 94% HDI [-0.37, -0.04]
-  C(state)[T.Iowa]            -1.5, 94% HDI [-1.6, -1.4]
-  C(state)[T.Kansas]          -0.55, 94% HDI [-0.72, -0.35]
-  C(state)[T.Kentucky]        -0.4, 94% HDI [-0.59, -0.24]
-  C(state)[T.Louisiana]       0.54, 94% HDI [0.37, 0.71]
+  C(state)[T.Illinois]        -0.081, 94% HDI [-0.25, 0.097]
+  C(state)[T.Indiana]         -0.21, 94% HDI [-0.39, -0.0049]
+  C(state)[T.Iowa]            -1.5, 94% HDI [-1.7, -1.3]
+  C(state)[T.Kansas]          -0.55, 94% HDI [-0.73, -0.34]
+  C(state)[T.Kentucky]        -0.4, 94% HDI [-0.6, -0.21]
+  C(state)[T.Louisiana]       0.53, 94% HDI [0.33, 0.72]
   C(state)[T.Maine]           -1.5, 94% HDI [-1.7, -1.4]
-  C(state)[T.Maryland]        0.24, 94% HDI [0.1, 0.4]
-  C(state)[T.Massachusetts]   -0.99, 94% HDI [-1.2, -0.86]
-  C(state)[T.Michigan]        -0.089, 94% HDI [-0.28, 0.068]
-  C(state)[T.Minnesota]       -1.1, 94% HDI [-1.3, -1]
-  C(state)[T.Mississippi]     0.21, 94% HDI [0.033, 0.4]
-  C(state)[T.Missouri]        -0.15, 94% HDI [-0.32, -0.0013]
-  C(state)[T.Montana]         -0.96, 94% HDI [-1.1, -0.79]
-  C(state)[T.Nebraska]        -0.86, 94% HDI [-1, -0.71]
-  C(state)[T.Nevada]          0.063, 94% HDI [-0.084, 0.22]
+  C(state)[T.Maryland]        0.24, 94% HDI [0.054, 0.4]
+  C(state)[T.Massachusetts]   -0.99, 94% HDI [-1.2, -0.82]
+  C(state)[T.Michigan]        -0.093, 94% HDI [-0.28, 0.12]
+  C(state)[T.Minnesota]       -1.2, 94% HDI [-1.3, -0.97]
+  C(state)[T.Mississippi]     0.21, 94% HDI [0.017, 0.41]
+  C(state)[T.Missouri]        -0.15, 94% HDI [-0.34, 0.038]
+  C(state)[T.Montana]         -0.96, 94% HDI [-1.1, -0.77]
+  C(state)[T.Nebraska]        -0.86, 94% HDI [-1, -0.69]
+  C(state)[T.Nevada]          0.06, 94% HDI [-0.11, 0.24]
   C(state)[T.New Hampshire]   -1.8, 94% HDI [-2, -1.6]
-  C(state)[T.New Jersey]      -0.5, 94% HDI [-0.65, -0.35]
-  C(state)[T.New Mexico]      0.077, 94% HDI [-0.049, 0.23]
-  C(state)[T.New York]        -0.42, 94% HDI [-0.56, -0.28]
-  C(state)[T.North Carolina]  -0.12, 94% HDI [-0.24, 0.032]
-  C(state)[T.North Dakota]    -1.8, 94% HDI [-2, -1.7]
-  C(state)[T.Ohio]            -0.47, 94% HDI [-0.63, -0.3]
-  C(state)[T.Oklahoma]        -0.29, 94% HDI [-0.45, -0.099]
-  C(state)[T.Oregon]          -1.2, 94% HDI [-1.3, -1]
-  C(state)[T.Pennsylvania]    -0.25, 94% HDI [-0.4, -0.11]
-  C(state)[T.Rhode Island]    -0.88, 94% HDI [-1, -0.74]
-  C(state)[T.South Carolina]  0.045, 94% HDI [-0.11, 0.25]
-  C(state)[T.South Dakota]    -1.6, 94% HDI [-1.7, -1.4]
-  C(state)[T.Tennessee]       -0.025, 94% HDI [-0.19, 0.13]
-  C(state)[T.Texas]           -0.16, 94% HDI [-0.32, 0.012]
-  C(state)[T.Utah]            -1.2, 94% HDI [-1.4, -1.1]
+  C(state)[T.New Jersey]      -0.51, 94% HDI [-0.68, -0.33]
+  C(state)[T.New Mexico]      0.077, 94% HDI [-0.087, 0.26]
+  C(state)[T.New York]        -0.42, 94% HDI [-0.59, -0.25]
+  C(state)[T.North Carolina]  -0.12, 94% HDI [-0.3, 0.056]
+  C(state)[T.North Dakota]    -1.8, 94% HDI [-2, -1.6]
+  C(state)[T.Ohio]            -0.48, 94% HDI [-0.66, -0.29]
+  C(state)[T.Oklahoma]        -0.29, 94% HDI [-0.48, -0.096]
+  C(state)[T.Oregon]          -1.2, 94% HDI [-1.3, -0.98]
+  C(state)[T.Pennsylvania]    -0.25, 94% HDI [-0.43, -0.072]
+  C(state)[T.Rhode Island]    -0.88, 94% HDI [-1.1, -0.71]
+  C(state)[T.South Carolina]  0.044, 94% HDI [-0.14, 0.25]
+  C(state)[T.South Dakota]    -1.6, 94% HDI [-1.8, -1.4]
+  C(state)[T.Tennessee]       -0.027, 94% HDI [-0.21, 0.16]
+  C(state)[T.Texas]           -0.16, 94% HDI [-0.35, 0.026]
+  C(state)[T.Utah]            -1.2, 94% HDI [-1.4, -1]
   C(state)[T.Vermont]         -1.4, 94% HDI [-1.5, -1.2]
-  C(state)[T.Virginia]        -0.28, 94% HDI [-0.43, -0.15]
-  C(state)[T.Washington]      -0.86, 94% HDI [-1, -0.72]
-  C(state)[T.West Virginia]   -0.73, 94% HDI [-0.9, -0.57]
-  C(state)[T.Wisconsin]       -0.83, 94% HDI [-0.99, -0.7]
-  C(state)[T.Wyoming]         -1.1, 94% HDI [-1.2, -0.92]
-  C(year)[T.2001]             0.019, 94% HDI [-0.04, 0.088]
-  C(year)[T.2002]             0.0001, 94% HDI [-0.062, 0.072]
-  C(year)[T.2003]             0.044, 94% HDI [-0.028, 0.11]
-  C(year)[T.2004]             0.04, 94% HDI [-0.032, 0.11]
-  C(year)[T.2005]             0.064, 94% HDI [-0.0014, 0.14]
-  C(year)[T.2006]             0.057, 94% HDI [-0.0088, 0.14]
-  C(year)[T.2007]             0.031, 94% HDI [-0.048, 0.11]
-  C(year)[T.2008]             0.032, 94% HDI [-0.051, 0.11]
-  C(year)[T.2009]             -0.11, 94% HDI [-0.19, -0.03]
-  C(year)[T.2010]             -0.13, 94% HDI [-0.21, -0.032]</code></pre>
+  C(state)[T.Virginia]        -0.29, 94% HDI [-0.46, -0.12]
+  C(state)[T.Washington]      -0.86, 94% HDI [-1, -0.67]
+  C(state)[T.West Virginia]   -0.73, 94% HDI [-0.91, -0.54]
+  C(state)[T.Wisconsin]       -0.84, 94% HDI [-1, -0.66]
+  C(state)[T.Wyoming]         -1.1, 94% HDI [-1.2, -0.88]
+  C(year)[T.2001]             0.022, 94% HDI [-0.043, 0.092]
+  C(year)[T.2002]             0.0011, 94% HDI [-0.072, 0.064]
+  C(year)[T.2003]             0.047, 94% HDI [-0.023, 0.11]
+  C(year)[T.2004]             0.042, 94% HDI [-0.024, 0.11]
+  C(year)[T.2005]             0.066, 94% HDI [0.001, 0.13]
+  C(year)[T.2006]             0.062, 94% HDI [-0.012, 0.14]
+  C(year)[T.2007]             0.035, 94% HDI [-0.045, 0.11]
+  C(year)[T.2008]             0.036, 94% HDI [-0.046, 0.11]
+  C(year)[T.2009]             -0.1, 94% HDI [-0.19, -0.023]
+  C(year)[T.2010]             -0.13, 94% HDI [-0.21, -0.047]</code></pre>
 </div>
 </div>
-<p>On this sample, <code>att</code> is the posterior mean of the same unit-averaged contrast. Event time −1 is -0.016. Event time 0 is +0.062 log points. Its 94% interval is [+0.013, +0.109]. <code>att_lower</code> and <code>att_upper</code> are the 3rd and 97th percentiles of that contrast. They are not residual standard errors.</p>
+<p>On this sample, <code>att</code> is the posterior mean of the same unit-averaged contrast. Event time −1 is -0.017. Event time 0 is +0.061 log points. Its 94% interval is [+0.014, +0.106]. <code>att_lower</code> and <code>att_upper</code> are the 3rd and 97th percentiles of that contrast. They are not residual standard errors.</p>
 <div id="cell-fig-castle-event-time-bayes" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> bayes_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Event time (years since adoption)"</span>)</span>
@@ -612,7 +620,7 @@ Model coefficients:
 <img src="09_difference_in_differences_files/figure-html/fig-castle-event-time-bayes-output-1.png" width="991" height="589" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-castle-event-time-bayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Optional short Bayesian sample of the same imputation formula. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors.
+Figure&nbsp;3: Optional Bayesian sample of the same imputation formula. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors.
 </figcaption>
 </figure>
 </div>
@@ -653,7 +661,7 @@ Figure&nbsp;3: Optional short Bayesian sample of the same imputation formula. Ba
 <section id="abortion-legalization" class="level2">
 <h2 class="anchored" data-anchor-id="abortion-legalization">Abortion legalization</h2>
 <p>The book’s abortion exercise is a two-way fixed-effects regression. Treatment is an early-repeal indicator interacted with year, on state-years from 1985 to 2000, with state and year effects and controls. A split of the sample at 1993 is not that design. It is not used here, and the regression is not fit.</p>
-<div id="dba27e90" class="cell" data-execution_count="8">
+<div id="c303defe" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>abortion <span class="op">=</span> load_abortion()</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rows: </span><span class="sc">{</span><span class="bu">len</span>(abortion)<span class="sc">}</span><span class="ss">; years </span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">min</span>())<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">max</span>())<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion[<span class="st">"repeal"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -680,7 +688,7 @@ repeal
 </section>
 <section id="summary" class="level2">
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<p>The required estimator is the sklearn imputation for castle doctrine. The short Bayesian sample is optional and is not that result. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.</p>
+<p>The required estimator is the sklearn imputation for castle doctrine. The Bayesian sample is optional and is not that result. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
