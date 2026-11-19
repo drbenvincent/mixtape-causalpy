@@ -352,10 +352,6 @@ print(
 ```{python}
 # Run CausalPy IPW with robust weighting
 sample_kwargs = {
-    "tune": 1000,
-    "draws": 500,
-    "chains": 4,
-    "cores": 4,
     "target_accept": 0.99,  # Higher target_accept for this challenging problem
     "progressbar": True,
     "random_seed": 42,
@@ -370,6 +366,15 @@ ipw_result = cp.InversePropensityWeighting(
     weighting_scheme="robust",
     model=cp.pymc_models.PropensityScore(sample_kwargs=sample_kwargs),
 ).fit()
+import arviz as az
+
+rhat = az.rhat(ipw_result.idata).to_dataset()
+max_rhat = float(np.nanmax(rhat.to_array().values))
+n_div = int(ipw_result.idata["sample_stats"]["diverging"].sum())
+min_ess = float(
+    np.nanmin(az.ess(ipw_result.idata, method="bulk").to_dataset().to_array().values)
+)
+print(f"max r-hat {max_rhat:.4f}, divergences {n_div}, min bulk ESS {min_ess:.0f}")
 ```
 
 ```{python}
@@ -380,10 +385,14 @@ plt.show()
 ```
 
 ```{python}
-# Extract ATE estimates
+# Extract the ATE from every stacked posterior sample. get_ate indexes chain and draw in that order.
+n_ate_draws = int(
+    ipw_result.idata["posterior"].sizes["chain"]
+    * ipw_result.idata["posterior"].sizes["draw"]
+)
 ate_samples = [
     ipw_result.get_ate(i, ipw_result.idata, method="robust")[0]
-    for i in range(200)
+    for i in range(n_ate_draws)
 ]
 ate_mean = np.mean(ate_samples)
 ate_std = np.std(ate_samples)
@@ -442,7 +451,7 @@ IPW attempts to correct for these differences by reweighting, but:
 - No adjustment for unobservables
 
 ### This run
-Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the 200 draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -12,265 dollars, so the migration did not move this estimate off the LaLonde failure. The book's logit is not this specification: it includes polynomials, an `educ * re74` interaction, and a 0.1–0.9 trim. Those terms are not added here, and no rows are dropped to imitate the trim. `InversePropensityWeighting` has no trim argument and no ATT argument. Dropping rows outside 0.1–0.9 would be a hand edit, not a feature of the class.
+Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the `{python} f"{n_ate_draws}"` draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -12,265 dollars, so the migration did not move this estimate off the LaLonde failure. The book's logit is not this specification: it includes polynomials, an `educ * re74` interaction, and a 0.1–0.9 trim. Those terms are not added here, and no rows are dropped to imitate the trim. `InversePropensityWeighting` has no trim argument and no ATT argument. Dropping rows outside 0.1–0.9 would be a hand edit, not a feature of the class.
 
 ---
 

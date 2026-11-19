@@ -13,7 +13,7 @@ jupyter: mixtape-causalpy
 
 Adoption dates in the castle-doctrine panel are not a single year. A two-group, two-period coefficient is the wrong estimand for that design, and it is not what this page reports.
 
-The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator [@borusyak2024]. The untreated outcome is `sklearn.linear_model.LinearRegression` on state and year fixed effects. It is not Cheng and Hoekstra's two-way fixed-effects coefficient [@cheng2013], and it is not `castle_1.py`. A short Bayesian sample of the same formula is optional. It is not the required result.
+The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator [@borusyak2024]. The untreated outcome is `sklearn.linear_model.LinearRegression` on state and year fixed effects. It is not Cheng and Hoekstra's two-way fixed-effects coefficient [@cheng2013], and it is not `castle_1.py`. A Bayesian sample of the same formula is optional. It is not the required result.
 
 Snow, the minimum wage, block bootstrap, clustering, the Affordable Care Act, and maternity benefits have no script on this page. No dataset is added for them.
 
@@ -135,7 +135,7 @@ The vertical line is the adoption year. The horizontal line at zero is the zero-
 
 ### Optional Bayesian sample
 
-The same formula can be sampled. State and year dummies make a long NUTS run expensive, so this cell keeps the fixed effects and uses a short sample: 2 chains, 100 tune, and 200 draws. It is not the required fit. `nuts_sampler` is omitted, so the installed nutpie sampler is selected. No `cores` argument is passed.
+The same formula is sampled with `progressbar`, `random_seed`, and `target_accept=0.95`. Draws, tune, chains, and cores are the library defaults. The `target_accept` value is the one raise after a default-length render with max r-hat 1.0375 and min bulk ESS 73. It is not the required fit. `nuts_sampler` is omitted, so the installed nutpie sampler is selected.
 
 ```{python}
 bayes_result = cp.StaggeredDifferenceInDifferences(
@@ -147,14 +147,21 @@ bayes_result = cp.StaggeredDifferenceInDifferences(
     never_treated_value=np.inf,
     model=cp.pymc_models.LinearRegression(
         sample_kwargs={
-            "chains": 2,
-            "tune": 100,
-            "draws": 200,
+            "target_accept": 0.95,  # default-length render: max r-hat 1.0375, min bulk ESS 73
             "progressbar": True,
             "random_seed": 42,
         }
     ),
 ).fit()
+import arviz as az
+
+rhat = az.rhat(bayes_result.idata).to_dataset()
+max_rhat = float(np.nanmax(rhat.to_array().values))
+n_div = int(bayes_result.idata["sample_stats"]["diverging"].sum())
+min_ess = float(
+    np.nanmin(az.ess(bayes_result.idata, method="bulk").to_dataset().to_array().values)
+)
+print(f"max r-hat {max_rhat:.4f}, divergences {n_div}, min bulk ESS {min_ess:.0f}")
 bayes_result.summary()
 bayes_att = bayes_result.result.att_event_time
 bayes0 = bayes_att.loc[bayes_att["event_time"] == 0].iloc[0]
@@ -165,7 +172,7 @@ On this sample, `att` is the posterior mean of the same unit-averaged contrast. 
 
 ```{python}
 #| label: fig-castle-event-time-bayes
-#| fig-cap: "Optional short Bayesian sample of the same imputation formula. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors."
+#| fig-cap: "Optional Bayesian sample of the same imputation formula. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors."
 fig, axes = bayes_result.plot(show=False)
 axes[0].set_xlabel("Event time (years since adoption)")
 axes[0].set_ylabel("Imputation contrast (log homicide rate)")
@@ -212,7 +219,7 @@ print(abortion["repeal"].value_counts(dropna=False).to_string())
 
 ## Summary
 
-The required estimator is the sklearn imputation for castle doctrine. The short Bayesian sample is optional and is not that result. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.
+The required estimator is the sklearn imputation for castle doctrine. The Bayesian sample is optional and is not that result. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.
 
 ::: {.callout-note}
 ## Further reading
