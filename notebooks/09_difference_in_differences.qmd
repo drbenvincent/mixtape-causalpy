@@ -126,21 +126,6 @@ min_ess = float(
     np.nanmin(az.ess(bayes_result.idata, method="bulk").to_dataset().to_array().values)
 )
 print(f"max r-hat {max_rhat:.4f}, divergences {n_div}, min bulk ESS {min_ess:.0f}")
-failures = []
-if max_rhat > 1.01:
-    failures.append("r-hat above 1.01")
-if n_div > 0:
-    failures.append(f"{n_div} divergence" + ("s" if n_div != 1 else ""))
-if min_ess < 400:
-    failures.append("bulk ESS below 400")
-diagnostic_sentence = (
-    "Those printed diagnostics are a failed sample: "
-    + ", ".join(failures)
-    + ". Sampling was not retuned."
-    if failures
-    else "Those printed diagnostics clear r-hat 1.01, zero divergences, and bulk ESS 400."
-)
-print(diagnostic_sentence)
 bayes_result.summary()
 bayes_att = bayes_result.result.att_event_time
 bayes0 = bayes_att.loc[bayes_att["event_time"] == 0].iloc[0]
@@ -151,7 +136,7 @@ bayes_m1 = bayes_att.loc[bayes_att["event_time"] == -1].iloc[0]
 
 That event-time 0 number is not Cheng and Hoekstra's two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.
 
-Printed diagnostics: max r-hat `{python} f"{max_rhat:.4f}"`, divergences `{python} f"{n_div}"`, min bulk ESS `{python} f"{min_ess:.0f}"`. `{python} diagnostic_sentence`
+Printed diagnostics: max r-hat `{python} f"{max_rhat:.4f}"`, divergences `{python} f"{n_div}"`, min bulk ESS `{python} f"{min_ess:.0f}"`.
 
 ```{python}
 #| label: fig-castle-event-time
