@@ -38,8 +38,8 @@ CausalPy provides `InversePropensityWeighting` for propensity score-based estima
 | `training_example.py` | Age histograms. The $1,695 figure is not computed | ✅ (conceptual) |
 | `training_bias_reduction.py` | Eight-row illustration and `Y ~ X`. No matcher | ✅ (conceptual) |
 | `nsw_experimental.py` | NSW experimental benchmark | ✅ |
-| `nsw_pscore.py` | Propensity score estimation | ✅ |
-| `ipw.py` | Inverse propensity weighting | ✅ |
+| `nsw_pscore.py` | Book propensity formula on `PropensityScore`; score distribution by treatment | formula and figure below |
+| `ipw.py` | Raw untrimmed contrast only (`te_1`) | `te_2`, `te_3`, and `te_4` are not this fit |
 | `teffects_ipw.py` | Not a 2021 chapter section | ⏭️ Not on this page |
 | `titanic_subclassification.py` | Subclassification | ⏭️ Callout |
 | `teffects_nn.py` | Nearest neighbor matching | ⏭️ Callout |
@@ -56,7 +56,7 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import statsmodels.formula.api as smf
+import xarray as xr
 import causalpy as cp
 
 # Add the src directory to path for our data utilities
@@ -66,6 +66,13 @@ sys.path.insert(0, "../src")
 from mixtape_causalpy import load_nsw, load_cps, load_mixtape_data
 
 %matplotlib inline
+
+# One sampling policy for every fit on this page.
+sample_kwargs = {
+    "target_accept": 0.99,  # Higher target_accept for this challenging problem
+    "progressbar": True,
+    "random_seed": 42,
+}
 ```
 
 ---
@@ -129,15 +136,39 @@ plt.show()
 
 ### Eight-row bias illustration
 
-`training_bias_reduction.py` writes potential outcomes by hand and fits `Y ~ X`. The fitted values are the script's control prediction. No nearest-neighbor matcher is built.
+`training_bias_reduction.py` writes potential outcomes by hand and fits `Y ~ X`. The column below is the posterior mean of the regression mean from that same linear span (`Intercept` and `X`), not the script's OLS fitted values. No nearest-neighbor matcher is built.
 
 ```{python}
 bias = load_mixtape_data("training_bias_reduction.dta").copy()
 bias["Y1"] = 0
 bias.loc[bias["Unit"].isin(range(1, 5)), "Y1"] = 1
 bias["Y0"] = (4, 0, 5, 1, 4, 0, 5, 1)
-bias_fit = smf.ols("Y ~ X", data=bias).fit()
-bias["u_hat0"] = bias_fit.predict(bias)
+bias_X = np.column_stack([np.ones(len(bias)), bias["X"].to_numpy()])
+bias_coords = {
+    "coeffs": ["Intercept", "X"],
+    "obs_ind": np.arange(len(bias)),
+    "treated_units": ["unit_0"],
+}
+bias_fit = cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs)
+bias_fit.fit(
+    xr.DataArray(
+        bias_X,
+        dims=["obs_ind", "coeffs"],
+        coords={"obs_ind": bias_coords["obs_ind"], "coeffs": bias_coords["coeffs"]},
+    ),
+    xr.DataArray(
+        bias["Y"].to_numpy()[:, None],
+        dims=["obs_ind", "treated_units"],
+        coords={
+            "obs_ind": bias_coords["obs_ind"],
+            "treated_units": bias_coords["treated_units"],
+        },
+    ),
+    coords=bias_coords,
+)
+bias["u_hat0"] = (
+    bias_fit.idata["posterior"]["mu"].mean(("chain", "draw")).values.reshape(-1)
+)
 bias[["Unit", "Y1", "Y0", "Y", "D", "X", "u_hat0"]]
 ```
 
@@ -289,37 +320,23 @@ plt.show()
 print("Note: NSW participants had much lower prior earnings than CPS controls!")
 ```
 
-### CausalPy Inverse Propensity Weighting
+### CausalPy inverse propensity weighting
 
-Now we'll use CausalPy to estimate propensity scores and compute the IPW-adjusted treatment effect.
+The propensity model is `cp.pymc_models.PropensityScore`. The formula is the `nsw_pscore.py` specification, with the interaction written as `educ:re74` rather than `educ*re74`, because `educ` and `re74` are already main effects. Polynomials use `I()`. The `age**2` string in `ipw.py` is not this formula. Age, education, and prior earnings are not standardized. That shorter formula is not this linear span.
 
-CausalPy's `InversePropensityWeighting` supports several weighting schemes:
-- **raw**: Simple inverse probability weighting
-- **robust**: Horvitz-Thompson type weighting
-- **doubly robust**: Combines propensity and outcome models
-- **overlap**: Targets the overlap population
+`weighting_scheme="raw"` weights by `1/p` and `1/(1-p)` and divides by N. That is `te_1` in `ipw.py` (untrimmed, non-normalized). The class clips propensity scores to `[1e-6, 1 - 1e-6]` before that division. This page does not recompute the weights, does not drop rows, and does not request ATT. `te_2` (normalized, all rows), `te_3` (non-normalized, scores inside 0.1–0.9), and `te_4` (normalized and trimmed) are not this fit. `weighting_scheme="robust"` is not that contrast. `weighting_scheme="doubly_robust"` is not used.
 
 ```{python}
 # Prepare data for CausalPy
 ipw_data = combined.copy()
-
-# Ensure treat is 0/1 integer
 ipw_data["treat"] = ipw_data["treat"].astype(int)
 
-# Standardize continuous variables to help MCMC sampling
-# Earnings are on very different scales (0 to ~40,000) which can cause divergences
-ipw_data["age_std"] = (ipw_data["age"] - ipw_data["age"].mean()) / ipw_data["age"].std()
-ipw_data["educ_std"] = (ipw_data["educ"] - ipw_data["educ"].mean()) / ipw_data[
-    "educ"
-].std()
-ipw_data["re74_std"] = (ipw_data["re74"] - ipw_data["re74"].mean()) / ipw_data[
-    "re74"
-].std()
-ipw_data["re75_std"] = (ipw_data["re75"] - ipw_data["re75"].mean()) / ipw_data[
-    "re75"
-].std()
+pscore_formula = (
+    "treat ~ 1 + age + I(age**2) + I(age**3) + educ + I(educ**2) + "
+    "marr + nodegree + black + hisp + re74 + re75 + u74 + u75 + educ:re74"
+)
+print(pscore_formula)
 
-# Check for missing values in key columns
 key_cols = [
     "treat",
     "age",
@@ -336,36 +353,17 @@ key_cols = [
 ]
 print(f"Missing values:\n{ipw_data[key_cols].isnull().sum()}")
 print(f"\nDataset shape: {ipw_data.shape}")
-print(f"\nStandardized variable ranges:")
-print(f"  age_std:  [{ipw_data['age_std'].min():.2f}, {ipw_data['age_std'].max():.2f}]")
-print(
-    f"  educ_std: [{ipw_data['educ_std'].min():.2f}, {ipw_data['educ_std'].max():.2f}]"
-)
-print(
-    f"  re74_std: [{ipw_data['re74_std'].min():.2f}, {ipw_data['re74_std'].max():.2f}]"
-)
-print(
-    f"  re75_std: [{ipw_data['re75_std'].min():.2f}, {ipw_data['re75_std'].max():.2f}]"
-)
 ```
 
 ```{python}
-# Run CausalPy IPW with robust weighting
-sample_kwargs = {
-    "target_accept": 0.99,  # Higher target_accept for this challenging problem
-    "progressbar": True,
-    "random_seed": 42,
-}
-
-# Propensity score formula using STANDARDIZED continuous variables
-# This helps MCMC sampling converge better (avoids divergences from large scale differences)
 ipw_result = cp.InversePropensityWeighting(
     ipw_data,
-    formula="treat ~ 1 + age_std + educ_std + black + hisp + marr + nodegree + re74_std + re75_std + u74 + u75",
+    formula=pscore_formula,
     outcome_variable="re78",
-    weighting_scheme="robust",
+    weighting_scheme="raw",
     model=cp.pymc_models.PropensityScore(sample_kwargs=sample_kwargs),
 ).fit()
+print(ipw_result.labels)
 import arviz as az
 
 rhat = az.rhat(ipw_result.idata).to_dataset()
@@ -375,10 +373,17 @@ min_ess = float(
     np.nanmin(az.ess(ipw_result.idata, method="bulk").to_dataset().to_array().values)
 )
 print(f"max r-hat {max_rhat:.4f}, divergences {n_div}, min bulk ESS {min_ess:.0f}")
+sampling_failed = (max_rhat > 1.01) or (n_div > 0) or (min_ess < 400)
+print(
+    "diagnostics "
+    + ("failed" if sampling_failed else "passed")
+    + " (r-hat > 1.01, any divergence, or min bulk ESS < 400)"
+)
 ```
 
 ```{python}
-# Plot the results - propensity score distribution and ATE
+#| label: fig-pscore-by-treat
+#| fig-cap: "Propensity score distribution by treatment. Sky blue is treated, orange is control. Dashed lines at 0.1 and 0.9 are plot reference marks, not a trim."
 fig, axs = ipw_result.plot_ate(prop_draws=50, ate_draws=200)
 plt.tight_layout()
 plt.show()
@@ -391,13 +396,13 @@ n_ate_draws = int(
     * ipw_result.idata["posterior"].sizes["draw"]
 )
 ate_samples = [
-    ipw_result.get_ate(i, ipw_result.idata, method="robust")[0]
+    ipw_result.get_ate(i, ipw_result.idata, method="raw")[0]
     for i in range(n_ate_draws)
 ]
 ate_mean = np.mean(ate_samples)
 ate_std = np.std(ate_samples)
 
-print("IPW Results (Robust Weighting):")
+print("IPW results (raw weighting, te_1):")
 print(f"  Estimated ATE: ${ate_mean:,.2f}")
 print(f"  Std Dev: ${ate_std:,.2f}")
 print(
@@ -411,15 +416,15 @@ print(f"\nExperimental benchmark: ${experimental_ate:,.2f}")
 CausalPy provides tools to check whether the weighting achieves covariate balance:
 
 ```{python}
-# Check balance for age covariate (using standardized variable)
-fig, axs = ipw_result.plot_balance_ecdf("age_std")
+# Check balance for age
+fig, axs = ipw_result.plot_balance_ecdf("age")
 plt.tight_layout()
 plt.show()
 ```
 
 ```{python}
-# Check balance for education (using standardized variable)
-fig, axs = ipw_result.plot_balance_ecdf("educ_std")
+# Check balance for education
+fig, axs = ipw_result.plot_balance_ecdf("educ")
 plt.tight_layout()
 plt.show()
 ```
@@ -432,10 +437,10 @@ plt.show()
 
 | Aspect | Mixtape | This Notebook |
 |--------|---------|---------------|
-| Propensity model | Logistic regression (statsmodels) | Bayesian logistic (PyMC) |
-| Weighting | Manual Horvitz-Thompson | CausalPy `robust` scheme |
-| Uncertainty | Bootstrap or asymptotic | Bayesian posterior |
-| Specification | Polynomials in age, education, and prior earnings, plus `educ * re74`, then a 0.1–0.9 propensity trim | Linear in standardized covariates. No polynomials, no `educ * re74`, and no trim. Rows are not dropped to imitate that screen |
+| Propensity model | Logistic regression | Bayesian `PropensityScore` |
+| Weighting | `te_1` through `te_4` | `raw` only. That is `te_1`. `te_2`, `te_3`, and `te_4` are not this fit |
+| Uncertainty | Point estimate from the logit | Bayesian posterior |
+| Specification | `nsw_pscore.py` polynomials, `educ*re74`, then a 0.1–0.9 trim in `ipw.py` | `treat ~ 1 + age + I(age**2) + I(age**3) + educ + I(educ**2) + marr + nodegree + black + hisp + re74 + re75 + u74 + u75 + educ:re74`. No standardization. No row drop |
 
 ### The LaLonde Problem
 
@@ -451,7 +456,7 @@ IPW attempts to correct for these differences by reweighting, but:
 - No adjustment for unobservables
 
 ### This run
-Robust IPW on the NSW treated units plus CPS controls, `random_seed=42`: ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the `{python} f"{n_ate_draws}"` draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -12,265 dollars, so the migration did not move this estimate off the LaLonde failure. The book's logit is not this specification: it includes polynomials, an `educ * re74` interaction, and a 0.1–0.9 trim. Those terms are not added here, and no rows are dropped to imitate the trim. `InversePropensityWeighting` has no trim argument and no ATT argument. Dropping rows outside 0.1–0.9 would be a hand edit, not a feature of the class.
+Raw IPW on the NSW sample plus CPS controls, formula printed above, `random_seed=42`, `target_accept=0.99`. Draws, chains, and tune are the library defaults. ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the `{python} f"{n_ate_draws}"` draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. Printed diagnostics: max r-hat `{python} f"{max_rhat:.4f}"`, divergences `{python} f"{n_div}"`, min bulk ESS `{python} f"{min_ess:.0f}"`. This page reads those as a failed sample when max r-hat exceeds 1.01, any divergence is recorded, or min bulk ESS is below 400. On that reading the sample `{python} "failed" if sampling_failed else "passed"`. Sampling was not retuned. The figure above shows the propensity score distribution by treatment. `te_2`, `te_3`, and `te_4` are not this fit.
 
 ---
 
@@ -482,15 +487,18 @@ In this notebook, we demonstrated:
 - Balance diagnostics help assess whether weighting achieves covariate balance
 - The LaLonde problem remains challenging — observational methods may not fully recover experimental estimates
 
-**What CausalPy supports:**
-- ✅ Inverse Propensity Weighting (multiple schemes)
-- ✅ Propensity score diagnostics
-- ✅ Balance plots
+**What this page fits:**
 
-**What's not yet available:**
-- ❌ Nearest neighbor matching
-- ❌ Subclassification
-- ❌ Coarsened exact matching
+- Inverse propensity weighting with `weighting_scheme="raw"` and `PropensityScore`
+- Propensity score distribution by treatment
+- Balance plots for `age` and `educ`
+
+**Not this fit:**
+
+- `te_2`, `te_3`, and `te_4` (normalized weights, the 0.1–0.9 trim, and ATT)
+- Nearest neighbor matching
+- Subclassification
+- Coarsened exact matching
 
 ---
 
