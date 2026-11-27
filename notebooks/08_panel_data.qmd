@@ -21,19 +21,19 @@ The within estimator, which is what provider fixed effects estimate, subtracts e
 Fixed effects are not a fix for reverse causality, and they are not a fix for a confounder that changes across sessions. The chapter shows those failures with published tables from @cornwell1994 and @cornwell1997. Those datasets are not in the Mixtape repo. This page cites the tables and does not recreate them.
 :::
 
-The coded exercise is Cunningham and Kendall's Survey of Adult Service Providers. Each row is one of a provider's recent client sessions, not a calendar year. The outcome is log hourly price (`lnw`). [Table 8.3](https://mixtape-1ed.netlify.app/08-panel_data) reports three columns on the same balanced sample: pooled OLS, provider fixed effects, and OLS on provider-demeaned variables. Columns 2 and 3 are the same point estimates. That equivalence is the result to show. The book does not put session fixed effects in this regression.
+The coded exercise is Cunningham and Kendall's Survey of Adult Service Providers. Each row is one of a provider's recent client sessions, not a calendar year. The outcome is log hourly price (`lnw`). [Table 8.3](https://mixtape-1ed.netlify.app/08-panel_data) reports three columns on the same balanced sample: pooled OLS, provider fixed effects, and OLS on provider-demeaned variables. Columns 2 and 3 are the same point estimates. This page does not refit those columns. It estimates the within relationship with one Bayesian demeaned regression and compares the posterior means to the published fixed-effects point estimates. The book does not put session fixed effects in this regression.
 
 ### What we'll cover
 
 1. Clean the panel to the book's 1,028-row sample
-2. Pooled OLS, provider dummy FE, and the within estimator — same sklearn backend
-3. One Bayesian within regression, and why its interval is not the book's clustered standard error
+2. Show which covariates the within transformation wipes
+3. One Bayesian within regression, compared with Table 8.3's published point estimates, and why its interval is not the book's clustered standard error
 
 ### Mixtape files implemented
 
 | File | Description | Status |
 |------|-------------|--------|
-| `sasp.py` | Sex-worker panel, pooled OLS versus provider FE | ✅ |
+| `sasp.py` | Sex-worker panel, pooled OLS versus provider FE | 🟡 Bayesian within means versus Table 8.3; clustered SEs not estimated |
 
 `bail.py` is a judge-leniency instrumental-variables design, not this page. The cluster-robust Monte Carlos (`cluster1.py`–`cluster4.py`) are not in this chapter, and CausalPy does not report cluster-robust frequentist standard errors. Neither is estimated here.
 
@@ -47,10 +47,9 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+import arviz as az
 
 import causalpy as cp
-from causalpy.formula_utils import build_formula_matrices
 
 import sys
 
@@ -93,7 +92,7 @@ TIME_VARYING = [
     "massage_cl",
 ]
 FORMULA_VARS = ["lnw", *TIME_INVARIANT, *TIME_VARYING]
-# Book order, from python/sasp.py. Slopes below are checked against this list.
+# Book order, from python/sasp.py. Table 8.3 citations below use this list.
 REGRESSORS = TIME_INVARIANT + TIME_VARYING
 
 # Table 8.3 point estimates at the printed precision. Parentheses in the book
@@ -168,7 +167,7 @@ print(sasp["provider_second"].value_counts().rename("provider_second"))
 
 ## What fixed effects can see
 
-Subtract the provider mean and the time-invariant columns are identically zero. That is the within transformation, not a coefficient the dummy regression should be asked to invent.
+Subtract the provider mean and the time-invariant columns are identically zero. That is the within transformation. A slope on a column this transformation deletes is not identified.
 
 ```{python}
 within_sd = sasp.groupby("id")[REGRESSORS].std().max().rename("max within-unit SD")
@@ -180,120 +179,24 @@ if not np.allclose(within_sd.loc[TIME_INVARIANT], 0.0):
 
 **Takeaway:** age, BMI, race, schooling, and marital status are identified in pooled OLS and wiped by provider demeaning. The book prints them as `0.000` with a missing standard error in the FE columns.
 
-## Three point estimates
+## Bayesian within estimator
 
-Same sklearn backend for all three columns, so a difference is the estimator, not the optimizer. `PanelRegression` requires `unit_fe_variable`, so pooled OLS cannot be that class. It is `LinearRegression` on the formula design matrix, with `fit_intercept=False` because patsy already built the intercept column. CausalPy does the same internally.
+This is the CausalPy result, and the comparison to Table 8.3. `fe_method="demeaned"`, time-varying formula only, `time_fe_variable` left unset, then `.fit()`. The book's pooled OLS column and provider-dummy column are cited below. They are not refit. Sampling a dummy per provider — about 257 effects — is not this page. The prior is the model's default. It is not tuned to the published numbers.
 
 `time_fe_variable` stays unset. On the demeaned path that argument is not a label: setting it also demeans by that column, which would be two-way FE. The book is one-way provider FE. Session is the within-unit index, not a second fixed effect.
 
-The demeaned formula keeps only the time-varying regressors. After demeaning, the provider characteristics are zero columns and the design is singular. Leaving them out is the result, not a shorter model.
+The demeaned formula keeps only the time-varying regressors. After demeaning, the provider characteristics are zero columns and the design is singular. Leaving them out is the result, not a shorter model. Do not add session FE, and do not drop a different set of regressors than the book does.
 
 ```{python}
-pooled_formula = "lnw ~ " + " + ".join(REGRESSORS)
-dummy_formula = "lnw ~ C(id) + " + " + ".join(REGRESSORS)
 demeaned_formula = "lnw ~ " + " + ".join(TIME_VARYING)
+rhs = demeaned_formula.split(" ~ ", 1)[1].split(" + ")
 
-if "session" in pooled_formula or "C(session)" in dummy_formula or "C(session)" in demeaned_formula:
+if "session" in rhs or "C(session)" in demeaned_formula:
     raise RuntimeError("estimating formulas must not include session fixed effects")
 for column in TIME_INVARIANT:
-    if column in demeaned_formula.split(" ~ ", 1)[1].split(" + "):
+    if column in rhs:
         raise RuntimeError(f"{column} is time-invariant and does not belong in the demeaned formula")
 
-y_pooled, X_pooled = build_formula_matrices(pooled_formula, sasp)
-pooled_fit = LinearRegression(fit_intercept=False).fit(
-    np.asarray(X_pooled), np.asarray(y_pooled).ravel()
-)
-pooled_slopes = dict(zip(X_pooled.design_info.column_names, pooled_fit.coef_))
-
-fe = cp.PanelRegression(
-    sasp,
-    dummy_formula,
-    unit_fe_variable="id",
-    time_fe_variable=None,
-    fe_method="dummies",
-    model=LinearRegression(fit_intercept=False),
-).fit()
-within = cp.PanelRegression(
-    sasp,
-    demeaned_formula,
-    unit_fe_variable="id",
-    time_fe_variable=None,
-    fe_method="demeaned",
-    model=LinearRegression(fit_intercept=False),
-).fit()
-
-
-def coefficient_means(result):
-    """Mean coefficient by patsy label.
-
-    PanelRegression keeps draws on the model backend rather than a result
-    bundle. An OLS backend is one draw, so the mean is the point estimate.
-    """
-    draws = result._model_backend.coefficients()
-    return {
-        str(name): float(draws.sel(coeffs=name).mean())
-        for name in draws.coords["coeffs"].values
-    }
-
-
-fe_slopes = coefficient_means(fe)
-within_slopes = coefficient_means(within)
-
-if fe.time_fe_variable is not None or within.time_fe_variable is not None:
-    raise RuntimeError("estimating fits must leave time_fe_variable unset")
-
-for term in TIME_VARYING:
-    if abs(fe_slopes[term] - within_slopes[term]) > 1e-8:
-        raise RuntimeError(f"{term}: dummy FE and demeaned FE differ")
-
-for term, (ols_target, fe_target) in BOOK.items():
-    if round(pooled_slopes[term], 3) != ols_target:
-        raise RuntimeError(f"{term} pooled OLS {pooled_slopes[term]:.6f} != {ols_target}")
-    if round(fe_slopes[term], 3) != fe_target or round(within_slopes[term], 3) != fe_target:
-        raise RuntimeError(
-            f"{term} FE {fe_slopes[term]:.6f} / demeaned {within_slopes[term]:.6f} != {fe_target}"
-        )
-
-comparison = pd.DataFrame(
-    {
-        "Pooled OLS": pd.Series({term: pooled_slopes[term] for term in BOOK}),
-        "Provider FE": pd.Series({term: fe_slopes[term] for term in BOOK}),
-        "Demeaned": pd.Series({term: within_slopes[term] for term in BOOK}),
-        "Book OLS": pd.Series({term: targets[0] for term, targets in BOOK.items()}),
-        "Book FE": pd.Series({term: targets[1] for term, targets in BOOK.items()}),
-    }
-)
-comparison.round(3)
-```
-
-Dummy FE and demeaned FE match each other, not merely the printed table. The design for the dummy fit is rank-deficient by the twelve time-invariant covariates: those columns lie in the span of the provider dummies. Sklearn's least squares does not drop them, and the min-norm numbers on age, BMI, race, schooling, and marital status are not identified. They are not the book's `0.000`. The within transformation is the result that matches the book: those columns have within-unit SD 0, so the demeaned formula omits them. Do not "solve" that by adding session FE or by dropping a different set of regressors than the book does.
-
-```{python}
-X_dummy = np.asarray(fe.design["X"])
-dummy_rank = np.linalg.matrix_rank(X_dummy)
-print(f"Dummy design: {X_dummy.shape[1]} columns, rank {dummy_rank}")
-print(f"Rank gap: {X_dummy.shape[1] - dummy_rank}")
-print(f"Time-invariant regressors: {len(TIME_INVARIANT)}")
-if X_dummy.shape[1] - dummy_rank != len(TIME_INVARIANT):
-    raise RuntimeError("dummy rank gap is not the time-invariant covariate count")
-print(f"Providers: {fe.n_units}; time FE: {fe.time_fe_variable}")
-```
-
-```{python}
-#| label: fig-provider-effects
-#| fig-cap: "Provider intercepts from the OLS dummy-variable fit. The demeaned fit does not estimate these."
-
-fe.plot_unit_effects()
-plt.show()
-```
-
-`plot_unit_effects()` is dummy-FE only. It is not called on the Bayesian fit below. `plot_trajectories()` is not called either: it raises when `time_fe_variable` is unset, and setting that argument on an estimating fit would change the estimator.
-
-## Bayesian within estimator
-
-This is the CausalPy result. `fe_method="demeaned"`, time-varying formula only, `time_fe_variable` left unset, then `.fit()`. The dummy specification is not sampled — about 257 provider effects. The prior is the model's default. It is not tuned to the published numbers.
-
-```{python}
 sample_kwargs = {
     "target_accept": 0.95,
     "random_seed": 42,
@@ -308,7 +211,20 @@ bayes = cp.PanelRegression(
     fe_method="demeaned",
     model=cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs),
 ).fit()
-import arviz as az
+
+
+def coefficient_means(result):
+    """Mean coefficient by patsy label.
+
+    PanelRegression keeps draws on the model backend rather than a result
+    bundle.
+    """
+    draws = result._model_backend.coefficients()
+    return {
+        str(name): float(draws.sel(coeffs=name).mean())
+        for name in draws.coords["coeffs"].values
+    }
+
 
 rhat = az.rhat(bayes.idata).to_dataset()
 max_rhat = float(np.nanmax(rhat.to_array().values))
@@ -322,22 +238,23 @@ if bayes.time_fe_variable is not None or bayes.fe_method != "demeaned":
     raise RuntimeError("Bayesian fit must be one-way demeaned provider FE")
 
 bayes_means = coefficient_means(bayes)
-if abs(bayes_means["unsafe"] - within_slopes["unsafe"]) > 0.01:
-    raise RuntimeError("Bayesian unsafe mean is not sitting on the OLS within estimate")
-
 bayes.summary()
 ```
 
 ```{python}
+book_pooled = {term: targets[0] for term, targets in BOOK.items()}
+book_fe = {term: targets[1] for term, targets in BOOK.items()}
 bayes_comparison = pd.DataFrame(
     {
-        "OLS within": pd.Series({term: within_slopes[term] for term in BOOK}),
+        "Book pooled OLS": pd.Series(book_pooled),
+        "Book FE": pd.Series(book_fe),
         "Posterior mean": pd.Series({term: bayes_means[term] for term in BOOK}),
     }
 )
-bayes_comparison["Difference"] = (
-    bayes_comparison["Posterior mean"] - bayes_comparison["OLS within"]
+bayes_comparison["Posterior - book FE"] = (
+    bayes_comparison["Posterior mean"] - bayes_comparison["Book FE"]
 )
+max_fe_gap = float(bayes_comparison["Posterior - book FE"].abs().max())
 bayes_comparison.round(3)
 ```
 
@@ -359,24 +276,26 @@ plt.show()
 
 `effect_summary()` always raises `NotImplementedError` on this class. This regression is not a difference-in-differences, interrupted time series, or synthetic-control design, and it is not `InteractiveFixedEffectsSyntheticControl`. The page does not call `effect_summary()`.
 
+`plot_unit_effects()` is dummy-FE only. This page does not fit that specification, so the method is not called. `plot_trajectories()` is not called either: it raises when `time_fe_variable` is unset, and setting that argument would change the estimator.
+
 ## Comparison to the book
 
-Removing the provider effect moves the slopes the chapter discusses.
+Removing the provider effect moves the slopes the chapter discusses. Those movements are Table 8.3's published point estimates. This page cites them. It does not refit pooled OLS or the provider-dummy column.
 
-The unsafe association is `{python} f"{pooled_slopes['unsafe']:.3f}"` in pooled OLS and `{python} f"{within_slopes['unsafe']:.3f}"` with provider effects. The premium is invisible until the provider mean is removed. The session-length elasticity steepens, from `{python} f"{pooled_slopes['llength']:.3f}"` to `{python} f"{within_slopes['llength']:.3f}"`. The client-attractiveness slope shrinks from `{python} f"{pooled_slopes['appearance_cl']:.3f}"` to `{python} f"{within_slopes['appearance_cl']:.3f}"`, and the massage association shrinks from `{python} f"{pooled_slopes['massage_cl']:.3f}"` to `{python} f"{within_slopes['massage_cl']:.3f}"`. Time-invariant covariates drop out of the within columns.
+The unsafe association is `{python} f"{book_pooled['unsafe']:.3f}"` in the book's pooled OLS and `{python} f"{book_fe['unsafe']:.3f}"` with provider effects. The premium is invisible until the provider mean is removed. The Bayesian within mean is `{python} f"{bayes_means['unsafe']:.3f}"`. The session-length elasticity steepens, from `{python} f"{book_pooled['llength']:.3f}"` to `{python} f"{book_fe['llength']:.3f}"`; the posterior mean is `{python} f"{bayes_means['llength']:.3f}"`. The client-attractiveness slope shrinks from `{python} f"{book_pooled['appearance_cl']:.3f}"` to `{python} f"{book_fe['appearance_cl']:.3f}"` (posterior mean `{python} f"{bayes_means['appearance_cl']:.3f}"`), and the massage association shrinks from `{python} f"{book_pooled['massage_cl']:.3f}"` to `{python} f"{book_fe['massage_cl']:.3f}"` (posterior mean `{python} f"{bayes_means['massage_cl']:.3f}"`). Time-invariant covariates drop out of the within columns.
 
 ::: {.callout-warning}
 A posterior highest-density interval is not a provider-clustered standard error. Table 8.3's parentheses are clustered at the provider, and they already differ slightly between the FE and demeaned columns (unsafe: 0.028 versus 0.026) even though the point estimates match. This page compares point estimates. CausalPy does not report a cluster-robust covariance here.
 :::
 
-Posterior means from the demeaned Bayesian fit sit on the OLS within estimates. They are not a second replication of the clustered standard errors, and the prior was not chosen to chase the printed table.
+The table above compares those posterior means with Table 8.3's provider-FE point estimates. The largest absolute gap on the cited terms is `{python} f"{max_fe_gap:.3f}"`. That gap is not a clustered standard error, and the prior was not chosen to chase the printed table.
 
 | Aspect | Table 8.3 | This page |
 |--------|-----------|-----------|
 | Sample | 1,028 balanced provider-sessions | Same sample; the page stops otherwise |
-| Pooled OLS and FE point estimates | Printed to 3 decimals | Sklearn, same formula, matched at that precision |
-| FE versus demeaned | Same point estimates | Required to match each other, not only the table |
-| Inference | Provider-clustered SEs | OLS point estimates; Bayesian HDI on the within fit |
+| Pooled OLS and provider FE | Printed to 3 decimals | Cited. Not refit |
+| Within estimator | Provider FE and demeaned OLS, same point estimates | Bayesian `PanelRegression`, `fe_method="demeaned"` |
+| Inference | Provider-clustered SEs | Posterior means and highest-density intervals. Not clustered SEs |
 | Session FE | Not in the estimating equation | `time_fe_variable` left unset |
 
 ## CausalPy notes
@@ -385,12 +304,9 @@ Construction validates the formula and builds the design. Nothing is sampled unt
 
 | Fit | `fe_method` | Formula | What it is for |
 |-----|-------------|---------|----------------|
-| Pooled OLS | not `PanelRegression` | Full Table 8.3 formula | The column that ignores \(u_i\) |
-| Provider FE | `"dummies"` | Full formula plus `C(id)` | OLS equivalence check, and `plot_unit_effects()` |
-| Within | `"demeaned"` | Time-varying regressors only | Same OLS slopes without a dummy per provider |
-| Bayesian within | `"demeaned"` | Same time-varying formula | Posterior uncertainty. Not a clustered SE |
+| Bayesian within | `"demeaned"` | Time-varying regressors only | Posterior means compared with Table 8.3's published FE point estimates. Not a clustered SE |
 
-There is no hierarchical or partial-pooling fixed effect in this fit. The chapter does not ask for one.
+There is no hierarchical or partial-pooling fixed effect in this fit. The chapter does not ask for one. The book's pooled OLS and provider-dummy columns are not fits on this page.
 
 ## Summary
 
