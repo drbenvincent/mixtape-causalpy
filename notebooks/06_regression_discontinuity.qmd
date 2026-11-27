@@ -54,9 +54,11 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import statsmodels.formula.api as smf
+import xarray as xr
+import arviz as az
 
 import causalpy as cp
+from causalpy.formula_utils import build_design_matrices, build_formula_matrices
 
 # Add the src directory to path for our data utilities
 import sys
@@ -69,6 +71,50 @@ from mixtape_causalpy import load_lmb
 
 # Set random seed for reproducibility
 np.random.seed(12282020)  # Same seed as Mixtape examples
+
+
+def as_regression_inputs(formula, data):
+    """Build the xarray inputs LinearRegression.fit expects from a formula."""
+    y, X = build_formula_matrices(formula, data)
+    labels = list(X.design_info.column_names)
+    n = np.asarray(X).shape[0]
+    X_da = xr.DataArray(
+        np.asarray(X),
+        dims=["obs_ind", "coeffs"],
+        coords={"obs_ind": np.arange(n), "coeffs": labels},
+    )
+    y_da = xr.DataArray(
+        np.asarray(y).reshape(n, 1),
+        dims=["obs_ind", "treated_units"],
+        coords={"obs_ind": np.arange(n), "treated_units": ["unit_0"]},
+    )
+    coords = {
+        "obs_ind": np.arange(n),
+        "coeffs": labels,
+        "treated_units": ["unit_0"],
+    }
+    return X, X_da, y_da, coords
+
+
+def print_linear_diagnostics(label, idata):
+    rhat = az.rhat(idata)
+    ess = az.ess(idata, method="bulk")
+    max_rhat = max(
+        float(np.nanmax(rhat["beta"].values)),
+        float(np.nanmax(rhat["y_hat_sigma"].values)),
+    )
+    min_ess = min(
+        float(np.nanmin(ess["beta"].values)),
+        float(np.nanmin(ess["y_hat_sigma"].values)),
+    )
+    n_div = int(idata["sample_stats"]["diverging"].sum())
+    print(
+        f"{label}: max r-hat {max_rhat:.3f}, divergences {n_div}, "
+        f"min bulk ESS {min_ess:.0f}"
+    )
+
+
+sample_kwargs = {"progressbar": True, "random_seed": 42}
 ```
 
 ---
@@ -155,7 +201,7 @@ plt.show()
 
 ```{python}
 #| label: fig-rdd-simulate4
-#| fig-cap: "Simulated outcome with a smooth conditional expectation and no planted jump at 140. Curves are the fully interacted polynomial fit on each side of the cutoff."
+#| fig-cap: "Simulated outcome with a smooth conditional expectation and no planted jump at 140. Curves are the posterior mean of the fully interacted polynomial on each side of the cutoff, not an RD jump."
 # rdd_simulate4: no discontinuity. Reset the seed so this cell matches the
 # script's DGP rather than continuing the stream from simulate1-3.
 np.random.seed(12282020)
@@ -172,10 +218,44 @@ sim4["y3"] = (
     + np.random.normal(0, 1000, 1000)
 )
 sim4 = sim4[sim4.x < 280]
-sim4_fit = smf.ols(
-    "y3 ~ D + x + x2 + x3 + D*x + D*x2 + D*x3", data=sim4
-).fit()
-sim4_d = float(sim4_fit.params["D"])
+sim4_X, _, sim4_y_raw, sim4_coords = as_regression_inputs(
+    "y3 ~ D + x + x2 + x3 + D*x + D*x2 + D*x3", sim4
+)
+sim4_labels = list(sim4_X.design_info.column_names)
+# Default priors are Normal(0, 50) on coefficients and HalfNormal(1) on the
+# residual SD. The outcome is near 15,000 and the cubic columns run into the
+# millions, so sample the outcome in thousands and non-intercept columns in
+# SD units, then map the posterior mean back to the original formula.
+sim4_y_scale = 1000.0
+sim4_col_scale = np.std(np.asarray(sim4_X), axis=0)
+sim4_col_scale[sim4_col_scale == 0] = 1.0
+sim4_X_da = xr.DataArray(
+    np.asarray(sim4_X) / sim4_col_scale,
+    dims=["obs_ind", "coeffs"],
+    coords={"obs_ind": sim4_coords["obs_ind"], "coeffs": sim4_labels},
+)
+sim4_y_da = sim4_y_raw / sim4_y_scale
+sim4_fit = cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs)
+sim4_fit.fit(sim4_X_da, sim4_y_da, coords=sim4_coords)
+sim4_beta_scaled = (
+    sim4_fit.idata["posterior"]["beta"]
+    .mean(dim=["chain", "draw"])
+    .sel(treated_units="unit_0")
+)
+sim4_beta = np.array(
+    [
+        float(sim4_beta_scaled.sel(coeffs=name)) * sim4_y_scale / scale
+        for name, scale in zip(sim4_labels, sim4_col_scale)
+    ]
+)
+sim4_d = float(sim4_beta[sim4_labels.index("D")])
+
+
+def sim4_mean_prediction(frame):
+    (design,) = build_design_matrices([sim4_X.design_info], frame)
+    return np.asarray(design) @ sim4_beta
+
+
 # The formula's D coefficient is the intercept gap at x=0. The jump the
 # figure is about is the predicted difference at the cutoff.
 cutoff = pd.DataFrame(
@@ -186,25 +266,27 @@ cutoff = pd.DataFrame(
         "D": [0, 1],
     }
 )
-sim4_jump = float(np.diff(sim4_fit.predict(cutoff))[0])
+sim4_jump = float(np.diff(sim4_mean_prediction(cutoff))[0])
 
 fig, ax = plt.subplots(figsize=(8, 5))
 colors = ["C0" if d == 0 else "C3" for d in sim4["D"]]
 ax.scatter(sim4["x"], sim4["y3"], c=colors, alpha=0.25, s=16)
 for d, color in [(0, "C0"), (1, "C3")]:
     side = sim4[sim4["D"] == d].sort_values("x")
-    ax.plot(side["x"], sim4_fit.predict(side), color=color, linewidth=2)
+    ax.plot(side["x"], sim4_mean_prediction(side), color=color, linewidth=2)
 ax.axvline(x=140, color="gray", linestyle="--", linewidth=2)
 ax.set_xlabel("Running variable (X)")
 ax.set_ylabel("Outcome (Y)")
 ax.set_title("No planted jump: flexible fit")
 plt.tight_layout()
 plt.show()
-print(f"Formula D coefficient (intercept gap at x=0): {sim4_d:.1f}")
-print(f"Predicted gap at the cutoff x=140: {sim4_jump:.1f}")
+print(f"Posterior mean of the D coefficient (intercept gap at x=0): {sim4_d:.1f}")
+print(f"Posterior mean of the predicted gap at the cutoff x=140: {sim4_jump:.1f}")
+print("Linear association from the scaled formula, mapped back. Not an RD jump.")
+print_linear_diagnostics("No-discontinuity simulation", sim4_fit.idata)
 ```
 
-The data-generating process plants a jump of zero at 140. The script's formula is `y3 ~ D * (x + x2 + x3)`, so its `D` coefficient is the intercept gap at x = 0, not the jump at the cutoff. The same fit's predicted gap at 140 is `{python} f"{sim4_jump:.0f}"`, against an outcome near 15,000 and noise with standard deviation 1,000. A linear fit on each side of a curved conditional expectation can still look like a discontinuity; that failure is the previous simulation, not this one.
+The data-generating process plants a jump of zero at 140. The script's formula is `y3 ~ D * (x + x2 + x3)`, so its `D` coefficient is the intercept gap at x = 0, not the jump at the cutoff. Sampling uses the outcome in thousands and non-intercept columns in standard-deviation units, because the default `Normal(0, 50)` and `HalfNormal(1)` priors cannot represent the raw cubic. The printed gaps and the curves are posterior means mapped back to that formula. They are a linear association, not an RD discontinuity. The predicted gap at 140 is `{python} f"{sim4_jump:.0f}"`, against an outcome near 15,000 and noise with standard deviation 1,000. A linear fit on each side of a curved conditional expectation can still look like a discontinuity; that failure is the previous simulation, not this one.
 
 
 ---
@@ -234,18 +316,40 @@ lmb_subset = df_clean[df_clean["lagdemvoteshare"].between(0.48, 0.52)].copy()
 
 print("NAIVE COMPARISONS (Not RD - motivation for the method)")
 print("=" * 60)
-lm_close = smf.ols("score ~ democrat", data=lmb_subset).fit(cov_type="HC1")
-lm_full = smf.ols("score ~ democrat", data=df_clean).fit(cov_type="HC1")
+_, close_X_da, close_y_da, close_coords = as_regression_inputs(
+    "score ~ democrat", lmb_subset
+)
+lm_close = cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs)
+lm_close.fit(close_X_da, close_y_da, coords=close_coords)
+_, full_X_da, full_y_da, full_coords = as_regression_inputs(
+    "score ~ democrat", df_clean
+)
+lm_full = cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs)
+lm_full.fit(full_X_da, full_y_da, coords=full_coords)
+
+
+def democrat_posterior_mean(fit):
+    return float(
+        fit.idata["posterior"]["beta"]
+        .mean(dim=["chain", "draw"])
+        .sel(treated_units="unit_0", coeffs="democrat")
+    )
+
 
 print(
-    f"Close elections (±2pp): effect = {lm_close.params['democrat']:.1f} (n={len(lmb_subset)})"
+    "Close elections (±2pp): posterior mean of the democrat coefficient = "
+    f"{democrat_posterior_mean(lm_close):.1f} (n={len(lmb_subset)})"
 )
 print(
-    f"Full sample:           effect = {lm_full.params['democrat']:.1f} (n={len(df_clean)})"
+    "Full sample:           posterior mean of the democrat coefficient = "
+    f"{democrat_posterior_mean(lm_full):.1f} (n={len(df_clean)})"
 )
 print()
+print("Linear association of score and democrat. Not an RD discontinuity.")
 print("The full sample conflates treatment with selection.")
 print("RD solves this by comparing only at the threshold.")
+print_linear_diagnostics("Close elections", lm_close.idata)
+print_linear_diagnostics("Full sample", lm_full.idata)
 ```
 
 ---
@@ -263,7 +367,7 @@ result_linear = cp.RegressionDiscontinuity(
     formula="score ~ 1 + demvoteshare_c + treated",
     running_variable_name="demvoteshare_c",
     model=cp.pymc_models.LinearRegression(
-        sample_kwargs={"progressbar": True, "random_seed": 42}
+        sample_kwargs=sample_kwargs
     ),
     treatment_threshold=0.0,
 ).fit()
@@ -277,7 +381,7 @@ result_interact = cp.RegressionDiscontinuity(
     formula="score ~ 1 + demvoteshare_c + treated + demvoteshare_c:treated",
     running_variable_name="demvoteshare_c",
     model=cp.pymc_models.LinearRegression(
-        sample_kwargs={"progressbar": True, "random_seed": 42}
+        sample_kwargs=sample_kwargs
     ),
     treatment_threshold=0.0,
 ).fit()
@@ -293,7 +397,7 @@ result_quad = cp.RegressionDiscontinuity(
     formula="score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated",
     running_variable_name="demvoteshare_c",
     model=cp.pymc_models.LinearRegression(
-        sample_kwargs={"progressbar": True, "random_seed": 42}
+        sample_kwargs=sample_kwargs
     ),
     treatment_threshold=0.0,
     bandwidth=0.05,  # ±5 percentage points (lmb_6)
@@ -309,7 +413,7 @@ result_donut = cp.RegressionDiscontinuity(
     formula="score ~ 1 + demvoteshare_c + I(demvoteshare_c**2) + treated + demvoteshare_c:treated + I(demvoteshare_c**2):treated",
     running_variable_name="demvoteshare_c",
     model=cp.pymc_models.LinearRegression(
-        sample_kwargs={"progressbar": True, "random_seed": 42}
+        sample_kwargs=sample_kwargs
     ),
     treatment_threshold=0.0,
     bandwidth=0.05,
