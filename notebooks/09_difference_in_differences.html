@@ -275,7 +275,6 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#adoption-timing" id="toc-adoption-timing" class="nav-link" data-scroll-target="#adoption-timing">Adoption timing</a></li>
   <li><a href="#imputation-event-time-contrasts" id="toc-imputation-event-time-contrasts" class="nav-link" data-scroll-target="#imputation-event-time-contrasts">Imputation event-time contrasts</a></li>
-  <li><a href="#optional-bayesian-sample" id="toc-optional-bayesian-sample" class="nav-link" data-scroll-target="#optional-bayesian-sample">Optional Bayesian sample</a></li>
   </ul></li>
   <li><a href="#abortion-legalization" id="toc-abortion-legalization" class="nav-link" data-scroll-target="#abortion-legalization">Abortion legalization</a></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
@@ -313,12 +312,12 @@ div.csl-indent {
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>Adoption dates in the castle-doctrine panel are not a single year. A two-group, two-period coefficient is the wrong estimand for that design, and it is not what this page reports.</p>
-<p>The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator <span class="citation" data-cites="borusyak2024">(<a href="#ref-borusyak2024" role="doc-biblioref">Borusyak et al. 2024</a>)</span>. The untreated outcome is <code>sklearn.linear_model.LinearRegression</code> on state and year fixed effects. It is not Cheng and Hoekstra’s two-way fixed-effects coefficient <span class="citation" data-cites="cheng2013">(<a href="#ref-cheng2013" role="doc-biblioref">Cheng and Hoekstra 2013</a>)</span>, and it is not <code>castle_1.py</code>. A Bayesian sample of the same formula is optional. It is not the required result.</p>
+<p>The required fit below is the Borusyak, Jaravel, and Spiess imputation estimator <span class="citation" data-cites="borusyak2024">(<a href="#ref-borusyak2024" role="doc-biblioref">Borusyak et al. 2024</a>)</span>. The untreated outcome is <code>cp.pymc_models.LinearRegression</code> on state and year fixed effects. It is not Cheng and Hoekstra’s two-way fixed-effects coefficient <span class="citation" data-cites="cheng2013">(<a href="#ref-cheng2013" role="doc-biblioref">Cheng and Hoekstra 2013</a>)</span>, and it is not <code>castle_1.py</code>.</p>
 <p>Snow, the minimum wage, block bootstrap, clustering, the Affordable Care Act, and maternity benefits have no script on this page. No dataset is added for them.</p>
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="1942811a" class="cell" data-execution_count="1">
+<div id="7e3cac02" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -328,15 +327,14 @@ div.csl-indent {
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> causalpy <span class="im">as</span> cp</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="st">"../src"</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mixtape_causalpy <span class="im">import</span> load_castle, load_abortion</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>config InlineBackend.figure_format <span class="op">=</span> <span class="st">'retina'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="st">"../src"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mixtape_causalpy <span class="im">import</span> load_castle, load_abortion</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>config InlineBackend.figure_format <span class="op">=</span> <span class="st">'retina'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="castle-doctrine" class="level2">
@@ -345,7 +343,7 @@ div.csl-indent {
 <p><code>DifferenceInDifferences</code> estimates a single group-by-post interaction. That is not this panel, and it is not used as the result.</p>
 <section id="adoption-timing" class="level3">
 <h3 class="anchored" data-anchor-id="adoption-timing">Adoption timing</h3>
-<div id="1c20e3e9" class="cell" data-execution_count="2">
+<div id="4fb915c8" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>castle <span class="op">=</span> load_castle().copy()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>castle[<span class="st">"treatment_time"</span>] <span class="op">=</span> castle[<span class="st">"treatment_date"</span>].astype(<span class="bu">float</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n_missing_dates <span class="op">=</span> <span class="bu">int</span>(castle[<span class="st">"treatment_time"</span>].isna().<span class="bu">sum</span>())</span>
@@ -410,98 +408,39 @@ Figure&nbsp;1: States by recorded castle-doctrine adoption year, including state
 </section>
 <section id="imputation-event-time-contrasts" class="level3">
 <h3 class="anchored" data-anchor-id="imputation-event-time-contrasts">Imputation event-time contrasts</h3>
-<p>The required formula is state and year fixed effects. <code>C()</code> accepts the numeric year column, so year is not recoded to a string. The <code>1</code> in the formula is the intercept column of the design matrix. <code>sklearn.linear_model.LinearRegression</code> fits that matrix. It does not add a second intercept.</p>
+<p>The required formula is state and year fixed effects. <code>C()</code> accepts the numeric year column, so year is not recoded to a string. The <code>1</code> in the formula is the intercept column of the design matrix. <code>cp.pymc_models.LinearRegression</code> fits that matrix. It does not add a second intercept.</p>
 <p><code>post</code> is an absorbing 0/1 column in the file. It is not passed as <code>treated_variable_name</code>. The absorbing-treatment check runs only when that argument is passed. <code>l_homicide</code> has no missing values, so there is nothing for a missing-outcome check to drop. The class’s missing-value check on a treated column is about the treatment indicator, not the outcome.</p>
 <p><code>StaggeredDifferenceInDifferences</code> has no weight argument. <code>popwt</code> is not passed, and this is not the book’s population-weighted least squares.</p>
-<div id="b4d44519" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ols_result <span class="op">=</span> cp.StaggeredDifferenceInDifferences(</span>
+<p>Draws, tune, chains, and cores are the library defaults. <code>sample_kwargs</code> keeps <code>progressbar</code>, <code>random_seed</code>, and <code>target_accept=0.95</code>. That <code>target_accept</code> is the one raise already in this file, after a default-length render with max r-hat 1.0375 and min bulk ESS 73. <code>nuts_sampler</code> is omitted, so the installed nutpie sampler is selected.</p>
+<div id="2620fd1c" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bayes_result <span class="op">=</span> cp.StaggeredDifferenceInDifferences(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    castle,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"l_homicide ~ 1 + C(state) + C(year)"</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    unit_variable_name<span class="op">=</span><span class="st">"state"</span>,</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"year"</span>,</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    treatment_time_variable_name<span class="op">=</span><span class="st">"treatment_time"</span>,</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    never_treated_value<span class="op">=</span>np.inf,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>LinearRegression(),</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>).fit()</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>ols_att <span class="op">=</span> ols_result.result.att_event_time</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ols_att.to_string(index<span class="op">=</span><span class="va">False</span>))</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>ols0 <span class="op">=</span> ols_att.loc[ols_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="dv">0</span>].iloc[<span class="dv">0</span>]</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>ols_m1 <span class="op">=</span> ols_att.loc[ols_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>].iloc[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> event_time       att  att_std  n_obs  identified
-         -9 -0.170673      NaN      1        True
-         -8 -0.025384 0.316705      3        True
-         -7 -0.191170 0.261356      7        True
-         -6  0.055426 0.155460     18        True
-         -5 -0.005128 0.160238     21        True
-         -4 -0.007609 0.142853     21        True
-         -3  0.019350 0.103468     21        True
-         -2  0.038205 0.176767     21        True
-         -1 -0.016849 0.146974     21        True
-          0  0.060178 0.260817     21        True
-          1  0.077707 0.265246     21        True
-          2  0.111066 0.298613     20        True
-          3  0.104144 0.301288     18        True
-          4  0.016706 0.265740     14        True
-          5  0.006112 0.086722      3        True</code></pre>
-</div>
-</div>
-<p><code>att</code> is the point estimate of the unit-averaged imputation contrast at that event time: observed log homicide minus the untreated prediction. It is not normalized to a zero reference period. The constructor’s <code>reference_event_time</code> defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is -0.017, not zero. Event time 0, the adoption year, is +0.060 log points, from 21 state-years.</p>
-<p><code>att_std</code> is the residual dispersion of the unit-level contrasts in that cell. It is not a Borusyak–Jaravel–Spiess analytical standard error, and it is not a standard error clustered by state. That event-time 0 number is not Cheng and Hoekstra’s two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.</p>
-<div id="cell-fig-castle-event-time" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> ols_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Event time (years since adoption)"</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Imputation contrast (log homicide rate)"</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Castle doctrine: sklearn imputation contrasts"</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display">
-<div id="fig-castle-event-time" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-castle-event-time-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="09_difference_in_differences_files/figure-html/fig-castle-event-time-output-1.png" width="991" height="589" class="figure-img">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-castle-event-time-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Event-time imputation contrasts from the sklearn fit of log homicide. Bars are 1.96 times the residual standard deviation divided by the square root of the cell count. They are not clustered standard errors and not a Borusyak–Jaravel–Spiess analytical interval. No pre-treatment cell is normalized to zero.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The vertical line is the adoption year. The horizontal line at zero is the zero-effect line, not an omitted reference period.</p>
-</section>
-<section id="optional-bayesian-sample" class="level3">
-<h3 class="anchored" data-anchor-id="optional-bayesian-sample">Optional Bayesian sample</h3>
-<p>The same formula is sampled with <code>progressbar</code>, <code>random_seed</code>, and <code>target_accept=0.95</code>. Draws, tune, chains, and cores are the library defaults. The <code>target_accept</code> value is the one raise after a default-length render with max r-hat 1.0375 and min bulk ESS 73. It is not the required fit. <code>nuts_sampler</code> is omitted, so the installed nutpie sampler is selected.</p>
-<div id="2037d264" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bayes_result <span class="op">=</span> cp.StaggeredDifferenceInDifferences(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    castle,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"l_homicide ~ 1 + C(state) + C(year)"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    unit_variable_name<span class="op">=</span><span class="st">"state"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    time_variable_name<span class="op">=</span><span class="st">"year"</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    treatment_time_variable_name<span class="op">=</span><span class="st">"treatment_time"</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    never_treated_value<span class="op">=</span>np.inf,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,  <span class="co"># default-length render: max r-hat 1.0375, min bulk ESS 73</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>).fit()</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>rhat <span class="op">=</span> az.rhat(bayes_result.idata).to_dataset()</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>max_rhat <span class="op">=</span> <span class="bu">float</span>(np.nanmax(rhat.to_array().values))</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(bayes_result.idata[<span class="st">"sample_stats"</span>][<span class="st">"diverging"</span>].<span class="bu">sum</span>())</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>min_ess <span class="op">=</span> <span class="bu">float</span>(</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    np.nanmin(az.ess(bayes_result.idata, method<span class="op">=</span><span class="st">"bulk"</span>).to_dataset().to_array().values)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"max r-hat </span><span class="sc">{</span>max_rhat<span class="sc">:.4f}</span><span class="ss">, divergences </span><span class="sc">{</span>n_div<span class="sc">}</span><span class="ss">, min bulk ESS </span><span class="sc">{</span>min_ess<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>bayes_result.summary()</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>bayes_att <span class="op">=</span> bayes_result.result.att_event_time</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>bayes0 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="dv">0</span>].iloc[<span class="dv">0</span>]</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>bayes_m1 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>].iloc[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.LinearRegression(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        sample_kwargs<span class="op">=</span>{</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"target_accept"</span>: <span class="fl">0.95</span>,  <span class="co"># default-length render: max r-hat 1.0375, min bulk ESS 73</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>rhat <span class="op">=</span> az.rhat(bayes_result.idata).to_dataset()</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>max_rhat <span class="op">=</span> <span class="bu">float</span>(np.nanmax(rhat.to_array().values))</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(bayes_result.idata[<span class="st">"sample_stats"</span>][<span class="st">"diverging"</span>].<span class="bu">sum</span>())</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>min_ess <span class="op">=</span> <span class="bu">float</span>(</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    np.nanmin(az.ess(bayes_result.idata, method<span class="op">=</span><span class="st">"bulk"</span>).to_dataset().to_array().values)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"max r-hat </span><span class="sc">{</span>max_rhat<span class="sc">:.4f}</span><span class="ss">, divergences </span><span class="sc">{</span>n_div<span class="sc">}</span><span class="ss">, min bulk ESS </span><span class="sc">{</span>min_ess<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>bayes_result.summary()</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>bayes_att <span class="op">=</span> bayes_result.result.att_event_time</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>bayes0 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="dv">0</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>bayes_m1 <span class="op">=</span> bayes_att.loc[bayes_att[<span class="st">"event_time"</span>] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>].iloc[<span class="dv">0</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
 </div>
@@ -605,27 +544,30 @@ Model coefficients:
   C(year)[T.2010]             -0.13, 94% HDI [-0.21, -0.047]</code></pre>
 </div>
 </div>
-<p>On this sample, <code>att</code> is the posterior mean of the same unit-averaged contrast. Event time −1 is -0.017. Event time 0 is +0.061 log points. Its 94% interval is [+0.014, +0.106]. <code>att_lower</code> and <code>att_upper</code> are the 3rd and 97th percentiles of that contrast. They are not residual standard errors.</p>
-<div id="cell-fig-castle-event-time-bayes" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> bayes_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Event time (years since adoption)"</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Imputation contrast (log homicide rate)"</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Castle doctrine: optional Bayesian sample"</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>att</code> is the posterior mean of the unit-averaged imputation contrast at that event time: observed log homicide minus the untreated prediction. It is not normalized to a zero reference period. The constructor’s <code>reference_event_time</code> defaults to −1 and is reserved for plots; it does not subtract that cell from the others. Event time −1 is -0.017, not zero. Event time 0, the adoption year, is +0.061 log points, from 21 state-years. Its 94% interval is [+0.014, +0.106]. <code>att_lower</code> and <code>att_upper</code> are the 3rd and 97th percentiles of that contrast. They are not residual standard errors, and they are not standard errors clustered by state.</p>
+<p>That event-time 0 number is not Cheng and Hoekstra’s two-way fixed-effects coefficient. This page does not estimate that coefficient, so the two are not compared.</p>
+<p>Printed diagnostics: max r-hat 1.0387, divergences 0, min bulk ESS 73.</p>
+<div id="cell-fig-castle-event-time" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> bayes_result.plot(show<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Event time (years since adoption)"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Imputation contrast (log homicide rate)"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Castle doctrine: Bayesian imputation contrasts"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div id="fig-castle-event-time-bayes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-castle-event-time" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-castle-event-time-bayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="09_difference_in_differences_files/figure-html/fig-castle-event-time-bayes-output-1.png" width="991" height="589" class="figure-img">
+<div aria-describedby="fig-castle-event-time-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="09_difference_in_differences_files/figure-html/fig-castle-event-time-output-1.png" width="991" height="589" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-castle-event-time-bayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Optional Bayesian sample of the same imputation formula. Bars are the stored 94% interval of the unit-averaged contrast, not clustered standard errors.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-castle-event-time-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Event-time imputation contrasts from the Bayesian fit of log homicide. Bars are the stored 94% interval of the unit-averaged contrast. They are not clustered standard errors and not a Borusyak–Jaravel–Spiess analytical interval. No pre-treatment cell is normalized to zero.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>The vertical line is the adoption year. The horizontal line at zero is the zero-effect line, not an omitted reference period.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -637,7 +579,7 @@ Figure&nbsp;3: Optional Bayesian sample of the same imputation formula. Bars are
 </div>
 <div class="callout-body-container callout-body">
 <p>This is not <code>castle_1.py</code>. That script is population-weighted least squares of log homicide on <code>post</code>, demographic and spending covariates, region-quarter indicators, state trends, and state and year effects, with standard errors clustered by state. This page does not estimate that coefficient. The class has no weight argument, so <code>popwt</code> is not used.</p>
-<p><code>castle_2.py</code> is an event study: leads 1–9 and lags 1–5, with <code>lag0</code> omitted, plus region-quarter indicators and state and year effects. It is population-weighted least squares, clustered by state. It does not include <code>castle_1.py</code>’s covariate list. <code>castle_3.py</code> and <code>castle_4.py</code> plot those weighted least-squares estimates. CausalPy does not implement that regression. The sklearn table above is the imputation substitute, not those figures.</p>
+<p><code>castle_2.py</code> is an event study: leads 1–9 and lags 1–5, with <code>lag0</code> omitted, plus region-quarter indicators and state and year effects. It is population-weighted least squares, clustered by state. It does not include <code>castle_1.py</code>’s covariate list. <code>castle_3.py</code> and <code>castle_4.py</code> plot those weighted least-squares estimates. CausalPy does not implement that regression. The imputation table above is not those figures.</p>
 <p><code>castle_5.py</code> is empty. The R script decomposes <code>l_homicide ~ post</code> with the Bacon decomposition. It is not run.</p>
 <p><a href="https://github.com/pymc-labs/CausalPy/pull/584">PR #584</a> is an open proposal for a common-timing event study. It is not this staggered design, and it is not a castle-doctrine specification.</p>
 </div>
@@ -661,10 +603,10 @@ Figure&nbsp;3: Optional Bayesian sample of the same imputation formula. Bars are
 <section id="abortion-legalization" class="level2">
 <h2 class="anchored" data-anchor-id="abortion-legalization">Abortion legalization</h2>
 <p>The book’s abortion exercise is a two-way fixed-effects regression. Treatment is an early-repeal indicator interacted with year, on state-years from 1985 to 2000, with state and year effects and controls. A split of the sample at 1993 is not that design. It is not used here, and the regression is not fit.</p>
-<div id="c303defe" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>abortion <span class="op">=</span> load_abortion()</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rows: </span><span class="sc">{</span><span class="bu">len</span>(abortion)<span class="sc">}</span><span class="ss">; years </span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">min</span>())<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">max</span>())<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion[<span class="st">"repeal"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="f6da44df" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>abortion <span class="op">=</span> load_abortion()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rows: </span><span class="sc">{</span><span class="bu">len</span>(abortion)<span class="sc">}</span><span class="ss">; years </span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">min</span>())<span class="sc">}</span><span class="ss">–</span><span class="sc">{</span><span class="bu">int</span>(abortion[<span class="st">'year'</span>].<span class="bu">max</span>())<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(abortion[<span class="st">"repeal"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 19584; years 1985–2000
 repeal
@@ -688,7 +630,7 @@ repeal
 </section>
 <section id="summary" class="level2">
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<p>The required estimator is the sklearn imputation for castle doctrine. The Bayesian sample is optional and is not that result. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.</p>
+<p>The required estimator is the Bayesian imputation for castle doctrine. It is still not <code>castle_1.py</code>. The two-way fixed-effects castle coefficient, the weighted least-squares event study, the Bacon decomposition, the abortion two-way fixed effects, and triple differences are callouts. They are not counted as completed reproductions of those scripts.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
