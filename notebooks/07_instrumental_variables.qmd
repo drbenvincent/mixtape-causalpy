@@ -252,7 +252,6 @@ iv_result = InstrumentalVariable(
     formula=formula,
     model=InstrumentalVariableRegression(sample_kwargs=sample_kwargs),
 ).fit()
-iv_result.summary()
 ```
 
 ```{python}
@@ -272,12 +271,8 @@ beta_z = iv_result.idata["posterior"]["beta_z"]
 
 educ_coef = beta_z.sel(covariates="educ").values.flatten()
 iv_educ_mean = float(np.mean(educ_coef))
-iv_2sls = dict(zip(iv_result.labels, iv_result.ols_beta_second_params, strict=True))
-iv_2sls_educ = float(iv_2sls["educ"])
 iv_rhat = float(az.rhat(iv_result.idata)["beta_z"].sel(covariates="educ"))
-print("2SLS reference fit (labels):", list(iv_2sls))
 print(f"Bayesian mean on educ: {iv_educ_mean:.4f}")
-print(f"2SLS reference on educ: {iv_2sls_educ:.4f}")
 print(f"r-hat on educ: {iv_rhat:.3f}")
 print(
     "The book runs `test nearc4` on the first stage. "
@@ -343,7 +338,7 @@ The Mixtape's IV analysis of the Card data shows:
 2. **Book IV**: often higher than that OLS estimate. Ability bias may downward-bias the book's OLS, or measurement error may attenuate it.
 
 ### This run
-Confounded association of `lwage` on `educ` plus `exper`, `black`, `south`, `married`, and `smsa`, on the complete cases: posterior mean `{python} f"{assoc_educ_mean:.4f}"`, 94% HDI [`{python} f"{assoc_lo:.4f}"`, `{python} f"{assoc_hi:.4f}"`]. That coefficient is not the causal return to schooling. Seven rows missing `married` are dropped; that is the sample both fits use. r-hat on `educ` is `{python} f"{assoc_rhat:.2f}"`, divergences `{python} f"{assoc_div}"`, bulk ESS `{python} f"{assoc_ess:.0f}"`. Bayesian IV, instrument `nearc4`, same controls on both stages, `random_seed=42`: mean `{python} f"{iv_educ_mean:.4f}"`. The stored 2SLS reference fit on the same specification is `{python} f"{iv_2sls_educ:.4f}"`. r-hat on the IV `educ` coefficient is `{python} f"{iv_rhat:.2f}"`. The book's first-stage F is not computed: the class does not return it.
+Confounded association of `lwage` on `educ` plus `exper`, `black`, `south`, `married`, and `smsa`, on the complete cases: posterior mean `{python} f"{assoc_educ_mean:.4f}"`, 94% HDI [`{python} f"{assoc_lo:.4f}"`, `{python} f"{assoc_hi:.4f}"`]. That coefficient is not the causal return to schooling. Seven rows missing `married` are dropped; that is the sample both fits use. r-hat on `educ` is `{python} f"{assoc_rhat:.2f}"`, divergences `{python} f"{assoc_div}"`, bulk ESS `{python} f"{assoc_ess:.0f}"`. Bayesian IV, instrument `nearc4`, same controls on both stages, `random_seed=42`: mean `{python} f"{iv_educ_mean:.4f}"`. r-hat on the IV `educ` coefficient is `{python} f"{iv_rhat:.2f}"`. The book's first-stage F is not computed: the class does not return it.
 
 ### Differences from Book's Implementation
 
@@ -393,32 +388,27 @@ judge_fit = InstrumentalVariable(
     ),
     binary_treatment=False,
 ).fit()
-judge_fit.summary()
 judge_jail = judge_fit.idata["posterior"]["beta_z"].sel(covariates="jail3").values.flatten()
-judge_2sls = dict(zip(judge_fit.labels, judge_fit.ols_beta_second_params, strict=True))
 judge_lo = float(np.quantile(judge_jail, 0.03))
 judge_hi = float(np.quantile(judge_jail, 0.97))
 judge_rhat = float(az.rhat(judge_fit.idata)["beta_z"].sel(covariates="jail3"))
 print(f"jail3 posterior mean: {judge_jail.mean():.4f}")
 print(f"jail3 94% interval: [{judge_lo:.4f}, {judge_hi:.4f}]")
-print(f"2SLS reference on jail3: {judge_2sls['jail3']:.5f}")
 print(f"r-hat on jail3: {judge_rhat:.3f}")
 ```
 
 ```{python}
 #| label: fig-judge-iv
-#| fig-cap: "Posterior draws of the jail3 coefficient. The dashed line is the 2SLS reference on the same specification."
+#| fig-cap: "Posterior draws of the jail3 coefficient."
 fig, ax = plt.subplots(figsize=(8, 4))
 ax.hist(judge_jail, bins=40, color="C0", edgecolor="black")
-ax.axvline(judge_2sls["jail3"], color="C3", linestyle="--", label="2SLS reference")
 ax.set_xlabel("jail3 coefficient")
 ax.set_ylabel("Count")
-ax.legend()
 plt.tight_layout()
 plt.show()
 ```
 
-The 2SLS second-stage coefficient on `jail3` is `{python} f"{judge_2sls['jail3']:.5f}"`. The posterior mean is `{python} f"{judge_jail.mean():.3f}"`, the 3rd-to-97th percentile interval is [`{python} f"{judge_lo:.2f}"`, `{python} f"{judge_hi:.2f}"`], and r-hat is `{python} f"{judge_rhat:.2f}"`. This page does not treat that r-hat as agreement between chains. The sample is 2 chains, 400 tune, and 200 draws. A longer sample was killed before it finished, and this short run is not a mixing claim. The prior scale is 1. This is the minimum-control Bayesian fit. It is not the maximum-control specification, and it is not JIVE.
+The posterior mean is `{python} f"{judge_jail.mean():.3f}"`, the 3rd-to-97th percentile interval is [`{python} f"{judge_lo:.2f}"`, `{python} f"{judge_hi:.2f}"`], and r-hat is `{python} f"{judge_rhat:.2f}"`. This page does not treat that r-hat as agreement between chains. The sample is 2 chains, 400 tune, and 200 draws. A longer sample was killed before it finished, and this short run is not a mixing claim. The prior scale is 1. This is the minimum-control Bayesian fit. It is not the maximum-control specification, and it is not JIVE.
 
 ::: {.callout-note}
 ## JIVE is not ported
