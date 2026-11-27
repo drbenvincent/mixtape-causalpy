@@ -24,7 +24,7 @@ This notebook covers the @card1995 example, which estimates the returns to schoo
 ### What we'll cover
 
 1. Data exploration and instrument relevance
-2. OLS vs 2SLS comparison (the endogeneity problem)
+2. Confounded association versus the IV estimate
 3. CausalPy Bayesian IV estimation
 4. Comparison to Mixtape results
 
@@ -32,8 +32,10 @@ This notebook covers the @card1995 example, which estimates the returns to schoo
 
 | File | Description | Status |
 |------|-------------|--------|
-| `card.py` | @card1995 returns to schooling IV | ✅ |
-| `bail.py` | Judge-leniency example. JIVE is a callout, not a fit | ✅ |
+| `card.py` | @card1995 returns to schooling IV | Partial — Bayesian IV runs; the book's first-stage F is not reported |
+| `bail.py` | Judge-leniency example. JIVE is not fit | Partial — small-control Bayesian IV runs; JIVE is not |
+
+A check mark would mean that script's estimator is on the page. Neither script is closed here. Tick list: [#23](https://github.com/drbenvincent/mixtape-causalpy/issues/23).
 
 
 ## Setup
@@ -72,7 +74,7 @@ The @card1995 dataset contains information about wages, education, and geographi
 
 ### The Endogeneity Problem
 
-Estimating returns to schooling via OLS is problematic because education is **endogenous** — it's correlated with unobserved ability, motivation, and family background. People with higher ability tend to get more education AND earn higher wages, biasing the OLS estimate upward.
+A regression of wages on education is not the causal return to schooling. Education is **endogenous** — it's correlated with unobserved ability, motivation, and family background. People with higher ability tend to get more education AND earn higher wages, so that association is confounded.
 
 Card's insight: proximity to a college affects education (reduces cost of attending) but shouldn't directly affect wages conditional on education.
 
@@ -145,27 +147,70 @@ plt.tight_layout()
 plt.show()
 ```
 
-## OLS Baseline (Biased)
+## Confounded association
 
-First, let's estimate the returns to schooling using OLS. This estimate is likely biased due to ability confounding.
+A linear regression of `lwage` on `educ` plus the same controls is the confounded association. It is not the causal return to schooling.
 
 ```{python}
-import statsmodels.api as sm
+import xarray as xr
+from causalpy.formula_utils import build_formula_matrices
 
-# OLS on the same complete cases the IV fit uses. Seven rows are missing `married`.
+# Same complete cases the IV fit uses. Seven rows are missing `married`.
 card = df.dropna(
     subset=["lwage", "educ", "nearc4", "exper", "black", "south", "married", "smsa"]
 ).copy()
-ols_formula = "lwage ~ educ + exper + black + south + married + smsa"
-ols_result = sm.OLS.from_formula(ols_formula, data=card).fit()
-
-print("OLS Results (Naive):")
-print(f"Returns to schooling (educ coefficient): {ols_result.params['educ']:.4f}")
-print(
-    f"95% CI: [{ols_result.conf_int().loc['educ', 0]:.4f}, {ols_result.conf_int().loc['educ', 1]:.4f}]"
+assoc_formula = "lwage ~ educ + exper + black + south + married + smsa"
+# Same policy as the IV fit: seed only. Do not add draws, chains, or target_accept.
+sample_kwargs = {"random_seed": 42}
+y_mat, X_mat = build_formula_matrices(assoc_formula, card)
+assoc_labels = list(X_mat.design_info.column_names)
+n_obs = int(X_mat.shape[0])
+assoc_coords = {
+    "coeffs": assoc_labels,
+    "obs_ind": np.arange(n_obs),
+    "treated_units": ["unit_0"],
+}
+X_assoc = xr.DataArray(
+    np.asarray(X_mat),
+    dims=["obs_ind", "coeffs"],
+    coords={"obs_ind": assoc_coords["obs_ind"], "coeffs": assoc_labels},
 )
+y_assoc = xr.DataArray(
+    np.asarray(y_mat),
+    dims=["obs_ind", "treated_units"],
+    coords={
+        "obs_ind": assoc_coords["obs_ind"],
+        "treated_units": assoc_coords["treated_units"],
+    },
+)
+assoc_idata = cp.pymc_models.LinearRegression(sample_kwargs=sample_kwargs).fit(
+    X_assoc, y_assoc, coords=assoc_coords
+)
+assoc_educ = assoc_idata["posterior"]["beta"].sel(
+    coeffs="educ", treated_units="unit_0"
+).values.flatten()
+assoc_educ_mean = float(np.mean(assoc_educ))
+assoc_lo, assoc_hi = (float(v) for v in np.asarray(az.hdi(assoc_educ, prob=0.94)))
+assoc_rhat = float(
+    az.rhat(assoc_idata, var_names=["beta"])["beta"].sel(
+        coeffs="educ", treated_units="unit_0"
+    )
+)
+assoc_div = int(assoc_idata["sample_stats"]["diverging"].sum())
+assoc_ess = float(
+    az.ess(assoc_idata, var_names=["beta"], method="bulk")["beta"].sel(
+        coeffs="educ", treated_units="unit_0"
+    )
+)
+print("Confounded association (not the causal estimate):")
+print(f"educ posterior mean: {assoc_educ_mean:.4f}")
+print(f"educ 94% HDI: [{assoc_lo:.4f}, {assoc_hi:.4f}]")
+print(f"r-hat on educ: {assoc_rhat:.3f}")
+print(f"divergences: {assoc_div}")
+print(f"bulk ESS on educ: {assoc_ess:.0f}")
 print(
-    f"\nInterpretation: Each additional year of education is associated with a {ols_result.params['educ'] * 100:.1f}% increase in wages."
+    "Each additional year of education is associated with a "
+    f"{assoc_educ_mean * 100:.1f}% difference in wages. This is not a causal return."
 )
 ```
 
@@ -247,33 +292,30 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Comparing OLS vs IV Estimates
+## Comparing the confounded association and the IV estimate
 
-Let's visualize the difference between the naive OLS estimate and the IV estimate.
+The histogram is the causal IV posterior. The dashed line is the posterior mean of the confounded association. That line is not the causal estimate.
 
 ```{python}
 fig, ax = plt.subplots(figsize=(10, 6))
 
-# Plot posterior distribution of IV estimate
 ax.hist(
     educ_coef,
     bins=50,
     density=True,
     alpha=0.7,
     color="C0",
-    label="Bayesian IV Posterior",
+    label="Bayesian IV posterior",
 )
 
-# Add OLS estimate as vertical line
 ax.axvline(
-    ols_result.params["educ"],
-    color="red",
+    assoc_educ_mean,
+    color="C3",
     linestyle="--",
     linewidth=2,
-    label=f"OLS estimate: {ols_result.params['educ']:.4f}",
+    label=f"Confounded association mean: {assoc_educ_mean:.4f}",
 )
 
-# Add IV mean
 ax.axvline(
     np.mean(educ_coef),
     color="C0",
@@ -282,9 +324,9 @@ ax.axvline(
     label=f"IV mean: {np.mean(educ_coef):.4f}",
 )
 
-ax.set_xlabel("Returns to Schooling (coefficient on education)", fontsize=12)
+ax.set_xlabel("Coefficient on education", fontsize=12)
 ax.set_ylabel("Density", fontsize=12)
-ax.set_title("OLS vs Instrumental Variables: Returns to Schooling", fontsize=14)
+ax.set_title("Confounded association vs instrumental variables", fontsize=14)
 ax.legend(fontsize=11)
 
 plt.tight_layout()
@@ -297,11 +339,11 @@ plt.show()
 
 The Mixtape's IV analysis of the Card data shows:
 
-1. **OLS estimate**: ~7-8% return per year of schooling
-2. **IV estimate**: Often higher, suggesting ability bias may actually *downward* bias OLS (or measurement error attenuates it)
+1. **Book OLS**: about 7–8% per year of schooling. That number is the book's estimate, not the fit on this page.
+2. **Book IV**: often higher than that OLS estimate. Ability bias may downward-bias the book's OLS, or measurement error may attenuate it.
 
 ### This run
-OLS on the complete cases, with `exper`, `black`, `south`, `married`, and `smsa`: `{python} f"{ols_result.params['educ']:.4f}"`, 95% CI [`{python} f"{ols_result.conf_int().loc['educ', 0]:.4f}"`, `{python} f"{ols_result.conf_int().loc['educ', 1]:.4f}"`]. Seven rows missing `married` are dropped; that is the sample both fits use. Bayesian IV, instrument `nearc4`, same controls on both stages, `random_seed=42`: mean `{python} f"{iv_educ_mean:.4f}"`. The stored 2SLS reference fit on the same specification is `{python} f"{iv_2sls_educ:.4f}"`. r-hat on `educ` is `{python} f"{iv_rhat:.2f}"`. The book's first-stage F is not computed: the class does not return it.
+Confounded association of `lwage` on `educ` plus `exper`, `black`, `south`, `married`, and `smsa`, on the complete cases: posterior mean `{python} f"{assoc_educ_mean:.4f}"`, 94% HDI [`{python} f"{assoc_lo:.4f}"`, `{python} f"{assoc_hi:.4f}"`]. That coefficient is not the causal return to schooling. Seven rows missing `married` are dropped; that is the sample both fits use. r-hat on `educ` is `{python} f"{assoc_rhat:.2f}"`, divergences `{python} f"{assoc_div}"`, bulk ESS `{python} f"{assoc_ess:.0f}"`. Bayesian IV, instrument `nearc4`, same controls on both stages, `random_seed=42`: mean `{python} f"{iv_educ_mean:.4f}"`. The stored 2SLS reference fit on the same specification is `{python} f"{iv_2sls_educ:.4f}"`. r-hat on the IV `educ` coefficient is `{python} f"{iv_rhat:.2f}"`. The book's first-stage F is not computed: the class does not return it.
 
 ### Differences from Book's Implementation
 
@@ -315,9 +357,9 @@ OLS on the complete cases, with `exper`, `black`, `south`, `married`, and `smsa`
 
 ### Notes on the IV Estimate
 
-The IV estimate is often *larger* than OLS for returns to schooling. This seems counterintuitive (we expect ability bias to inflate OLS), but there are several explanations:
+The IV estimate is often *larger* than the book's OLS estimate for returns to schooling. This seems counterintuitive (ability bias would inflate that OLS estimate), but there are several explanations:
 
-1. **Measurement error**: OLS is attenuated by measurement error in education; IV corrects this
+1. **Measurement error**: the book's OLS estimate is attenuated by measurement error in education; IV corrects this
 2. **Local Average Treatment Effect (LATE)**: IV estimates the effect for "compliers" — people whose education is actually affected by college proximity. This group may have higher returns than average.
 3. **Heterogeneous effects**: The marginal return to schooling for those on the margin of attending college may be higher
 
@@ -390,9 +432,7 @@ This notebook demonstrated:
 1. **The endogeneity problem** in estimating returns to schooling
 2. **Instrument validity** checks (first stage relevance)
 3. **CausalPy's `InstrumentalVariable`** for Bayesian IV estimation
-4. **Comparison of OLS vs IV** estimates with uncertainty quantification
-
-The key takeaway: IV allows us to estimate causal effects when there is unmeasured confounding, provided we have a valid instrument. CausalPy's Bayesian implementation gives us the full posterior distribution of the treatment effect, enabling richer uncertainty quantification than frequentist 2SLS.
+4. **Comparison of the confounded association and the IV estimate**
 
 ---
 
