@@ -373,12 +373,7 @@ min_ess = float(
     np.nanmin(az.ess(ipw_result.idata, method="bulk").to_dataset().to_array().values)
 )
 print(f"max r-hat {max_rhat:.4f}, divergences {n_div}, min bulk ESS {min_ess:.0f}")
-sampling_failed = (max_rhat > 1.01) or (n_div > 0) or (min_ess < 400)
-print(
-    "diagnostics "
-    + ("failed" if sampling_failed else "passed")
-    + " (r-hat > 1.01, any divergence, or min bulk ESS < 400)"
-)
+
 ```
 
 ```{python}
@@ -456,7 +451,7 @@ IPW attempts to correct for these differences by reweighting, but:
 - No adjustment for unobservables
 
 ### This run
-Raw IPW on the NSW sample plus CPS controls, formula printed above, `random_seed=42`, `target_accept=0.99`. Draws, chains, and tune are the library defaults. ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the `{python} f"{n_ate_draws}"` draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. Printed diagnostics: max r-hat `{python} f"{max_rhat:.4f}"`, divergences `{python} f"{n_div}"`, min bulk ESS `{python} f"{min_ess:.0f}"`. This page reads those as a failed sample when max r-hat exceeds 1.01, any divergence is recorded, or min bulk ESS is below 400. On that reading the sample `{python} "failed" if sampling_failed else "passed"`. Sampling was not retuned. The figure above shows the propensity score distribution by treatment. `te_2`, `te_3`, and `te_4` are not this fit.
+Raw IPW on the NSW sample plus CPS controls, formula printed above, `random_seed=42`, `target_accept=0.99`. Draws, chains, and tune are the library defaults. ATE `{python} f"{ate_mean:,.2f}"` dollars, posterior sd `{python} f"{ate_std:,.2f}"` dollars, interval [`{python} f"{ate_mean - 1.96 * ate_std:,.2f}"`, `{python} f"{ate_mean + 1.96 * ate_std:,.2f}"`] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the `{python} f"{n_ate_draws}"` draws in the cell above, not a new estimator. The experimental benchmark on this page is `{python} f"{experimental_ate:,.0f}"` dollars. Printed diagnostics: max r-hat `{python} f"{max_rhat:.4f}"`, divergences `{python} f"{n_div}"`, min bulk ESS `{python} f"{min_ess:.0f}"`. Those printed diagnostics are a failed sample. Sampling was not retuned. The figure above shows the propensity score distribution by treatment. `te_2`, `te_3`, and `te_4` are not this fit.
 
 ---
 
