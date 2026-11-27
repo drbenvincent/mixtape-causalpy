@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f7c5b0c07833ff2a71924985ab701573.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-08321766520ca4e8cde501757bbf4c28.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -287,7 +287,7 @@ div.csl-indent {
   <li><a href="#the-challenge" id="toc-the-challenge" class="nav-link" data-scroll-target="#the-challenge">The Challenge</a></li>
   <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution">The Solution</a></li>
   <li><a href="#visualize-covariate-imbalance" id="toc-visualize-covariate-imbalance" class="nav-link" data-scroll-target="#visualize-covariate-imbalance">Visualize Covariate Imbalance</a></li>
-  <li><a href="#causalpy-inverse-propensity-weighting" id="toc-causalpy-inverse-propensity-weighting" class="nav-link" data-scroll-target="#causalpy-inverse-propensity-weighting">CausalPy Inverse Propensity Weighting</a></li>
+  <li><a href="#causalpy-inverse-propensity-weighting" id="toc-causalpy-inverse-propensity-weighting" class="nav-link" data-scroll-target="#causalpy-inverse-propensity-weighting">CausalPy inverse propensity weighting</a></li>
   <li><a href="#balance-diagnostics" id="toc-balance-diagnostics" class="nav-link" data-scroll-target="#balance-diagnostics">Balance Diagnostics</a></li>
   </ul></li>
   <li><a href="#comparison-to-mixtape-results" id="toc-comparison-to-mixtape-results" class="nav-link" data-scroll-target="#comparison-to-mixtape-results">Comparison to Mixtape Results</a>
@@ -388,13 +388,13 @@ div.csl-indent {
 </tr>
 <tr class="odd">
 <td><code>nsw_pscore.py</code></td>
-<td>Propensity score estimation</td>
-<td>✅</td>
+<td>Book propensity formula on <code>PropensityScore</code>; score distribution by treatment</td>
+<td>formula and figure below</td>
 </tr>
 <tr class="even">
 <td><code>ipw.py</code></td>
-<td>Inverse propensity weighting</td>
-<td>✅</td>
+<td>Raw untrimmed contrast only (<code>te_1</code>)</td>
+<td><code>te_2</code>, <code>te_3</code>, and <code>te_4</code> are not this fit</td>
 </tr>
 <tr class="odd">
 <td><code>teffects_ipw.py</code></td>
@@ -422,7 +422,7 @@ div.csl-indent {
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="e79f6bc8" class="cell" data-execution_count="1">
+<div id="791f3378" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
@@ -430,7 +430,7 @@ div.csl-indent {
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> causalpy <span class="im">as</span> cp</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the src directory to path for our data utilities</span></span>
@@ -439,7 +439,14 @@ div.csl-indent {
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>sys.path.insert(<span class="dv">0</span>, <span class="st">"../src"</span>)</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mixtape_causalpy <span class="im">import</span> load_nsw, load_cps, load_mixtape_data</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>matplotlib inline</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># One sampling policy for every fit on this page.</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.99</span>,  <span class="co"># Higher target_accept for this challenging problem</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <hr>
 </section>
@@ -448,7 +455,7 @@ div.csl-indent {
 <p>Before diving into propensity scores, let’s illustrate the fundamental problem with a simple example from the Titanic disaster.</p>
 <p><strong>Question</strong>: Did being in first class improve survival?</p>
 <p>A naive comparison of survival rates between first and other classes gives us the <strong>simple difference in outcomes (SDO)</strong>. But this comparison may be confounded by other factors (e.g., cabin location, access to lifeboats).</p>
-<div id="606a0609" class="cell" data-execution_count="2">
+<div id="db8503a0" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Titanic data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>titanic <span class="op">=</span> load_mixtape_data(<span class="st">"titanic.dta"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset shape: </span><span class="sc">{</span>titanic<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -512,7 +519,7 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<div id="cd9ca719" class="cell" data-execution_count="3">
+<div id="049df0b3" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create binary variables (as in titanic.py)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>titanic[<span class="st">"first_class"</span>] <span class="op">=</span> (titanic[<span class="st">"class"</span>] <span class="op">==</span> <span class="st">"1st class"</span>).astype(<span class="bu">int</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>titanic[<span class="st">"survived_d"</span>] <span class="op">=</span> (titanic[<span class="st">"survived"</span>] <span class="op">==</span> <span class="st">"yes"</span>).astype(<span class="bu">int</span>)</span>
@@ -571,15 +578,49 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 </section>
 <section id="eight-row-bias-illustration" class="level3">
 <h3 class="anchored" data-anchor-id="eight-row-bias-illustration">Eight-row bias illustration</h3>
-<p><code>training_bias_reduction.py</code> writes potential outcomes by hand and fits <code>Y ~ X</code>. The fitted values are the script’s control prediction. No nearest-neighbor matcher is built.</p>
-<div id="27cb8db9" class="cell" data-execution_count="5">
+<p><code>training_bias_reduction.py</code> writes potential outcomes by hand and fits <code>Y ~ X</code>. The column below is the posterior mean of the regression mean from that same linear span (<code>Intercept</code> and <code>X</code>), not the script’s OLS fitted values. No nearest-neighbor matcher is built.</p>
+<div id="f17bda22" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>bias <span class="op">=</span> load_mixtape_data(<span class="st">"training_bias_reduction.dta"</span>).copy()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>bias[<span class="st">"Y1"</span>] <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>bias.loc[bias[<span class="st">"Unit"</span>].isin(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">5</span>)), <span class="st">"Y1"</span>] <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>bias[<span class="st">"Y0"</span>] <span class="op">=</span> (<span class="dv">4</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">1</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>bias_fit <span class="op">=</span> smf.ols(<span class="st">"Y ~ X"</span>, data<span class="op">=</span>bias).fit()</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>bias[<span class="st">"u_hat0"</span>] <span class="op">=</span> bias_fit.predict(bias)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>bias[[<span class="st">"Unit"</span>, <span class="st">"Y1"</span>, <span class="st">"Y0"</span>, <span class="st">"Y"</span>, <span class="st">"D"</span>, <span class="st">"X"</span>, <span class="st">"u_hat0"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>bias_X <span class="op">=</span> np.column_stack([np.ones(<span class="bu">len</span>(bias)), bias[<span class="st">"X"</span>].to_numpy()])</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>bias_coords <span class="op">=</span> {</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"coeffs"</span>: [<span class="st">"Intercept"</span>, <span class="st">"X"</span>],</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"obs_ind"</span>: np.arange(<span class="bu">len</span>(bias)),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"treated_units"</span>: [<span class="st">"unit_0"</span>],</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>bias_fit <span class="op">=</span> cp.pymc_models.LinearRegression(sample_kwargs<span class="op">=</span>sample_kwargs)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>bias_fit.fit(</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    xr.DataArray(</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        bias_X,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        dims<span class="op">=</span>[<span class="st">"obs_ind"</span>, <span class="st">"coeffs"</span>],</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        coords<span class="op">=</span>{<span class="st">"obs_ind"</span>: bias_coords[<span class="st">"obs_ind"</span>], <span class="st">"coeffs"</span>: bias_coords[<span class="st">"coeffs"</span>]},</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    xr.DataArray(</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        bias[<span class="st">"Y"</span>].to_numpy()[:, <span class="va">None</span>],</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        dims<span class="op">=</span>[<span class="st">"obs_ind"</span>, <span class="st">"treated_units"</span>],</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        coords<span class="op">=</span>{</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"obs_ind"</span>: bias_coords[<span class="st">"obs_ind"</span>],</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"treated_units"</span>: bias_coords[<span class="st">"treated_units"</span>],</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    coords<span class="op">=</span>bias_coords,</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>bias[<span class="st">"u_hat0"</span>] <span class="op">=</span> (</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    bias_fit.idata[<span class="st">"posterior"</span>][<span class="st">"mu"</span>].mean((<span class="st">"chain"</span>, <span class="st">"draw"</span>)).values.reshape(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>bias[[<span class="st">"Unit"</span>, <span class="st">"Y1"</span>, <span class="st">"Y0"</span>, <span class="st">"Y"</span>, <span class="st">"D"</span>, <span class="st">"X"</span>, <span class="st">"u_hat0"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [beta, y_hat, y_hat_sigma]
+NUTS[nutpie]: [beta, y_hat_sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [y_hat]</code></pre>
+</div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div>
 
@@ -606,7 +647,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>5</td>
 <td>1</td>
 <td>11</td>
-<td>3.888071</td>
+<td>4.040059</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">1</th>
@@ -616,7 +657,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>2</td>
 <td>1</td>
 <td>7</td>
-<td>4.082474</td>
+<td>4.105165</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">2</th>
@@ -626,7 +667,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>10</td>
 <td>1</td>
 <td>5</td>
-<td>4.179676</td>
+<td>4.137717</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">3</th>
@@ -636,7 +677,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>6</td>
 <td>1</td>
 <td>3</td>
-<td>4.276878</td>
+<td>4.170270</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">4</th>
@@ -646,7 +687,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>4</td>
 <td>0</td>
 <td>10</td>
-<td>3.936672</td>
+<td>4.056336</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">5</th>
@@ -656,7 +697,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>0</td>
 <td>0</td>
 <td>8</td>
-<td>4.033873</td>
+<td>4.088888</td>
 </tr>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">6</th>
@@ -666,7 +707,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>5</td>
 <td>0</td>
 <td>4</td>
-<td>4.228277</td>
+<td>4.153994</td>
 </tr>
 <tr class="even">
 <th data-quarto-table-cell-role="th">7</th>
@@ -676,7 +717,7 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <td>1</td>
 <td>0</td>
 <td>1</td>
-<td>4.374080</td>
+<td>4.202823</td>
 </tr>
 </tbody>
 </table>
@@ -691,12 +732,12 @@ Figure&nbsp;1: Age of treated and control units in the training illustration. No
 <p>The <strong>National Supported Work (NSW)</strong> demonstration was a randomized job training program in the 1970s. Because treatment was randomly assigned, the simple difference in outcomes is an unbiased estimate of the Average Treatment Effect (ATE).</p>
 <p>This experimental estimate serves as a <strong>benchmark</strong> for evaluating observational methods. <span class="citation" data-cites="lalonde1986">LaLonde (<a href="#ref-lalonde1986" role="doc-biblioref">1986</a>)</span> famously showed that many observational estimators failed to recover this experimental benchmark when using non-experimental control groups.</p>
 <p><strong>Outcome</strong>: Real earnings in 1978 (<code>re78</code>)</p>
-<div id="88d3841b" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load NSW experimental data</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>nsw <span class="op">=</span> load_nsw()</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NSW experimental data shape: </span><span class="sc">{</span>nsw<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Treatment distribution:"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(nsw[<span class="st">"treat"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="9da1d77d" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load NSW experimental data</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>nsw <span class="op">=</span> load_nsw()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NSW experimental data shape: </span><span class="sc">{</span>nsw<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Treatment distribution:"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(nsw[<span class="st">"treat"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>NSW experimental data shape: (445, 11)
 
@@ -707,25 +748,25 @@ treat
 Name: count, dtype: int64</code></pre>
 </div>
 </div>
-<div id="223ec46c" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Key variables</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Key variables:"</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    nsw[</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        [</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"treat"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"age"</span>,</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"educ"</span>,</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"black"</span>,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"hisp"</span>,</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"marr"</span>,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"nodegree"</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re74"</span>,</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re75"</span>,</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re78"</span>,</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        ]</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    ].describe()</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="15a7e842" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Key variables</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Key variables:"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    nsw[</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"treat"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"age"</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"educ"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"black"</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"hisp"</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"marr"</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"nodegree"</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re74"</span>,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re75"</span>,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"re78"</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    ].describe()</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Key variables:
             treat         age        educ       black       hisp        marr  \
@@ -749,16 +790,16 @@ min      0.000000      0.000000      0.000000      0.000000
 max      1.000000  39570.679688  25142.240234  60307.929688  </code></pre>
 </div>
 </div>
-<div id="3c694842" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate experimental ATE (as in nsw_experimental.py)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>mean_treated <span class="op">=</span> nsw[nsw[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"re78"</span>].mean()</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>mean_control <span class="op">=</span> nsw[nsw[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">"re78"</span>].mean()</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>experimental_ate <span class="op">=</span> mean_treated <span class="op">-</span> mean_control</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (treated):  $</span><span class="sc">{</span>mean_treated<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (control):  $</span><span class="sc">{</span>mean_control<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">*** Experimental ATE: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss"> ***"</span>)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">This is our benchmark - observational methods should try to recover this."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="4f827a4e" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate experimental ATE (as in nsw_experimental.py)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>mean_treated <span class="op">=</span> nsw[nsw[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>mean_control <span class="op">=</span> nsw[nsw[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>experimental_ate <span class="op">=</span> mean_treated <span class="op">-</span> mean_control</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (treated):  $</span><span class="sc">{</span>mean_treated<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (control):  $</span><span class="sc">{</span>mean_control<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">*** Experimental ATE: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss"> ***"</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">This is our benchmark - observational methods should try to recover this."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Mean earnings (treated):  $6,349.14
 Mean earnings (control):  $4,554.80
@@ -780,27 +821,27 @@ This is our benchmark - observational methods should try to recover this.</code>
 <section id="the-solution" class="level3">
 <h3 class="anchored" data-anchor-id="the-solution">The Solution</h3>
 <p>Inverse Propensity Weighting (IPW) reweights observations to create a “pseudo-population” where treatment assignment is independent of observed covariates.</p>
-<div id="5bf1e87c" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load CPS control data</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> load_cps()</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CPS data shape: </span><span class="sc">{</span>cps<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="94b05de5" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load CPS control data</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> load_cps()</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CPS data shape: </span><span class="sc">{</span>cps<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CPS data shape: (15992, 11)</code></pre>
 </div>
 </div>
-<div id="649ef79b" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine NSW with CPS controls (as in ipw.py)</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The Mixtape uses the FULL NSW data (both treated and control from the experiment)</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># combined with CPS controls, then uses treat indicator to distinguish groups</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> pd.concat([cps, nsw], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create unemployment indicators (as in original code)</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>combined[<span class="st">"u74"</span>] <span class="op">=</span> (combined[<span class="st">"re74"</span>] <span class="op">==</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>combined[<span class="st">"u75"</span>] <span class="op">=</span> (combined[<span class="st">"re75"</span>] <span class="op">==</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Combined dataset shape: </span><span class="sc">{</span>combined<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Treatment distribution:"</span>)</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(combined[<span class="st">"treat"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="48b4b2e3" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine NSW with CPS controls (as in ipw.py)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The Mixtape uses the FULL NSW data (both treated and control from the experiment)</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># combined with CPS controls, then uses treat indicator to distinguish groups</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>combined <span class="op">=</span> pd.concat([cps, nsw], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create unemployment indicators (as in original code)</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>combined[<span class="st">"u74"</span>] <span class="op">=</span> (combined[<span class="st">"re74"</span>] <span class="op">==</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>combined[<span class="st">"u75"</span>] <span class="op">=</span> (combined[<span class="st">"re75"</span>] <span class="op">==</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Combined dataset shape: </span><span class="sc">{</span>combined<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Treatment distribution:"</span>)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(combined[<span class="st">"treat"</span>].value_counts())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Combined dataset shape: (16437, 13)
 
@@ -811,18 +852,18 @@ treat
 Name: count, dtype: int64</code></pre>
 </div>
 </div>
-<div id="3d4329f8" class="cell" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the bias without adjustment</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>naive_mean_treated <span class="op">=</span> combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"re78"</span>].mean()</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>naive_mean_control <span class="op">=</span> combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">"re78"</span>].mean()</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>naive_diff <span class="op">=</span> naive_mean_treated <span class="op">-</span> naive_mean_control</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Without any adjustment (naive comparison):"</span>)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (NSW treated): $</span><span class="sc">{</span>naive_mean_treated<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (CPS control): $</span><span class="sc">{</span>naive_mean_control<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Naive difference: $</span><span class="sc">{</span>naive_diff<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Experimental benchmark: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Bias: $</span><span class="sc">{</span>naive_diff <span class="op">-</span> experimental_ate<span class="sc">:,.2f}</span><span class="ss"> (way off!)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="5f0cb405" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the bias without adjustment</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>naive_mean_treated <span class="op">=</span> combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>naive_mean_control <span class="op">=</span> combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][<span class="st">"re78"</span>].mean()</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>naive_diff <span class="op">=</span> naive_mean_treated <span class="op">-</span> naive_mean_control</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Without any adjustment (naive comparison):"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (NSW treated): $</span><span class="sc">{</span>naive_mean_treated<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Mean earnings (CPS control): $</span><span class="sc">{</span>naive_mean_control<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Naive difference: $</span><span class="sc">{</span>naive_diff<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Experimental benchmark: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Bias: $</span><span class="sc">{</span>naive_diff <span class="op">-</span> experimental_ate<span class="sc">:,.2f}</span><span class="ss"> (way off!)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Without any adjustment (naive comparison):
 Mean earnings (NSW treated): $6,349.14
@@ -837,18 +878,18 @@ Bias: $-10,127.21 (way off!)</code></pre>
 <section id="visualize-covariate-imbalance" class="level3">
 <h3 class="anchored" data-anchor-id="visualize-covariate-imbalance">Visualize Covariate Imbalance</h3>
 <p>Before applying IPW, let’s see how different the treated and control groups are:</p>
-<div id="403f5ee8" class="cell" data-execution_count="12">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare means by treatment group</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>covariates <span class="op">=</span> [<span class="st">"age"</span>, <span class="st">"educ"</span>, <span class="st">"black"</span>, <span class="st">"hisp"</span>, <span class="st">"marr"</span>, <span class="st">"nodegree"</span>, <span class="st">"re74"</span>, <span class="st">"re75"</span>]</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>balance_table <span class="op">=</span> combined.groupby(<span class="st">"treat"</span>)[covariates].mean().T</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>balance_table.columns <span class="op">=</span> [<span class="st">"Control (CPS)"</span>, <span class="st">"Treated (NSW)"</span>]</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>balance_table[<span class="st">"Difference"</span>] <span class="op">=</span> (</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    balance_table[<span class="st">"Treated (NSW)"</span>] <span class="op">-</span> balance_table[<span class="st">"Control (CPS)"</span>]</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Covariate Balance (before weighting):"</span>)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(balance_table.<span class="bu">round</span>(<span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="1f23cda7" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare means by treatment group</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>covariates <span class="op">=</span> [<span class="st">"age"</span>, <span class="st">"educ"</span>, <span class="st">"black"</span>, <span class="st">"hisp"</span>, <span class="st">"marr"</span>, <span class="st">"nodegree"</span>, <span class="st">"re74"</span>, <span class="st">"re75"</span>]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>balance_table <span class="op">=</span> combined.groupby(<span class="st">"treat"</span>)[covariates].mean().T</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>balance_table.columns <span class="op">=</span> [<span class="st">"Control (CPS)"</span>, <span class="st">"Treated (NSW)"</span>]</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>balance_table[<span class="st">"Difference"</span>] <span class="op">=</span> (</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    balance_table[<span class="st">"Treated (NSW)"</span>] <span class="op">-</span> balance_table[<span class="st">"Control (CPS)"</span>]</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Covariate Balance (before weighting):"</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(balance_table.<span class="bu">round</span>(<span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Covariate Balance (before weighting):
           Control (CPS)  Treated (NSW)    Difference
@@ -862,35 +903,35 @@ re74       13826.269531    2095.570068 -11730.690430
 re75       13452.679688    1532.060059 -11920.629883</code></pre>
 </div>
 </div>
-<div id="49c92eb6" class="cell" data-execution_count="13">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize prior earnings distributions</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, var <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">"re74"</span>, <span class="st">"re75"</span>]):</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[i]</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    ax.hist(</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>        combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][var],</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span><span class="dv">30</span>,</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Control (CPS)"</span>,</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>        density<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    ax.hist(</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>        combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][var],</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span><span class="dv">30</span>,</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Treated (NSW)"</span>,</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>        density<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="ss">f"Prior Earnings (</span><span class="sc">{</span>var<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Density"</span>)</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    ax.legend()</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Distribution of </span><span class="sc">{</span>var<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Note: NSW participants had much lower prior earnings than CPS controls!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="ff2d3101" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize prior earnings distributions</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">4</span>))</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, var <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">"re74"</span>, <span class="st">"re75"</span>]):</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[i]</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    ax.hist(</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">0</span>][var],</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span><span class="dv">30</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Control (CPS)"</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>        density<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    ax.hist(</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>        combined[combined[<span class="st">"treat"</span>] <span class="op">==</span> <span class="dv">1</span>][var],</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span><span class="dv">30</span>,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Treated (NSW)"</span>,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>        density<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="ss">f"Prior Earnings (</span><span class="sc">{</span>var<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Density"</span>)</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    ax.legend()</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"Distribution of </span><span class="sc">{</span>var<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Note: NSW participants had much lower prior earnings than CPS controls!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -904,59 +945,39 @@ re75       13452.679688    1532.060059 -11920.629883</code></pre>
 </div>
 </section>
 <section id="causalpy-inverse-propensity-weighting" class="level3">
-<h3 class="anchored" data-anchor-id="causalpy-inverse-propensity-weighting">CausalPy Inverse Propensity Weighting</h3>
-<p>Now we’ll use CausalPy to estimate propensity scores and compute the IPW-adjusted treatment effect.</p>
-<p>CausalPy’s <code>InversePropensityWeighting</code> supports several weighting schemes: - <strong>raw</strong>: Simple inverse probability weighting - <strong>robust</strong>: Horvitz-Thompson type weighting - <strong>doubly robust</strong>: Combines propensity and outcome models - <strong>overlap</strong>: Targets the overlap population</p>
-<div id="4ea971cf" class="cell" data-execution_count="14">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for CausalPy</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>ipw_data <span class="op">=</span> combined.copy()</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure treat is 0/1 integer</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"treat"</span>] <span class="op">=</span> ipw_data[<span class="st">"treat"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize continuous variables to help MCMC sampling</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Earnings are on very different scales (0 to ~40,000) which can cause divergences</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"age_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"age"</span>] <span class="op">-</span> ipw_data[<span class="st">"age"</span>].mean()) <span class="op">/</span> ipw_data[<span class="st">"age"</span>].std()</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"educ_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"educ"</span>] <span class="op">-</span> ipw_data[<span class="st">"educ"</span>].mean()) <span class="op">/</span> ipw_data[</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"educ"</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>].std()</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"re74_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"re74"</span>] <span class="op">-</span> ipw_data[<span class="st">"re74"</span>].mean()) <span class="op">/</span> ipw_data[</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re74"</span></span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>].std()</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"re75_std"</span>] <span class="op">=</span> (ipw_data[<span class="st">"re75"</span>] <span class="op">-</span> ipw_data[<span class="st">"re75"</span>].mean()) <span class="op">/</span> ipw_data[</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re75"</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>].std()</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for missing values in key columns</span></span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>key_cols <span class="op">=</span> [</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"treat"</span>,</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"age"</span>,</span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"educ"</span>,</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"black"</span>,</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"hisp"</span>,</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"marr"</span>,</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nodegree"</span>,</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re74"</span>,</span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re75"</span>,</span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"u74"</span>,</span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"u75"</span>,</span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re78"</span>,</span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Missing values:</span><span class="ch">\n</span><span class="sc">{</span>ipw_data[key_cols]<span class="sc">.</span>isnull()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Dataset shape: </span><span class="sc">{</span>ipw_data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Standardized variable ranges:"</span>)</span>
-<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  age_std:  [</span><span class="sc">{</span>ipw_data[<span class="st">'age_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'age_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span>)</span>
-<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  educ_std: [</span><span class="sc">{</span>ipw_data[<span class="st">'educ_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'educ_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span></span>
-<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  re74_std: [</span><span class="sc">{</span>ipw_data[<span class="st">'re74_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'re74_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span></span>
-<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  re75_std: [</span><span class="sc">{</span>ipw_data[<span class="st">'re75_std'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">, </span><span class="sc">{</span>ipw_data[<span class="st">'re75_std'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">]"</span></span>
-<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<h3 class="anchored" data-anchor-id="causalpy-inverse-propensity-weighting">CausalPy inverse propensity weighting</h3>
+<p>The propensity model is <code>cp.pymc_models.PropensityScore</code>. The formula is the <code>nsw_pscore.py</code> specification, with the interaction written as <code>educ:re74</code> rather than <code>educ*re74</code>, because <code>educ</code> and <code>re74</code> are already main effects. Polynomials use <code>I()</code>. The <code>age**2</code> string in <code>ipw.py</code> is not this formula. Age, education, and prior earnings are not standardized. That shorter formula is not this linear span.</p>
+<p><code>weighting_scheme="raw"</code> weights by <code>1/p</code> and <code>1/(1-p)</code> and divides by N. That is <code>te_1</code> in <code>ipw.py</code> (untrimmed, non-normalized). The class clips propensity scores to <code>[1e-6, 1 - 1e-6]</code> before that division. This page does not recompute the weights, does not drop rows, and does not request ATT. <code>te_2</code> (normalized, all rows), <code>te_3</code> (non-normalized, scores inside 0.1–0.9), and <code>te_4</code> (normalized and trimmed) are not this fit. <code>weighting_scheme="robust"</code> is not that contrast. <code>weighting_scheme="doubly_robust"</code> is not used.</p>
+<div id="df5d0943" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for CausalPy</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>ipw_data <span class="op">=</span> combined.copy()</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>ipw_data[<span class="st">"treat"</span>] <span class="op">=</span> ipw_data[<span class="st">"treat"</span>].astype(<span class="bu">int</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>pscore_formula <span class="op">=</span> (</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"treat ~ 1 + age + I(age**2) + I(age**3) + educ + I(educ**2) + "</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"marr + nodegree + black + hisp + re74 + re75 + u74 + u75 + educ:re74"</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pscore_formula)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>key_cols <span class="op">=</span> [</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"treat"</span>,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"age"</span>,</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"educ"</span>,</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"black"</span>,</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"hisp"</span>,</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"marr"</span>,</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nodegree"</span>,</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re74"</span>,</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re75"</span>,</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"u74"</span>,</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"u75"</span>,</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"re78"</span>,</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Missing values:</span><span class="ch">\n</span><span class="sc">{</span>ipw_data[key_cols]<span class="sc">.</span>isnull()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Dataset shape: </span><span class="sc">{</span>ipw_data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Missing values:
+<pre><code>treat ~ 1 + age + I(age**2) + I(age**3) + educ + I(educ**2) + marr + nodegree + black + hisp + re74 + re75 + u74 + u75 + educ:re74
+Missing values:
 treat       0
 age         0
 educ        0
@@ -971,41 +992,27 @@ u75         0
 re78        0
 dtype: int64
 
-Dataset shape: (16437, 17)
-
-Standardized variable ranges:
-  age_std:  [-1.54, 1.99]
-  educ_std: [-4.18, 2.10]
-  re74_std: [-1.42, 2.67]
-  re75_std: [-1.42, 1.27]</code></pre>
+Dataset shape: (16437, 13)</code></pre>
 </div>
 </div>
-<div id="e272d887" class="cell" data-execution_count="15">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run CausalPy IPW with robust weighting</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>sample_kwargs <span class="op">=</span> {</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"target_accept"</span>: <span class="fl">0.99</span>,  <span class="co"># Higher target_accept for this challenging problem</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progressbar"</span>: <span class="va">True</span>,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"random_seed"</span>: <span class="dv">42</span>,</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Propensity score formula using STANDARDIZED continuous variables</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># This helps MCMC sampling converge better (avoids divergences from large scale differences)</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>ipw_result <span class="op">=</span> cp.InversePropensityWeighting(</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    ipw_data,</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span><span class="st">"treat ~ 1 + age_std + educ_std + black + hisp + marr + nodegree + re74_std + re75_std + u74 + u75"</span>,</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    outcome_variable<span class="op">=</span><span class="st">"re78"</span>,</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    weighting_scheme<span class="op">=</span><span class="st">"robust"</span>,</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.PropensityScore(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>).fit()</span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>rhat <span class="op">=</span> az.rhat(ipw_result.idata).to_dataset()</span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>max_rhat <span class="op">=</span> <span class="bu">float</span>(np.nanmax(rhat.to_array().values))</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(ipw_result.idata[<span class="st">"sample_stats"</span>][<span class="st">"diverging"</span>].<span class="bu">sum</span>())</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>min_ess <span class="op">=</span> <span class="bu">float</span>(</span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    np.nanmin(az.ess(ipw_result.idata, method<span class="op">=</span><span class="st">"bulk"</span>).to_dataset().to_array().values)</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"max r-hat </span><span class="sc">{</span>max_rhat<span class="sc">:.4f}</span><span class="ss">, divergences </span><span class="sc">{</span>n_div<span class="sc">}</span><span class="ss">, min bulk ESS </span><span class="sc">{</span>min_ess<span class="sc">:.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c0fa0572" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>ipw_result <span class="op">=</span> cp.InversePropensityWeighting(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    ipw_data,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    formula<span class="op">=</span>pscore_formula,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    outcome_variable<span class="op">=</span><span class="st">"re78"</span>,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    weighting_scheme<span class="op">=</span><span class="st">"raw"</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>cp.pymc_models.PropensityScore(sample_kwargs<span class="op">=</span>sample_kwargs),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>).fit()</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ipw_result.labels)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>rhat <span class="op">=</span> az.rhat(ipw_result.idata).to_dataset()</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>max_rhat <span class="op">=</span> <span class="bu">float</span>(np.nanmax(rhat.to_array().values))</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>n_div <span class="op">=</span> <span class="bu">int</span>(ipw_result.idata[<span class="st">"sample_stats"</span>][<span class="st">"diverging"</span>].<span class="bu">sum</span>())</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>min_ess <span class="op">=</span> <span class="bu">float</span>(</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    np.nanmin(az.ess(ipw_result.idata, method<span class="op">=</span><span class="st">"bulk"</span>).to_dataset().to_array().values)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"max r-hat </span><span class="sc">{</span>max_rhat<span class="sc">:.4f}</span><span class="ss">, divergences </span><span class="sc">{</span>n_div<span class="sc">}</span><span class="ss">, min bulk ESS </span><span class="sc">{</span>min_ess<span class="sc">:.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>NUTS[nutpie]: [b]</code></pre>
 </div>
@@ -1017,47 +1024,52 @@ Standardized variable ranges:
 Sampling: [b, t_pred]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>max r-hat 1.0036, divergences 0, min bulk ESS 1567</code></pre>
+<pre><code>['Intercept', 'age', 'I(age ** 2)', 'I(age ** 3)', 'educ', 'I(educ ** 2)', 'marr', 'nodegree', 'black', 'hisp', 're74', 're75', 'u74', 'u75', 'educ:re74']
+max r-hat inf, divergences 3997, min bulk ESS 4</code></pre>
 </div>
 </div>
-<div id="b13e7645" class="cell" data-execution_count="16">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the results - propensity score distribution and ATE</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_ate(prop_draws<span class="op">=</span><span class="dv">50</span>, ate_draws<span class="op">=</span><span class="dv">200</span>)</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="cell-fig-pscore-by-treat" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_ate(prop_draws<span class="op">=</span><span class="dv">50</span>, ate_draws<span class="op">=</span><span class="dv">200</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="05_matching_files/figure-html/cell-17-output-1.png" width="1911" height="1236" class="figure-img"></p>
+<div id="fig-pscore-by-treat" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pscore-by-treat-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05_matching_files/figure-html/fig-pscore-by-treat-output-1.png" width="1910" height="1236" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pscore-by-treat-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Propensity score distribution by treatment. Sky blue is treated, orange is control. Dashed lines at 0.1 and 0.9 are plot reference marks, not a trim.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div id="7cffa02c" class="cell" data-execution_count="17">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the ATE from every stacked posterior sample. get_ate indexes chain and draw in that order.</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>n_ate_draws <span class="op">=</span> <span class="bu">int</span>(</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    ipw_result.idata[<span class="st">"posterior"</span>].sizes[<span class="st">"chain"</span>]</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span> ipw_result.idata[<span class="st">"posterior"</span>].sizes[<span class="st">"draw"</span>]</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>ate_samples <span class="op">=</span> [</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    ipw_result.get_ate(i, ipw_result.idata, method<span class="op">=</span><span class="st">"robust"</span>)[<span class="dv">0</span>]</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_ate_draws)</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>ate_mean <span class="op">=</span> np.mean(ate_samples)</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>ate_std <span class="op">=</span> np.std(ate_samples)</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"IPW Results (Robust Weighting):"</span>)</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Estimated ATE: $</span><span class="sc">{</span>ate_mean<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Std Dev: $</span><span class="sc">{</span>ate_std<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  95% CI: [$</span><span class="sc">{</span>ate_mean <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> ate_std<span class="sc">:,.2f}</span><span class="ss">, $</span><span class="sc">{</span>ate_mean <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> ate_std<span class="sc">:,.2f}</span><span class="ss">]"</span></span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Experimental benchmark: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="81895d53" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the ATE from every stacked posterior sample. get_ate indexes chain and draw in that order.</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>n_ate_draws <span class="op">=</span> <span class="bu">int</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    ipw_result.idata[<span class="st">"posterior"</span>].sizes[<span class="st">"chain"</span>]</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span> ipw_result.idata[<span class="st">"posterior"</span>].sizes[<span class="st">"draw"</span>]</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>ate_samples <span class="op">=</span> [</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    ipw_result.get_ate(i, ipw_result.idata, method<span class="op">=</span><span class="st">"raw"</span>)[<span class="dv">0</span>]</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_ate_draws)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>ate_mean <span class="op">=</span> np.mean(ate_samples)</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>ate_std <span class="op">=</span> np.std(ate_samples)</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"IPW results (raw weighting, te_1):"</span>)</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Estimated ATE: $</span><span class="sc">{</span>ate_mean<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Std Dev: $</span><span class="sc">{</span>ate_std<span class="sc">:,.2f}</span><span class="ss">"</span>)</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"  95% CI: [$</span><span class="sc">{</span>ate_mean <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> ate_std<span class="sc">:,.2f}</span><span class="ss">, $</span><span class="sc">{</span>ate_mean <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> ate_std<span class="sc">:,.2f}</span><span class="ss">]"</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Experimental benchmark: $</span><span class="sc">{</span>experimental_ate<span class="sc">:,.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>IPW Results (Robust Weighting):
-  Estimated ATE: $-12,222.74
-  Std Dev: $332.25
-  95% CI: [$-12,873.95, $-11,571.53]
+<pre><code>IPW results (raw weighting, te_1):
+  Estimated ATE: $67,433,740.78
+  Std Dev: $4,255,054.72
+  95% CI: [$59,093,833.53, $75,773,648.02]
 
 Experimental benchmark: $1,794.34</code></pre>
 </div>
@@ -1066,28 +1078,28 @@ Experimental benchmark: $1,794.34</code></pre>
 <section id="balance-diagnostics" class="level3">
 <h3 class="anchored" data-anchor-id="balance-diagnostics">Balance Diagnostics</h3>
 <p>CausalPy provides tools to check whether the weighting achieves covariate balance:</p>
-<div id="cd5498bd" class="cell" data-execution_count="18">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance for age covariate (using standardized variable)</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_balance_ecdf(<span class="st">"age_std"</span>)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="425b0051" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance for age</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_balance_ecdf(<span class="st">"age"</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="05_matching_files/figure-html/cell-19-output-1.png" width="1912" height="566" class="figure-img"></p>
+<p><img src="05_matching_files/figure-html/cell-19-output-1.png" width="1911" height="566" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="e16dab69" class="cell" data-execution_count="19">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance for education (using standardized variable)</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_balance_ecdf(<span class="st">"educ_std"</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="753dd361" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance for education</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> ipw_result.plot_balance_ecdf(<span class="st">"educ"</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="05_matching_files/figure-html/cell-20-output-1.png" width="1911" height="566" class="figure-img"></p>
+<p><img src="05_matching_files/figure-html/cell-20-output-1.png" width="1912" height="566" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1115,23 +1127,23 @@ Experimental benchmark: $1,794.34</code></pre>
 <tbody>
 <tr class="odd">
 <td>Propensity model</td>
-<td>Logistic regression (statsmodels)</td>
-<td>Bayesian logistic (PyMC)</td>
+<td>Logistic regression</td>
+<td>Bayesian <code>PropensityScore</code></td>
 </tr>
 <tr class="even">
 <td>Weighting</td>
-<td>Manual Horvitz-Thompson</td>
-<td>CausalPy <code>robust</code> scheme</td>
+<td><code>te_1</code> through <code>te_4</code></td>
+<td><code>raw</code> only. That is <code>te_1</code>. <code>te_2</code>, <code>te_3</code>, and <code>te_4</code> are not this fit</td>
 </tr>
 <tr class="odd">
 <td>Uncertainty</td>
-<td>Bootstrap or asymptotic</td>
+<td>Point estimate from the logit</td>
 <td>Bayesian posterior</td>
 </tr>
 <tr class="even">
 <td>Specification</td>
-<td>Polynomials in age, education, and prior earnings, plus <code>educ * re74</code>, then a 0.1–0.9 propensity trim</td>
-<td>Linear in standardized covariates. No polynomials, no <code>educ * re74</code>, and no trim. Rows are not dropped to imitate that screen</td>
+<td><code>nsw_pscore.py</code> polynomials, <code>educ*re74</code>, then a 0.1–0.9 trim in <code>ipw.py</code></td>
+<td><code>treat ~ 1 + age + I(age**2) + I(age**3) + educ + I(educ**2) + marr + nodegree + black + hisp + re74 + re75 + u74 + u75 + educ:re74</code>. No standardization. No row drop</td>
 </tr>
 </tbody>
 </table>
@@ -1148,7 +1160,7 @@ Experimental benchmark: $1,794.34</code></pre>
 </section>
 <section id="this-run" class="level3">
 <h3 class="anchored" data-anchor-id="this-run">This run</h3>
-<p>Robust IPW on the NSW treated units plus CPS controls, <code>random_seed=42</code>: ATE -12,222.74 dollars, posterior sd 332.25 dollars, interval [-12,873.95, -11,571.53] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the 4000 draws in the cell above, not a new estimator. The experimental benchmark on this page is 1,794 dollars. The observational estimate does not recover it. A pre-1.0 run of the same cell was about -12,265 dollars, so the migration did not move this estimate off the LaLonde failure. The book’s logit is not this specification: it includes polynomials, an <code>educ * re74</code> interaction, and a 0.1–0.9 trim. Those terms are not added here, and no rows are dropped to imitate the trim. <code>InversePropensityWeighting</code> has no trim argument and no ATT argument. Dropping rows outside 0.1–0.9 would be a hand edit, not a feature of the class.</p>
+<p>Raw IPW on the NSW sample plus CPS controls, formula printed above, <code>random_seed=42</code>, <code>target_accept=0.99</code>. Draws, chains, and tune are the library defaults. ATE 67,433,740.78 dollars, posterior sd 4,255,054.72 dollars, interval [59,093,833.53, 75,773,648.02] dollars. That interval is the mean plus or minus 1.96 posterior standard deviations from the 4000 draws in the cell above, not a new estimator. The experimental benchmark on this page is 1,794 dollars. Printed diagnostics: max r-hat inf, divergences 3997, min bulk ESS 4. Those printed diagnostics are a failed sample. Sampling was not retuned. The figure above shows the propensity score distribution by treatment. <code>te_2</code>, <code>te_3</code>, and <code>te_4</code> are not this fit.</p>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1182,8 +1194,19 @@ Experimental benchmark: $1,794.34</code></pre>
 <li>Balance diagnostics help assess whether weighting achieves covariate balance</li>
 <li>The LaLonde problem remains challenging — observational methods may not fully recover experimental estimates</li>
 </ul>
-<p><strong>What CausalPy supports:</strong> - ✅ Inverse Propensity Weighting (multiple schemes) - ✅ Propensity score diagnostics - ✅ Balance plots</p>
-<p><strong>What’s not yet available:</strong> - ❌ Nearest neighbor matching - ❌ Subclassification - ❌ Coarsened exact matching</p>
+<p><strong>What this page fits:</strong></p>
+<ul>
+<li>Inverse propensity weighting with <code>weighting_scheme="raw"</code> and <code>PropensityScore</code></li>
+<li>Propensity score distribution by treatment</li>
+<li>Balance plots for <code>age</code> and <code>educ</code></li>
+</ul>
+<p><strong>Not this fit:</strong></p>
+<ul>
+<li><code>te_2</code>, <code>te_3</code>, and <code>te_4</code> (normalized weights, the 0.1–0.9 trim, and ATT)</li>
+<li>Nearest neighbor matching</li>
+<li>Subclassification</li>
+<li>Coarsened exact matching</li>
+</ul>
 <hr>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
