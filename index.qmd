@@ -83,9 +83,9 @@ Close elections in Lee, Moretti, and Butler, plus the simulations that show a li
 ::: {.card-body}
 [Instrumental variables](notebooks/07_instrumental_variables.qmd){.card-title .stretched-link}
 
-Chapter 7
+Chapter 7 · [Partial]{.partial}
 
-Card's returns to schooling. Growing up near a four-year college instruments for years of education. The judge-leniency example is also fit. JIVE is a callout.
+Card's returns to schooling. The Bayesian IV runs. It is not `card.py`: the book's first-stage F is not reported. The judge-leniency Bayesian IV runs. It is not `bail.py`: JIVE is not run.
 :::
 ::: {.card-footer}
 `InstrumentalVariable`
@@ -113,9 +113,9 @@ Provider fixed effects on the Survey of Adult Service Providers. Within estimate
 ::: {.card-body}
 [Difference-in-differences](notebooks/09_difference_in_differences.qmd){.card-title .stretched-link}
 
-Chapter 9
+Chapter 9 · [Partial]{.partial}
 
-Castle doctrine, fit with `StaggeredDifferenceInDifferences` imputation. Not a two-group two-period result.
+Castle doctrine, fit with `StaggeredDifferenceInDifferences` imputation. That fit is not `castle_1.py`, `castle_2.py`, `castle_3.py`, `castle_4.py`, or `castle_5.py`. `abortion_dd.py`, `abortion_dd2.py`, `abortion_ddd.py`, and `abortion_ddd2.py` are not run.
 :::
 ::: {.card-footer}
 `StaggeredDifferenceInDifferences`
@@ -128,9 +128,9 @@ Castle doctrine, fit with `StaggeredDifferenceInDifferences` imputation. Not a t
 ::: {.card-body}
 [Synthetic control](notebooks/10_synthetic_control.qmd){.card-title .stretched-link}
 
-Chapter 10
+Chapter 10 · [Partial]{.partial}
 
-Texas prison-capacity expansion, a synthetic donor pool, and placebo-in-space checks.
+Texas prison-capacity expansion. Outcome-only synthetic control and placebo-in-space. The book's covariate match is not run. This is not `synth_1.py`, `synth_2.py`, or `synth_3_7.R`.
 :::
 ::: {.card-footer}
 `SyntheticControl`

@@ -52,14 +52,16 @@ Copy `.vscode/settings.json.example` to `.vscode/settings.json` if you use the e
 
 ## Chapter → page mapping
 
+Every chapter page is up. That is not the same as every 2021 script being on the page as that script. Scripts named in a status cell are open on [#23](https://github.com/drbenvincent/mixtape-causalpy/issues/23).
+
 | Mixtape Chapter | Page | Status |
 |-----------------|------|--------|
-| Ch 5: Matching & Subclassification | [`05_matching.qmd`](notebooks/05_matching.qmd) | ✅ Done |
-| Ch 6: Regression Discontinuity | [`06_regression_discontinuity.qmd`](notebooks/06_regression_discontinuity.qmd) | ✅ Done |
-| Ch 7: Instrumental Variables | [`07_instrumental_variables.qmd`](notebooks/07_instrumental_variables.qmd) | ✅ Done |
-| Ch 8: Panel Data | [`08_panel_data.qmd`](notebooks/08_panel_data.qmd) | ✅ Done |
-| Ch 9: Difference-in-Differences | [`09_difference_in_differences.qmd`](notebooks/09_difference_in_differences.qmd) | ✅ Done |
-| Ch 10: Synthetic Control | [`10_synthetic_control.qmd`](notebooks/10_synthetic_control.qmd) | ✅ Done |
+| Ch 5: Matching & Subclassification | [`05_matching.qmd`](notebooks/05_matching.qmd) | Page up. Open: `nsw_pscore.py`, `ipw.py`, `titanic_subclassification.py`, `teffects_nn.py`, `cem.py`. |
+| Ch 6: Regression Discontinuity | [`06_regression_discontinuity.qmd`](notebooks/06_regression_discontinuity.qmd) | Page up. Open: `lmb_9.py`, `lmb_10.py`. |
+| Ch 7: Instrumental Variables | [`07_instrumental_variables.qmd`](notebooks/07_instrumental_variables.qmd) | Page up. Open: `card.py`, `bail.py`. |
+| Ch 8: Panel Data | [`08_panel_data.qmd`](notebooks/08_panel_data.qmd) | Page up. Open: `sasp.py`. |
+| Ch 9: Difference-in-Differences | [`09_difference_in_differences.qmd`](notebooks/09_difference_in_differences.qmd) | Page up. Open: `castle_1.py`, `castle_2.py`, `castle_3.py`, `castle_4.py`, `castle_5.py`, `abortion_dd.py`, `abortion_dd2.py`, `abortion_ddd.py`, `abortion_ddd2.py`. |
+| Ch 10: Synthetic Control | [`10_synthetic_control.qmd`](notebooks/10_synthetic_control.qmd) | Page up. Open: `synth_1.py`, `synth_2.py`, `synth_3_7.R`. Outcome-only fit. No covariate match. |
 
 Short names used in the plan (`05_matching`, `06_rd`, `07_iv`, `09_did`, `10_sc`) refer to these pages. New chapters are `.qmd` from the start. There is no paired `.ipynb`.
 

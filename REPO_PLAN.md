@@ -22,23 +22,27 @@ This keeps the repo focused and avoids maintaining parallel "baseline" implement
 
 ## Implementation Status
 
-**Overall progress by chapter:**
+**Script status, not page existence.** A page can be up while a script is open. Done is the Status ✅, including conceptual scripts marked ✅ below. Open is not done. Do not mark a substitute fit Done. The tick list is [#23](https://github.com/drbenvincent/mixtape-causalpy/issues/23).
 
-| Chapter | Total | ✅ Done | ⏭️ Skip | ⬜ Todo |
-|----------|-------|---------|---------|---------|
-| `05_matching` | 10 | 6 | 4 | 0 |
+| Chapter | Scripts | Done | Open | Skip |
+|---------|---------|------|------|------|
+| `05_matching` | 10 | 4 | 5 | 1 |
 | `06_rd` | 14 | 12 | 2 | 0 |
-| `07_iv` | 2 | 2 | 0 | 0 |
-| `08_panel` | 1 | 1 | 0 | 0 |
-| `09_did` | 9 | 1 | 8 | 0 |
-| `10_sc` | 3 | 3 | 0 | 0 |
-| `00_data` | 11 | 0 | 11 | 0 |
+| `07_iv` | 2 | 0 | 2 | 0 |
+| `08_panel` | 1 | 0 | 1 | 0 |
+| `09_did` | 9 | 0 | 9 | 0 |
+| `10_sc` | 3 | 0 | 3 | 0 |
+| `00_data` | 11 | 0 | 0 | 11 |
 
-**Status legend:**
+Counts are the catalog rows below for chapters 5–10, plus the eleven conceptual scripts in chapters 2–3 (`00_data`). Chapter 4's three conceptual scripts stay skipped and were already outside this table.
+
+**Row marks:** Status ✅ is the only completion mark. The CausalPy column is library capability, not completion.
+
+**Symbol legend:**
 - ⬜ Not started
 - 🟡 In progress
-- ✅ Done
-- ⏭️ Skipped (no CausalPy support / conceptual only)
+- ✅ Done. Status column. Includes conceptual scripts marked ✅ in the catalog
+- ⏭️ Skip: not targeted, or not a 2021 section. Not a demotion of a Status ✅ row
 
 ---
 
@@ -108,7 +112,7 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 | Symbol | Meaning |
 |--------|---------|
-| ✅ Native | Direct CausalPy experiment API available |
+| Native | Direct CausalPy experiment API available |
 | ⚠️ Partial | CausalPy has related functionality, needs adaptation |
 | ⏭️ Skip | No CausalPy support — will be TODO placeholder |
 | 📖 Conceptual | Illustrates concepts, not a causal method |
@@ -153,15 +157,15 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
 | `titanic.py` | Simple difference in outcomes | `05_matching` | 📖 Conceptual | ✅ |
-| `titanic_subclassification.py` | Subclassification example | `05_matching` | ⏭️ Skip | ⏭️ |
+| `titanic_subclassification.py` | Subclassification example | `05_matching` | ⏭️ Skip | Open |
 | `training_example.py` | Age histograms; the book's $1,695 figure is a hand table, not computed | `05_matching` | 📖 Conceptual | ✅ |
 | `training_bias_reduction.py` | Eight-row illustration and an OLS fit of Y on X; no matcher | `05_matching` | 📖 Conceptual | ✅ |
 | `nsw_experimental.py` | NSW experimental benchmark | `05_matching` | 📖 Conceptual | ✅ |
-| `nsw_pscore.py` | Propensity score estimation | `05_matching` | ⚠️ Partial | ✅ |
-| `ipw.py` | Inverse propensity weighting | `05_matching` | ✅ Native | ✅ |
+| `nsw_pscore.py` | Propensity score estimation | `05_matching` | ⚠️ Partial | Open |
+| `ipw.py` | Inverse propensity weighting | `05_matching` | Native | Open |
 | `teffects_ipw.py` | Not a 2021 chapter section. Not on the page. | `05_matching` | ⏭️ Skip | ⏭️ |
-| `teffects_nn.py` | Nearest neighbor matching | `05_matching` | ❌ Missing | ⏭️ |
-| `cem.py` | Coarsened exact matching | `05_matching` | ❌ Missing | ⏭️ |
+| `teffects_nn.py` | Nearest neighbor matching | `05_matching` | ❌ Missing | Open |
+| `cem.py` | Coarsened exact matching | `05_matching` | ❌ Missing | Open |
 
 **Page**: `notebooks/05_matching.qmd`
 - Demonstrate CausalPy's `InversePropensityWeighting` with NSW data
@@ -174,16 +178,16 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `lmb_1.py` | Lee, Moretti, Butler — windowed difference in means, not a covariate placebo | `06_rd` | ✅ Native | ✅ |
-| `lmb_2.py` | LMB with polynomial | `06_rd` | ✅ Native | ✅ |
-| `lmb_3.py` | LMB first stage | `06_rd` | ✅ Native | ✅ |
-| `lmb_4.py` | LMB IK bandwidth | `06_rd` | ✅ Native | ✅ |
-| `lmb_5.py` | LMB quadratic interactions | `06_rd` | ✅ Native | ✅ |
-| `lmb_6.py` | LMB kernel-weighted | `06_rd` | ✅ Native | ✅ |
-| `lmb_7.py` | LMB visualization. Kernel panel is the nonparametric picture; no second smoother | `06_rd` | ✅ Native | ✅ |
-| `lmb_8.R` | LMB kernel-smoothed visualization | `06_rd` | ✅ Native | ✅ |
-| `lmb_9.py` | `rdrobust` bandwidth, not donut. Callout. Not CCT or IK | `06_rd` | ❌ Missing | ⏭️ |
-| `lmb_10.py` | McCrary density test. Callout. `McCraryDensityTest` is not called | `06_rd` | ❌ Missing | ⏭️ |
+| `lmb_1.py` | Lee, Moretti, Butler — windowed difference in means, not a covariate placebo | `06_rd` | Native | ✅ |
+| `lmb_2.py` | LMB with polynomial | `06_rd` | Native | ✅ |
+| `lmb_3.py` | LMB first stage | `06_rd` | Native | ✅ |
+| `lmb_4.py` | LMB IK bandwidth | `06_rd` | Native | ✅ |
+| `lmb_5.py` | LMB quadratic interactions | `06_rd` | Native | ✅ |
+| `lmb_6.py` | LMB kernel-weighted | `06_rd` | Native | ✅ |
+| `lmb_7.py` | LMB visualization. Kernel panel is the nonparametric picture; no second smoother | `06_rd` | Native | ✅ |
+| `lmb_8.R` | LMB kernel-smoothed visualization | `06_rd` | Native | ✅ |
+| `lmb_9.py` | `rdrobust` bandwidth, not donut. Callout. Not CCT or IK | `06_rd` | ❌ Missing | Open |
+| `lmb_10.py` | McCrary density test. Callout. `McCraryDensityTest` is not called | `06_rd` | ❌ Missing | Open |
 | `rdd_simulate1.py` | RD simulation — potential outcomes | `06_rd` | 📖 Conceptual | ✅ |
 | `rdd_simulate2.py` | RD simulation — treatment effect | `06_rd` | 📖 Conceptual | ✅ |
 | `rdd_simulate3.py` | RD simulation — nonlinear | `06_rd` | 📖 Conceptual | ✅ |
@@ -201,8 +205,8 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `card.py` | Card (1995) returns to schooling, with the book's controls in both stages | `07_iv` | ✅ Native | ✅ |
-| `bail.py` | Judge fixed effects. One Bayesian IV fit. JIVE is a callout, not ported | `07_iv` | ⚠️ Partial | ✅ |
+| `card.py` | Card (1995) returns to schooling, with the book's controls in both stages | `07_iv` | Native | Open |
+| `bail.py` | Judge fixed effects. One Bayesian IV fit. JIVE is a callout, not ported | `07_iv` | ⚠️ Partial | Open |
 
 **Page**: `notebooks/07_instrumental_variables.qmd`
 - Card's proximity to college as instrument for education, with `exper`, `black`, `south`, `married`, and `smsa` in both stages
@@ -215,9 +219,9 @@ Below is a complete catalog of the Python files in the Mixtape repo, mapped to c
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `sasp.py` | Sex worker panel data - FE estimation | `08_panel` | ✅ Native | ✅ |
+| `sasp.py` | Sex worker panel data - FE estimation | `08_panel` | Native | Open |
 
-**Page**: [`notebooks/08_panel_data.qmd`](notebooks/08_panel_data.qmd) — pooled OLS, provider fixed effects, and the within estimator via `cp.PanelRegression`.
+**Page**: [`notebooks/08_panel_data.qmd`](notebooks/08_panel_data.qmd) — one Bayesian within regression via `cp.PanelRegression` with `cp.pymc_models.LinearRegression`, compared with Table 8.3. The page does not fit pooled OLS. Clustered standard errors are not estimated. `sasp.py` is not this fit.
 
 Not this page, and not waiting on panel FE:
 
@@ -231,18 +235,18 @@ Not this page, and not waiting on panel FE:
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `abortion_dd.py` | Abortion legalization TWFE. Callout; the 1993 split is not the book's design and is not fit | `09_did` | ⏭️ Skip | ⏭️ |
-| `abortion_dd2.py` | Abortion DiD variations. Callout | `09_did` | ⏭️ Skip | ⏭️ |
-| `abortion_ddd.py` | Triple differences | `09_did` | ⏭️ Skip | ⏭️ |
-| `abortion_ddd2.py` | Triple differences variations | `09_did` | ⏭️ Skip | ⏭️ |
-| `castle_1.py` | TWFE not run. The page estimates the BJS imputation instead, and that fit is not this script | `09_did` | ⚠️ Partial | ⏭️ |
-| `castle_2.py` | Event-time table from the BJS imputation, not the script's WLS event study | `09_did` | ⚠️ Partial | ✅ |
-| `castle_3.py` | WLS event-study plot. Callout | `09_did` | ⚠️ Partial | ⏭️ |
-| `castle_4.py` | WLS event-study plot. Callout | `09_did` | ⚠️ Partial | ⏭️ |
-| `castle_5.py` | Empty Python file. The R script is a Bacon decomposition. Callout | `09_did` | ❌ Missing | ⏭️ |
+| `abortion_dd.py` | Abortion legalization TWFE. Callout; the 1993 split is not the book's design and is not fit | `09_did` | ⏭️ Skip | Open |
+| `abortion_dd2.py` | Abortion DiD variations. Callout | `09_did` | ⏭️ Skip | Open |
+| `abortion_ddd.py` | Triple differences | `09_did` | ⏭️ Skip | Open |
+| `abortion_ddd2.py` | Triple differences variations | `09_did` | ⏭️ Skip | Open |
+| `castle_1.py` | TWFE not run. The page estimates the BJS imputation instead, and that fit is not this script | `09_did` | ⚠️ Partial | Open |
+| `castle_2.py` | Event-time table from the BJS imputation, not the script's WLS event study | `09_did` | ⚠️ Partial | Open |
+| `castle_3.py` | WLS event-study plot. Callout | `09_did` | ⚠️ Partial | Open |
+| `castle_4.py` | WLS event-study plot. Callout | `09_did` | ⚠️ Partial | Open |
+| `castle_5.py` | Empty Python file. The R script is a Bacon decomposition. Callout | `09_did` | ❌ Missing | Open |
 
 **Page**: `notebooks/09_difference_in_differences.qmd`
-- Castle doctrine uses `StaggeredDifferenceInDifferences` with `sklearn.linear_model.LinearRegression` as the required fit. A short PyMC sample of the same formula is optional. Not TWFE. Fixed effects stay in the formula. The class has no weight argument
+- Castle display is `StaggeredDifferenceInDifferences` with `cp.pymc_models.LinearRegression`. That sample is the result, not an optional extra. No chapter 9 script is this fit. Not TWFE. Fixed effects stay in the formula. The class has no weight argument
 - Abortion, triple differences, the Bacon decomposition, and the WLS event study are callouts
 - [PR #584](https://github.com/pymc-labs/CausalPy/pull/584) is a common-timing event study. It is not this staggered design
 
@@ -252,15 +256,15 @@ Not this page, and not waiting on panel FE:
 
 | Mixtape file | Description | Notebook | CausalPy | Status |
 |--------------|-------------|----------|----------|--------|
-| `synth_1.py` | Texas incarceration SC | `10_sc` | ✅ Native | ✅ |
-| `synth_2.py` | Texas SC - weights | `10_sc` | ✅ Native | ✅ |
-| `synth_3_7.R` | Texas SC - placebo-in-space tests | `10_sc` | ✅ Native | ✅ |
+| `synth_1.py` | Texas incarceration SC. Outcome-only fit; not the book's covariate match | `10_sc` | Native | Open |
+| `synth_2.py` | Texas SC weights of that outcome-only fit | `10_sc` | Native | Open |
+| `synth_3_7.R` | Placebo-in-space on the outcome-only fit | `10_sc` | Native | Open |
 
 **Page**: `notebooks/10_synthetic_control.qmd`
-- Texas prison reform as main example
-- Use CausalPy's `SyntheticControl` experiment
-- Show donor weights, pre-treatment fit
-- Placebo-in-space tests with permutation p-value (from R's `synth_3_7.R`)
+- Texas prison reform, outcome series only
+- `SyntheticControl` does not take the book's covariate predictors
+- Donor weights and pre-treatment fit are from that outcome-only fit
+- Placebo-in-space runs on that same fit. `synth_1.py`, `synth_2.py`, and `synth_3_7.R` are open
 - Treatment effect gap plots with uncertainty
 
 ---
@@ -373,24 +377,12 @@ For sections/examples we skip due to missing CausalPy support:
 
 ## Success Criteria
 
-Per `mixtape_causalpy_translation_repo.md`, "done" means:
+Status ✅ is done, including the conceptual scripts marked ✅ below. Open is not done. A substitute fit does not close an open script. Open scripts are in [#23](https://github.com/drbenvincent/mixtape-causalpy/issues/23).
 
-- [x] **Implemented chapters** (RD, IV, DiD, SC) each have a page that:
-  - [x] Loads the chapter dataset
-  - [x] Runs a comparable identification strategy in CausalPy
-  - [x] Reproduces key result figure(s) in spirit
-  - [x] Clearly states differences vs book's implementation
+- [x] **Pages exist** for chapters 5–10
+- [x] **Related fits run** for the raw IPW contrast, sharp RD, Bayesian IV, the panel within estimate, staggered imputation, and outcome-only synthetic control
 
-- [x] **Partial chapters** (Matching) have a page that:
-  - [x] Demonstrates what CausalPy supports (IPSW)
-  - [x] Includes TODO placeholders for unsupported methods
-  - [x] Links to CausalPy issue tracker for future work
-
-- [ ] **Skipped chapters** (Panel) have a placeholder `.qmd` that:
-  - [ ] Explains why the chapter is not yet implemented
-  - [ ] Links to Mixtape chapter for reference
-  - [ ] Links to relevant CausalPy issues/PRs
-  - [ ] Can be filled in when CausalPy adds support
+- [x] **Chapter 8** is a page, not a placeholder. The within estimate is compared with Table 8.3. Clustered standard errors are not estimated
 
 - [x] README provides:
   - [x] Quick start instructions (`quarto preview`, not JupyterLab)
@@ -436,11 +428,11 @@ uv run python -c "import causalpy, pymc; print('causalpy', causalpy.__version__)
 ## Next Steps
 
 - [x] **Initialize repo structure**: Create folders, `pyproject.toml`, data utilities
-- [x] **Implement Phase 1 pages**: RD, IV, DiD, SC (full CausalPy coverage)
-- [x] **Implement Phase 2 pages**: Matching (IPSW only, with TODO stubs)
+- [x] **Phase 1 pages exist**: RD, IV, DiD, SC. Open scripts are in [#23](https://github.com/drbenvincent/mixtape-causalpy/issues/23)
+- [x] **Phase 2 page exists**: Matching. Open scripts are in [#23](https://github.com/drbenvincent/mixtape-causalpy/issues/23)
 - [x] **Quarto website**: `.qmd` sources, frozen outputs, GitHub Pages workflow
-- [ ] **Create placeholder page**: Panel data chapter as `.qmd` with the TODO template
-- [ ] **Monitor CausalPy PRs**: When new features land, revisit TODO placeholders
+- [x] **Chapter 8 page**: `notebooks/08_panel_data.qmd` exists. It is not a placeholder
+- [ ] **Open scripts**: tracked in [#23](https://github.com/drbenvincent/mixtape-causalpy/issues/23). A substitute fit is not the script
 
 ---
 
